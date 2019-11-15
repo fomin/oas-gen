@@ -1,0 +1,90 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: TODO
+servers:
+  - url: http://localhost/
+paths:
+  /:
+    post:
+      operationId: create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/item'
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                type: string
+  /{id}:
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/item'
+components:
+  schemas:
+    commonProperties:
+      title: Shared fields
+      type: object
+      properties:
+        commonProperty1:
+          title: Common property 1
+          type: string
+    item:
+      title: Item
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/commonProperties'
+      properties:
+        property1:
+          title: Property 1
+          type: string
+        property2:
+          title: Property 2
+          type: object
+          allOf:
+            - $ref: '#/components/schemas/commonProperties'
+          properties:
+            property21:
+              title: Property 21
+              type: string
+            property22:
+              title: Property 22
+              type: string
+              enum:
+                - value1
+                - value2
+                - value3
+        decimalProperty:
+          title: Decimal property
+          type: number
+        localDateTimeProperty:
+          title: Local date time property
+          type: string
+          format: local-date-time
+        stringArrayProperty:
+          title: String array property
+          type: array
+          items:
+            type: string
+        mapProperty:
+          title: Map property
+          type: object
+          additionalProperties:
+            type: number
