@@ -8,7 +8,7 @@ java {
 }
 
 dependencies {
-    implementation(project(":java:jackson-parser"))
+    implementation(project(":java:oas-gen-jackson-rt"))
     implementation("org.springframework:spring-web:5.+")
     implementation("org.springframework.boot:spring-boot-starter-web:2.+")
 }

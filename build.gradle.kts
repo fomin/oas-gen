@@ -1,8 +1,12 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+version = "0.0.1-SNAPSHOT"
+description = "Just another OpenAPI code generator"
+
 plugins {
     kotlin("jvm") version "1.3.50"
     `maven-publish`
+    signing
 }
 
 allprojects {
@@ -51,29 +55,63 @@ tasks.withType<Test> {
 }
 
 allprojects {
-    plugins.withType(MavenPublishPlugin::class.java) {
-        publishing {
-            repositories {
-                maven {
-                    name = "GitHubPackages"
-                    url = uri("https://maven.pkg.github.com/fomin/schema-transformer")
-                    credentials {
-                        username = project.findProperty("gpr.user") as String? ?: System.getenv("USERNAME")
-                        password = project.findProperty("gpr.key") as String? ?: System.getenv("PASSWORD")
+    afterEvaluate {
+        plugins.withType(MavenPublishPlugin::class.java) {
+            publishing {
+                repositories {
+                    maven {
+                        name = "OSSRH"
+                        val releasesRepoUrl = uri("https://oss.sonatype.org/service/local/staging/deploy/maven2")
+                        val snapshotsRepoUrl = uri("https://oss.sonatype.org/content/repositories/snapshots")
+                        url = if (version.toString().endsWith("SNAPSHOT")) snapshotsRepoUrl else releasesRepoUrl
+                        credentials {
+                            username = project.findProperty("ossrhUsername") as String?
+                            password = project.findProperty("ossrhPassword") as String?
+                        }
+                    }
+                }
+                publications {
+                    register<MavenPublication>("java") {
+                        groupId = "io.github.fomin"
+                        artifactId = project.name
+                        from(components["java"])
+                        pom {
+                            name.set(project.name)
+                            description.set(project.description)
+                            url.set("https://github.com/fomin/oas-gen")
+                            licenses {
+                                license {
+                                    name.set("The Apache License, Version 2.0")
+                                    url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                                }
+                            }
+                            developers {
+                                developer {
+                                    id.set("andrey.n.fomin")
+                                    name.set("Andrey Fomin")
+                                    email.set("andrey.n.fomin@gmail.com")
+                                }
+                            }
+                            scm {
+                                connection.set("scm:git:https://github.com/fomin/oas-gen.git")
+                                developerConnection.set("scm:git:https://github.com/fomin/oas-gen.git")
+                                url.set("https://github.com/fomin/oas-gen")
+                            }
+                        }
                     }
                 }
             }
         }
-    }
-}
-
-publishing {
-    publications {
-        register<MavenPublication>("gpr") {
-            groupId = "com.github.fomin"
-            artifactId = "schema-transformer"
-            version = "0.0.1-SNAPSHOT"
-            from(components["java"])
+        plugins.withType(JavaPlugin::class) {
+            java {
+                withJavadocJar()
+                withSourcesJar()
+            }
+        }
+        plugins.withType(SigningPlugin::class) {
+            signing {
+                sign(publishing.publications["java"])
+            }
         }
     }
 }

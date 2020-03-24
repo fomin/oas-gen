@@ -1,6 +1,6 @@
-rootProject.name = "json-schema-mapper"
+rootProject.name = "oas-gen"
 
-include(":java:jackson-parser")
+include(":java:oas-gen-jackson-rt")
 
 include(":test-cases:spring-mvc-server")
 
