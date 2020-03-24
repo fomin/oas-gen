@@ -39,14 +39,14 @@ tasks.withType<KotlinCompile> {
 
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.+")
-    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.+")
-    implementation("commons-cli:commons-cli:1.+")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.+")
-    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.+")
-    testImplementation("org.junit.jupiter:junit-jupiter-params:5.+")
-    testImplementation("org.eclipse.jgit:org.eclipse.jgit:5.+")
-    testImplementation("ch.qos.logback:logback-classic:1.2.+")
+    implementation("com.fasterxml.jackson.core:jackson-databind:[2.10,)")
+    implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:[2.10,)")
+    implementation("commons-cli:commons-cli:[1.4,)")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:[5.6,)")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:[5.6,)")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:[5.6,)")
+    testImplementation("org.eclipse.jgit:org.eclipse.jgit:[5.7,)")
+    testImplementation("ch.qos.logback:logback-classic:[1.2,)")
 }
 
 tasks.withType<Test> {

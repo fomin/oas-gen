@@ -13,5 +13,5 @@ java {
 }
 
 dependencies {
-    api("com.fasterxml.jackson.core:jackson-core:2.+")
+    api("com.fasterxml.jackson.core:jackson-core:[2.10,)")
 }
