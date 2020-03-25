@@ -75,6 +75,11 @@ allprojects {
                         groupId = "io.github.fomin"
                         artifactId = project.name
                         from(components["java"])
+                        versionMapping {
+                            this.allVariants {
+                                fromResolutionResult()
+                            }
+                        }
                         pom {
                             name.set(project.name)
                             description.set(project.description)
