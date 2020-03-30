@@ -1,12 +1,8 @@
-package io.github.fomin.oasgen.java
+package io.github.fomin.oasgen
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
-import io.github.fomin.oasgen.FragmentRegistry
-import io.github.fomin.oasgen.OpenApiSchema
-import io.github.fomin.oasgen.Reference
-import io.github.fomin.oasgen.RootFragment
 import io.github.fomin.oasgen.java.rest.operations.JavaSpringRestOperationsWriter
 import io.github.fomin.oasgen.java.spring.mvc.JavaSrpingMvcServerWriter
 import io.github.fomin.oasgen.typescript.axios.AxiosClientWriter
