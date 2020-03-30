@@ -3,5 +3,5 @@ package io.github.fomin.oasgen.java.jackson
 import io.github.fomin.oasgen.JsonSchema
 
 interface ConverterMatcher {
-    fun match(jsonSchema: JsonSchema): ConverterWriter?
+    fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter?
 }

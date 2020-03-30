@@ -19,24 +19,24 @@ class MessageConverterWriter {
         } + javaOperations.mapNotNull { javaOperation ->
             javaOperation.requestVariable?.schema
         }).toSortedSet(Comparator { o1, o2 ->
-            converterRegistry[o1].valueType(converterRegistry).compareTo(converterRegistry[o2].valueType(converterRegistry))
+            converterRegistry[o1].valueType().compareTo(converterRegistry[o2].valueType())
         })
 
         val supportedTypes = supportedSchemas.joinToString(",\n") { schema ->
-            "${converterRegistry[schema].valueType(converterRegistry)}.class"
+            "${converterRegistry[schema].valueType()}.class"
         }
 
         val parserAssignmentCases = supportedSchemas.mapIndexed { index, jsonSchema ->
-            val type = converterRegistry[jsonSchema].valueType(converterRegistry)
-            val parserCreateExpression = converterRegistry[jsonSchema].parserCreateExpression(converterRegistry)
+            val type = converterRegistry[jsonSchema].valueType()
+            val parserCreateExpression = converterRegistry[jsonSchema].parserCreateExpression()
             """|${if (index > 0) "else " else ""}if (clazz == $type.class)
                |    parser = $parserCreateExpression;
             """.trimMargin()
         }
 
         val writerCases = supportedSchemas.mapIndexed {index, jsonSchema ->
-            val type = converterRegistry[jsonSchema].valueType(converterRegistry)
-            val writerCreateExpression = converterRegistry[jsonSchema].writerCreateExpression(converterRegistry)
+            val type = converterRegistry[jsonSchema].valueType()
+            val writerCreateExpression = converterRegistry[jsonSchema].writerCreateExpression()
             """|${if (index > 0) "else " else ""}if (obj.getClass() == $type.class)
                |    $writerCreateExpression.write(jsonGenerator, ($type) obj);
             """.trimMargin()

@@ -7,14 +7,14 @@ import io.github.fomin.oasgen.indentWithMargin
 import io.github.fomin.oasgen.java.*
 
 class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
-    override fun match(jsonSchema: JsonSchema): ConverterWriter? {
+    override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
         return if (jsonSchema.type is JsonType.Scalar.STRING && jsonSchema.enum() != null) object : ConverterWriter {
             override val jsonSchema = jsonSchema
-            override fun valueType(converterRegistry: ConverterRegistry) = toJavaClassName(basePackage, jsonSchema)
-            override fun parserCreateExpression(converterRegistry: ConverterRegistry) = "${valueType(converterRegistry)}.createParser()"
-            override fun writerCreateExpression(converterRegistry: ConverterRegistry) = "${valueType(converterRegistry)}.WRITER"
-            override fun generate(converterRegistry: ConverterRegistry) : ConverterWriter.Result {
-                val className = valueType(converterRegistry)
+            override fun valueType() = toJavaClassName(basePackage, jsonSchema)
+            override fun parserCreateExpression() = "${valueType()}.createParser()"
+            override fun writerCreateExpression() = "${valueType()}.WRITER"
+            override fun generate() : ConverterWriter.Result {
+                val className = valueType()
                 val filePath = getFilePath(className)
 
                 val classJavaDoc = jsonSchema.title?.let { title ->

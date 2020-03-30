@@ -7,8 +7,8 @@ interface ConverterWriter {
     data class Result(val outputFile: OutputFile?, val jsonSchemas: List<JsonSchema>)
 
     val jsonSchema: JsonSchema
-    fun valueType(converterRegistry: ConverterRegistry): String
-    fun parserCreateExpression(converterRegistry: ConverterRegistry): String
-    fun writerCreateExpression(converterRegistry: ConverterRegistry): String
-    fun generate(converterRegistry: ConverterRegistry): Result
+    fun valueType(): String
+    fun parserCreateExpression(): String
+    fun writerCreateExpression(): String
+    fun generate(): Result
 }

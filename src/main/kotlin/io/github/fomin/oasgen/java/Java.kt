@@ -44,7 +44,7 @@ fun toJavaOperations(converterRegistry: ConverterRegistry, paths: Paths): List<J
                 val mediaTypeObject = it.content()["application/json"]
                         ?: error("media type application/json is required")
                 val requestSchema = mediaTypeObject.schema()
-                val type = converterRegistry[requestSchema].valueType(converterRegistry)
+                val type = converterRegistry[requestSchema].valueType()
                 RequestVariable(
                         type,
                         "$type.Parser",
@@ -58,11 +58,11 @@ fun toJavaOperations(converterRegistry: ConverterRegistry, paths: Paths): List<J
             val responseMediaTypeObject = response.content()["application/json"]
             val responseSchema = responseMediaTypeObject?.schema()
             val responseType = if (responseSchema != null)
-                converterRegistry[responseSchema].valueType(converterRegistry)
+                converterRegistry[responseSchema].valueType()
             else null
             val methodName = toMethodName(operation.operationId)
             val javaParameters = operation.parameters().mapIndexed { index, it ->
-                val parameterType = converterRegistry[it.schema()].valueType(converterRegistry)
+                val parameterType = converterRegistry[it.schema()].valueType()
                 JavaParameter(it.name, index, JavaVariable(parameterType, toVariableName(it.name)), it)
             }
 

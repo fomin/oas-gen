@@ -69,12 +69,12 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
             val jointProperties = jsonSchema.jointProperties()
             val builderPropertyDeclarations = jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
                 val converterWriter = converterRegistry[propertySchema]
-                "private ${converterWriter.valueType(converterRegistry)} p$index; // $propertyName"
+                "private ${converterWriter.valueType()} p$index; // $propertyName"
             }
 
             val parserPairs = jointProperties.map { (_, propertySchema) ->
                 val converterWriter = converterRegistry[propertySchema]
-                ParserPair(converterWriter.valueType(converterRegistry), converterWriter.parserCreateExpression(converterRegistry))
+                ParserPair(converterWriter.valueType(), converterWriter.parserCreateExpression())
             }.toSortedSet()
 
             val propertyParserDeclarations = parserPairs.mapIndexed { index, parserPair ->
@@ -84,10 +84,10 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
             val parseValueCases = jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
                 val converterWriter = converterRegistry[propertySchema]
 
-                val parserIndex = parserPairs.indexOfFirst { it.parserCreateExpression == converterWriter.parserCreateExpression(converterRegistry) }
+                val parserIndex = parserPairs.indexOfFirst { it.parserCreateExpression == converterWriter.parserCreateExpression() }
                 """|case "$propertyName":
                |    if (parser$parserIndex.parseNext(jsonParser)) {
-               |        ParseResult<${converterWriter.valueType(converterRegistry)}> parseResult = parser${parserIndex}.build();
+               |        ParseResult<${converterWriter.valueType()}> parseResult = parser${parserIndex}.build();
                |        this.p${index} = parseResult.getValue();
                |        objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                |    }
@@ -205,7 +205,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
             val jointProperties = jsonSchema.jointProperties()
             val writerPairs = jointProperties.map { (_, propertySchema) ->
                 val converterWriter = converterRegistry[propertySchema]
-                WriterPair(converterWriter.valueType(converterRegistry), converterWriter.writerCreateExpression(converterRegistry))
+                WriterPair(converterWriter.valueType(), converterWriter.writerCreateExpression())
             }.toSortedSet()
 
             val writerDeclarations = writerPairs.mapIndexed { index, parserPair ->
@@ -216,7 +216,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                 val converterWriter = converterRegistry[propertySchema]
 
                 val fieldName = toVariableName(propertyName)
-                val writerIndex = writerPairs.indexOfFirst { it.writerCreateExpression == converterWriter.writerCreateExpression(converterRegistry) }
+                val writerIndex = writerPairs.indexOfFirst { it.writerCreateExpression == converterWriter.writerCreateExpression() }
                 """|if (value.$fieldName != null) {
                |    jsonGenerator.writeFieldName("$propertyName");
                |    WRITER_$writerIndex.write(jsonGenerator, value.$fieldName);
@@ -241,20 +241,20 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
         }
     }
 
-    override fun match(jsonSchema: JsonSchema): ConverterWriter? {
+    override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
         return when (jsonSchema.type) {
             is JsonType.OBJECT -> object : ConverterWriter {
                 override val jsonSchema = jsonSchema
-                override fun valueType(converterRegistry: ConverterRegistry) = toJavaClassName(basePackage, jsonSchema)
-                override fun parserCreateExpression(converterRegistry: ConverterRegistry) = "new ${valueType(converterRegistry)}.Parser()"
-                override fun writerCreateExpression(converterRegistry: ConverterRegistry) = "${valueType(converterRegistry)}.Writer.INSTANCE"
-                override fun generate(converterRegistry: ConverterRegistry): ConverterWriter.Result {
-                    val filePath = getFilePath(valueType(converterRegistry))
+                override fun valueType() = toJavaClassName(basePackage, jsonSchema)
+                override fun parserCreateExpression() = "new ${valueType()}.Parser()"
+                override fun writerCreateExpression() = "${valueType()}.Writer.INSTANCE"
+                override fun generate(): ConverterWriter.Result {
+                    val filePath = getFilePath(valueType())
 
                     val jointProperties = jsonSchema.jointProperties()
                     val javaProperties = jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
                         val propertyConverterWriter = converterRegistry[propertySchema]
-                        val propertyType = propertyConverterWriter.valueType(converterRegistry)
+                        val propertyType = propertyConverterWriter.valueType()
                         JavaProperty(
                                 propertyName,
                                 toVariableName(propertyName),
@@ -281,9 +281,9 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     }
 
                     val jacksonParserWriter = JacksonParserWriter(converterRegistry)
-                    val parserContent = jacksonParserWriter.write(jsonSchema, importDeclarations, valueType(converterRegistry))
+                    val parserContent = jacksonParserWriter.write(jsonSchema, importDeclarations, valueType())
                     val jacksonWriterWriter = JacksonWriterWriter(converterRegistry)
-                    val writerContent = jacksonWriterWriter.write(jsonSchema, importDeclarations, valueType(converterRegistry))
+                    val writerContent = jacksonWriterWriter.write(jsonSchema, importDeclarations, valueType())
                     val classJavaDoc = jsonSchema.title?.let { title ->
                         """|/**
                            | * $title
@@ -291,16 +291,16 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     } ?: ""
 
                     val content = """
-                       |package ${getPackage(valueType(converterRegistry))};
+                       |package ${getPackage(valueType())};
                        |
                        |${importDeclarations.indentWithMargin(0)}
                        |
                        |$classJavaDoc
-                       |public final class ${getSimpleName(valueType(converterRegistry))} {
+                       |public final class ${getSimpleName(valueType())} {
                        |
                        |    ${fieldDeclarations.indentWithMargin(1)}
                        |
-                       |    public ${getSimpleName(valueType(converterRegistry))}(
+                       |    public ${getSimpleName(valueType())}(
                        |            ${constructorArgs.indentWithMargin(3)}
                        |    ) {
                        |        ${constructorAssignments.indentWithMargin(2)}
