@@ -12,7 +12,7 @@ import io.github.fomin.oasgen.java.spring.mvc.JavaSrpingMvcServerWriter
 import io.github.fomin.oasgen.typescript.axios.AxiosClientWriter
 import org.apache.commons.cli.*
 import java.io.File
-import java.nio.file.Paths
+import java.net.URI
 import kotlin.system.exitProcess
 
 const val BASE_DIR = "base-dir"
@@ -61,7 +61,7 @@ fun main(args: Array<String>) {
     val yamlMapper = ObjectMapper(YAMLFactory())
     val jsonMapper = ObjectMapper()
     val mapTypeReference = object : TypeReference<Map<*, *>>() {}
-    val basePath = Paths.get(baseDirArg)
+    val basePath = URI.create(baseDirArg)
 
     fun loadMap(filePathStr: String): RootFragment {
         val mapper = when (val extension = filePathStr.substring(filePathStr.lastIndexOf(".") + 1)) {
@@ -71,7 +71,7 @@ fun main(args: Array<String>) {
             else -> error("Unsupported extension $extension")
         }
         val map = mapper.readValue(File(filePathStr), mapTypeReference)
-        val filePath = Paths.get(filePathStr)
+        val filePath = URI.create(filePathStr)
         val relativeFilePath = basePath.relativize(filePath)
         return RootFragment(relativeFilePath.toString(), map)
     }
