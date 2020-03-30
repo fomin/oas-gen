@@ -242,7 +242,7 @@ class ObjectConverterMatcher : TypeConverterMatcher {
 
                 override fun importDeclarations() =
                         if (hasMappedToJsonProperties)
-                            listOf(ImportDeclaration("mapObjectProperties", "jsm-support"))
+                            listOf(ImportDeclaration("mapObjectProperties", "oas-gen-support"))
                         else emptyList()
 
                 override fun innerSchemas() = jsonSchema.jointProperties().values.toList()

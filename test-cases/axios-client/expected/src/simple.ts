@@ -1,6 +1,6 @@
 import {AxiosInstance} from "axios";
 import {LocalDateTime} from "@js-joda/core";
-import {mapObjectProperties} from "jsm-support";
+import {mapObjectProperties} from "oas-gen-support";
 
 export function create(axios: AxiosInstance, body: Item): Promise<string> {
     return axios.post(`/`, itemToJson(body)).then(value => value.data);
