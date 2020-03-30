@@ -1,6 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "0.0.3-SNAPSHOT"
+version = "0.0.3"
 description = "Just another OpenAPI code generator"
 
 plugins {
