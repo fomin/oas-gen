@@ -3,10 +3,10 @@ package com.example;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
+import io.github.fomin.oasgen.NonBlockingParser;
+import io.github.fomin.oasgen.ObjectParserState;
+import io.github.fomin.oasgen.ParseResult;
 import java.io.IOException;
-import jsm.NonBlockingParser;
-import jsm.ObjectParserState;
-import jsm.ParseResult;
 
 /**
  * Property 2
@@ -43,8 +43,8 @@ public final class ItemProperty2 {
         private java.lang.String p0; // commonProperty1
         private java.lang.String p1; // property21
         private com.example.ItemProperty2Property22 p2; // property22
-        private final jsm.NonBlockingParser<com.example.ItemProperty2Property22> parser0 = com.example.ItemProperty2Property22.createParser();
-        private final jsm.NonBlockingParser<java.lang.String> parser1 = jsm.ScalarParser.createStringParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<com.example.ItemProperty2Property22> parser0 = com.example.ItemProperty2Property22.createParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<java.lang.String> parser1 = io.github.fomin.oasgen.ScalarParser.createStringParser();
 
         @Override
         public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
@@ -139,10 +139,10 @@ public final class ItemProperty2 {
 
     }
 
-    public static class Writer implements jsm.Writer<com.example.ItemProperty2> {
+    public static class Writer implements io.github.fomin.oasgen.Writer<com.example.ItemProperty2> {
         public static final Writer INSTANCE = new Writer();
-        private static final jsm.Writer<com.example.ItemProperty2Property22> WRITER_0 = com.example.ItemProperty2Property22.WRITER;
-        private static final jsm.Writer<java.lang.String> WRITER_1 = jsm.ScalarWriter.STRING_WRITER;
+        private static final io.github.fomin.oasgen.Writer<com.example.ItemProperty2Property22> WRITER_0 = com.example.ItemProperty2Property22.WRITER;
+        private static final io.github.fomin.oasgen.Writer<java.lang.String> WRITER_1 = io.github.fomin.oasgen.ScalarWriter.STRING_WRITER;
 
         @Override
         public void write(JsonGenerator jsonGenerator, com.example.ItemProperty2 value) throws IOException {

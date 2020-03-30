@@ -7,8 +7,8 @@ import java.util.*;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
-import jsm.NonBlockingParser;
-import jsm.ParseResult;
+import io.github.fomin.oasgen.NonBlockingParser;
+import io.github.fomin.oasgen.ParseResult;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.HttpOutputMessage;
@@ -55,7 +55,7 @@ public class SimpleMessageConverter implements HttpMessageConverter<Object> {
         if (clazz == com.example.Item.class)
             parser = new com.example.Item.Parser();
         else if (clazz == java.lang.String.class)
-            parser = jsm.ScalarParser.createStringParser();
+            parser = io.github.fomin.oasgen.ScalarParser.createStringParser();
         else
             throw new UnsupportedOperationException("Unsupported class " + clazz);
         byte[] buffer = new byte[8192];
@@ -81,7 +81,7 @@ public class SimpleMessageConverter implements HttpMessageConverter<Object> {
             if (obj.getClass() == com.example.Item.class)
                 com.example.Item.Writer.INSTANCE.write(jsonGenerator, (com.example.Item) obj);
             else if (obj.getClass() == java.lang.String.class)
-                jsm.ScalarWriter.STRING_WRITER.write(jsonGenerator, (java.lang.String) obj);
+                io.github.fomin.oasgen.ScalarWriter.STRING_WRITER.write(jsonGenerator, (java.lang.String) obj);
             else
                 throw new UnsupportedOperationException("Unsupported class " + obj.getClass());
         }

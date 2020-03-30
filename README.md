@@ -5,7 +5,7 @@ Just another OpenAPI code generator
 ## How to run
 
 ```shell script
-java -cp <classpath> jsm.java.MainKt \
+java -cp <classpath> io.github.fomin.oasgen.java.MainKt \
         -b <base-directory> \
         -s <schema-file> \
         -o <output-directory> \

@@ -14,8 +14,8 @@ public enum ItemProperty2Property22 {
         this.strValue = strValue;
     }
 
-    public static jsm.NonBlockingParser<com.example.ItemProperty2Property22> createParser() {
-        return new jsm.ScalarParser<>(
+    public static io.github.fomin.oasgen.NonBlockingParser<com.example.ItemProperty2Property22> createParser() {
+        return new io.github.fomin.oasgen.ScalarParser<>(
                 token -> token == com.fasterxml.jackson.core.JsonToken.VALUE_STRING,
                 jsonParser -> {
                     String value = jsonParser.getText();
@@ -33,7 +33,7 @@ public enum ItemProperty2Property22 {
         );
     }
 
-    public static final jsm.Writer<com.example.ItemProperty2Property22> WRITER =
+    public static final io.github.fomin.oasgen.Writer<com.example.ItemProperty2Property22> WRITER =
             (jsonGenerator, value) -> jsonGenerator.writeString(value.strValue);
 
 }

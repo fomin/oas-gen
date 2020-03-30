@@ -3,10 +3,10 @@ package com.example;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
+import io.github.fomin.oasgen.NonBlockingParser;
+import io.github.fomin.oasgen.ObjectParserState;
+import io.github.fomin.oasgen.ParseResult;
 import java.io.IOException;
-import jsm.NonBlockingParser;
-import jsm.ObjectParserState;
-import jsm.ParseResult;
 
 /**
  * Item
@@ -71,12 +71,12 @@ public final class Item {
         private java.time.LocalDateTime p4; // localDateTimeProperty
         private java.util.List<java.lang.String> p5; // stringArrayProperty
         private java.util.Map<java.lang.String, java.math.BigDecimal> p6; // mapProperty
-        private final jsm.NonBlockingParser<java.math.BigDecimal> parser0 = jsm.ScalarParser.createNumberParser();
-        private final jsm.NonBlockingParser<java.time.LocalDateTime> parser1 = jsm.ScalarParser.createStringLocalDateTimeParser();
-        private final jsm.NonBlockingParser<java.lang.String> parser2 = jsm.ScalarParser.createStringParser();
-        private final jsm.NonBlockingParser<com.example.ItemProperty2> parser3 = new com.example.ItemProperty2.Parser();
-        private final jsm.NonBlockingParser<java.util.List<java.lang.String>> parser4 = new jsm.ArrayParser<>(jsm.ScalarParser.createStringParser());
-        private final jsm.NonBlockingParser<java.util.Map<java.lang.String, java.math.BigDecimal>> parser5 = new jsm.MapParser<>(jsm.ScalarParser.createNumberParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.math.BigDecimal> parser0 = io.github.fomin.oasgen.ScalarParser.createNumberParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<java.time.LocalDateTime> parser1 = io.github.fomin.oasgen.ScalarParser.createStringLocalDateTimeParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<java.lang.String> parser2 = io.github.fomin.oasgen.ScalarParser.createStringParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<com.example.ItemProperty2> parser3 = new com.example.ItemProperty2.Parser();
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.List<java.lang.String>> parser4 = new io.github.fomin.oasgen.ArrayParser<>(io.github.fomin.oasgen.ScalarParser.createStringParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.Map<java.lang.String, java.math.BigDecimal>> parser5 = new io.github.fomin.oasgen.MapParser<>(io.github.fomin.oasgen.ScalarParser.createNumberParser());
 
         @Override
         public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
@@ -203,14 +203,14 @@ public final class Item {
 
     }
 
-    public static class Writer implements jsm.Writer<com.example.Item> {
+    public static class Writer implements io.github.fomin.oasgen.Writer<com.example.Item> {
         public static final Writer INSTANCE = new Writer();
-        private static final jsm.Writer<com.example.ItemProperty2> WRITER_0 = com.example.ItemProperty2.Writer.INSTANCE;
-        private static final jsm.Writer<java.math.BigDecimal> WRITER_1 = jsm.ScalarWriter.NUMBER_WRITER;
-        private static final jsm.Writer<java.time.LocalDateTime> WRITER_2 = jsm.ScalarWriter.STRING_LOCAL_DATE_TIME_WRITER;
-        private static final jsm.Writer<java.lang.String> WRITER_3 = jsm.ScalarWriter.STRING_WRITER;
-        private static final jsm.Writer<java.util.List<java.lang.String>> WRITER_4 = new jsm.ArrayWriter<>(jsm.ScalarWriter.STRING_WRITER);
-        private static final jsm.Writer<java.util.Map<java.lang.String, java.math.BigDecimal>> WRITER_5 = new jsm.MapWriter<>(jsm.ScalarWriter.NUMBER_WRITER);
+        private static final io.github.fomin.oasgen.Writer<com.example.ItemProperty2> WRITER_0 = com.example.ItemProperty2.Writer.INSTANCE;
+        private static final io.github.fomin.oasgen.Writer<java.math.BigDecimal> WRITER_1 = io.github.fomin.oasgen.ScalarWriter.NUMBER_WRITER;
+        private static final io.github.fomin.oasgen.Writer<java.time.LocalDateTime> WRITER_2 = io.github.fomin.oasgen.ScalarWriter.STRING_LOCAL_DATE_TIME_WRITER;
+        private static final io.github.fomin.oasgen.Writer<java.lang.String> WRITER_3 = io.github.fomin.oasgen.ScalarWriter.STRING_WRITER;
+        private static final io.github.fomin.oasgen.Writer<java.util.List<java.lang.String>> WRITER_4 = new io.github.fomin.oasgen.ArrayWriter<>(io.github.fomin.oasgen.ScalarWriter.STRING_WRITER);
+        private static final io.github.fomin.oasgen.Writer<java.util.Map<java.lang.String, java.math.BigDecimal>> WRITER_5 = new io.github.fomin.oasgen.MapWriter<>(io.github.fomin.oasgen.ScalarWriter.NUMBER_WRITER);
 
         @Override
         public void write(JsonGenerator jsonGenerator, com.example.Item value) throws IOException {
