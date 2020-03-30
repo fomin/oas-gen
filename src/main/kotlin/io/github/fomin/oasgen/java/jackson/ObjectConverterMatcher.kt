@@ -5,7 +5,8 @@ import io.github.fomin.oasgen.JsonType
 import io.github.fomin.oasgen.OutputFile
 import io.github.fomin.oasgen.indentWithMargin
 import io.github.fomin.oasgen.java.*
-import java.util.*
+
+data class ClassMember(val content: String, val importedClasses: List<String>)
 
 public fun JsonSchema.jointProperties(): Map<String, JsonSchema> {
     if (this.type != JsonType.OBJECT) error("This method can be called only for objects")
@@ -53,18 +54,17 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
 
         fun write(
                 jsonSchema: JsonSchema,
-                importDeclarations: MutableSet<String>,
                 dtoClassName: String
-        ): String {
-            importDeclarations.addAll(listOf(
-                    "import com.fasterxml.jackson.core.JsonGenerator;",
-                    "import com.fasterxml.jackson.core.JsonToken;",
-                    "import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;",
-                    "import java.io.IOException;",
-                    "import io.github.fomin.oasgen.NonBlockingParser;",
-                    "import io.github.fomin.oasgen.ObjectParserState;",
-                    "import io.github.fomin.oasgen.ParseResult;"
-            ))
+        ): ClassMember {
+            val importedClasses = listOf(
+                    "com.fasterxml.jackson.core.JsonGenerator",
+                    "com.fasterxml.jackson.core.JsonToken",
+                    "com.fasterxml.jackson.core.json.async.NonBlockingJsonParser",
+                    "java.io.IOException",
+                    "io.github.fomin.oasgen.NonBlockingParser",
+                    "io.github.fomin.oasgen.ObjectParserState",
+                    "io.github.fomin.oasgen.ParseResult"
+            )
 
             val jointProperties = jsonSchema.jointProperties()
             val builderPropertyDeclarations = jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
@@ -101,7 +101,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
 
             val resetFieldExpressions = jointProperties.entries.mapIndexed { index, _ -> "this.p$index = null;" }
 
-            return """
+            val content = """
                |public static class Parser implements NonBlockingParser<$dtoClassName> {
                |
                |    private ObjectParserState objectParserState = ObjectParserState.PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL;
@@ -181,6 +181,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |}
                |
             """.trimMargin()
+            return ClassMember(content, importedClasses)
         }
     }
 
@@ -195,12 +196,11 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
 
         fun write(
                 jsonSchema: JsonSchema,
-                importDeclarations: MutableSet<String>,
                 dtoClassName: String
-        ): String {
-            importDeclarations.addAll(listOf(
-                    "import com.fasterxml.jackson.core.JsonGenerator;"
-            ))
+        ): ClassMember {
+            val importedClasses = listOf(
+                    "com.fasterxml.jackson.core.JsonGenerator"
+            )
 
             val jointProperties = jsonSchema.jointProperties()
             val writerPairs = jointProperties.map { (_, propertySchema) ->
@@ -224,7 +224,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
             """.trimMargin()
             }
 
-            return """
+            val content = """
            |public static class Writer implements io.github.fomin.oasgen.Writer<$dtoClassName> {
            |    public static final Writer INSTANCE = new Writer();
            |    ${writerDeclarations.indentWithMargin(1)}
@@ -238,6 +238,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
            |}
            |
         """.trimMargin()
+            return ClassMember(content, importedClasses)
         }
     }
 
@@ -274,16 +275,16 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                            |public final ${javaProperty.type} ${javaProperty.variableName};""".trimMargin()
                     }
 
-                    val importDeclarations = TreeSet<String>()
                     val constructorArgs = javaProperties.joinToString(",\n") { "${it.type} ${it.variableName}" }
                     val constructorAssignments = javaProperties.map { javaProperty ->
                         "this.${javaProperty.variableName} = ${javaProperty.variableName};"
                     }
 
                     val jacksonParserWriter = JacksonParserWriter(converterRegistry)
-                    val parserContent = jacksonParserWriter.write(jsonSchema, importDeclarations, valueType())
+                    val (parserContent, parserImports) = jacksonParserWriter.write(jsonSchema, valueType())
                     val jacksonWriterWriter = JacksonWriterWriter(converterRegistry)
-                    val writerContent = jacksonWriterWriter.write(jsonSchema, importDeclarations, valueType())
+                    val (writerContent, writerImports) = jacksonWriterWriter.write(jsonSchema, valueType())
+                    val importDeclarations = (parserImports + writerImports).map { "import $it;" }.toSortedSet()
                     val classJavaDoc = jsonSchema.title?.let { title ->
                         """|/**
                            | * $title
