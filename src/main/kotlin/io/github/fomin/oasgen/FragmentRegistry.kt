@@ -1,7 +1,7 @@
 package io.github.fomin.oasgen
 
+import java.io.File
 import java.net.URLDecoder
-import java.nio.file.Paths
 
 class Fragment(private val fragmentRegistry: FragmentRegistry, val reference: Reference, val value: Any) {
 
@@ -95,7 +95,7 @@ data class Reference(
         }
         val newPath = when (pathStr) {
             "" -> filePath
-            else -> Paths.get(filePath).resolveSibling(pathStr).normalize().toString()
+            else -> File(filePath).parentFile.toURI().resolve(pathStr).normalize().toString()
         }
         val fragments = fragmentStr
                 .split("/")
