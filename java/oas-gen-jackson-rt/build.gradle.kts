@@ -1,5 +1,5 @@
 description = "Just another OpenAPI code generator. Jackson support classes"
-version = "0.0.5-SNAPSHOT"
+version = "0.0.5"
 
 plugins {
     `java-library`
