@@ -7,7 +7,7 @@ import com.fasterxml.jackson.core.JsonToken;
 public class Int32Converter {
     public static NonBlockingParser<Integer> createParser() {
         return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_STRING,
+                token -> token == JsonToken.VALUE_NUMBER_INT,
                 JsonParser::getIntValue
         );
     }

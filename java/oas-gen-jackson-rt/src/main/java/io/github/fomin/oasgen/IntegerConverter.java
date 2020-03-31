@@ -9,7 +9,7 @@ import java.math.BigInteger;
 public class IntegerConverter {
     public static NonBlockingParser<BigInteger> createParser() {
         return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_STRING,
+                token -> token == JsonToken.VALUE_NUMBER_INT,
                 JsonParser::getBigIntegerValue
         );
     }
