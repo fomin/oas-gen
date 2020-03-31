@@ -14,7 +14,7 @@ const val BASE_DIR = "base-dir"
 const val SCHEMA = "schema"
 const val COMPONENTS = "components"
 const val OUTPUT_DIR = "output-dir"
-const val PACKAGE = "package"
+const val NAMESPACE = "namespace"
 const val GENERATOR = "generator"
 
 private val writerFactories = mapOf(
@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
                             .hasArgs().desc("component files").build()
             )
             .addRequiredOption("o", OUTPUT_DIR, true, "output directory")
-            .addRequiredOption("p", PACKAGE, true, "package name")
+            .addRequiredOption("n", NAMESPACE, true, "namespace")
             .addRequiredOption("g", GENERATOR, true, "generator identifier")
 
     val parser = DefaultParser()
@@ -50,7 +50,7 @@ fun main(args: Array<String>) {
     val schemaFileArg = commandLine.getOptionValue(SCHEMA)
     val componentsArg = commandLine.getOptionValues(COMPONENTS) ?: emptyArray()
     val outputDirArg = commandLine.getOptionValue(OUTPUT_DIR)
-    val packageName = commandLine.getOptionValue(PACKAGE)
+    val namespaceArg = commandLine.getOptionValue(NAMESPACE)
     val generatorId = commandLine.getOptionValue(GENERATOR)
 
     val yamlMapper = ObjectMapper(YAMLFactory())
@@ -82,7 +82,7 @@ fun main(args: Array<String>) {
     val openApiSchema = OpenApiSchema(fragmentRegistry.get(Reference.root(schemaRootFragment.path)), null)
 
     val writerFactory = writerFactories[generatorId] ?: error("Can't find generator $generatorId")
-    val writer = writerFactory(packageName)
+    val writer = writerFactory(namespaceArg)
 
     val outputFiles = writer.write(listOf(openApiSchema))
     val outputDir = File(outputDirArg)
