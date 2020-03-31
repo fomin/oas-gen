@@ -30,10 +30,10 @@ internal class OpenApiTestCases {
         val actualSchemas = rootFragments.map { OpenApiSchema(fragmentRegistry.get(Reference.root(it.path)), null) }
         val actualOutputFiles = testCase.writer.write(actualSchemas)
 
-        val outputDirPath = testCase.outputDir.toPath()
+        val outputDirUri = testCase.outputDir.toURI()
         val expectedOutputFiles = testCase.outputDir.walk().filter { it.isFile }.map {
-            val relativePath = outputDirPath.relativize(it.toPath())
-            OutputFile(relativePath.toString(), it.readText())
+            val relativePath = outputDirUri.relativize(it.toURI())
+            OutputFile(relativePath.toString(), it.readText().replace("\r", ""))
         }.toList()
 
         TestUtils.assertOutputFilesEquals(
