@@ -7,11 +7,11 @@ Just another OpenAPI code generator
 ```shell script
 java -cp <classpath> io.github.fomin.oasgen.java.MainKt \
         -b <base-directory> \
+        -p <schema-path (relative to base directory)> \
         -s <schema-file> \
         -o <output-directory> \
-        -p <namespace> \
-        -g <generator-id> \
-        -c <extra-schema-files>
+        -n <namespace> \
+        -g <generator-id>
 ```
 
 ## Links and Trademarks

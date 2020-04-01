@@ -1,0 +1,50 @@
+title: Item
+type: object
+allOf:
+  - $ref: '#/components/schemas/commonProperties'
+properties:
+  property1:
+    title: Property 1
+    type: string
+  property2:
+    title: Property 2
+    type: object
+    allOf:
+      - $ref: '#/components/schemas/commonProperties'
+    properties:
+      property21:
+        title: Property 21
+        type: string
+      property22:
+        title: Property 22
+        type: string
+        enum:
+          - value1
+          - value2
+          - value3
+  decimalProperty:
+    title: Decimal property
+    type: number
+  localDateTimeProperty:
+    title: Local date time property
+    type: string
+    format: local-date-time
+  stringArrayProperty:
+    title: String array property
+    type: array
+    items:
+      type: string
+  mapProperty:
+    title: Map property
+    type: object
+    additionalProperties:
+      type: number
+components:
+  schemas:
+    commonProperties:
+      title: Shared fields
+      type: object
+      properties:
+        commonProperty1:
+          title: Common property 1
+          type: string

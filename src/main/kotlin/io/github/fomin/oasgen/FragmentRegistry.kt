@@ -1,6 +1,10 @@
 package io.github.fomin.oasgen
 
+import com.fasterxml.jackson.core.type.TypeReference
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory
 import java.io.File
+import java.net.URI
 import java.net.URLDecoder
 
 class Fragment(private val fragmentRegistry: FragmentRegistry, val reference: Reference, val value: Any) {
@@ -95,7 +99,7 @@ data class Reference(
         }
         val newPath = when (pathStr) {
             "" -> filePath
-            else -> File(filePath).parentFile.toURI().resolve(pathStr).normalize().toString()
+            else -> URI.create(filePath).resolve(pathStr).toString()
         }
         val fragments = fragmentStr
                 .split("/")
@@ -134,13 +138,26 @@ data class RootFragment(
         val fragment: Map<*, *>
 )
 
-class FragmentRegistry(rootFragments: Iterable<RootFragment>) {
-    private val index = mutableMapOf<Reference, Any?>()
+class FragmentRegistry(private val baseDir: File) {
+    private val rootIndex = mutableMapOf<String, Map<*,*>>()
+    private val yamlMapper = ObjectMapper(YAMLFactory())
+    private val jsonMapper = ObjectMapper()
+    private val mapTypeReference = object : TypeReference<Map<*, *>>() {}
 
-    init {
-        rootFragments.forEach { rootFragment ->
-            index[Reference.root(rootFragment.path)] = rootFragment.fragment
+    private fun loadMap(path: String) = when (val indexedMap = rootIndex[path]) {
+        null -> {
+            val mapper = when (val extension = path.substring(path.lastIndexOf(".") + 1)) {
+                "json" -> jsonMapper
+                "yaml" -> yamlMapper
+                "yml" -> yamlMapper
+                else -> error("Unsupported extension $extension")
+            }
+            val file = File(baseDir, path)
+            val map = mapper.readValue(file, mapTypeReference)
+            rootIndex[path] = map
+            map
         }
+        else -> indexedMap
     }
 
     fun getOptional(reference: Reference): Fragment? {
@@ -154,31 +171,22 @@ class FragmentRegistry(rootFragments: Iterable<RootFragment>) {
     fun get(reference: Reference) = getOptional(reference) ?: error("reference not found $reference")
 
     fun getValue(reference: Reference): Any? {
-        val existingValue = index[reference]
-        if (existingValue != null) {
-            return existingValue
-        } else {
-            val rootFragment = index[reference.root()]
-            if (rootFragment != null) {
-                var currentValue: Any? = rootFragment
-                reference.fragmentPath.forEach { key ->
-                    val currentValueLocal = currentValue ?: return null
-                    if (key != "") currentValue = when (currentValueLocal) {
-                        is Map<*, *> -> currentValueLocal[key]
-                        is List<*> -> currentValueLocal[key.toInt()]
-                        else -> error("Can't get inner elements of ${currentValueLocal.javaClass} " +
-                                "for reference $reference")
-                    }
-                }
-                index[reference] = currentValue
-                return currentValue
-            } else {
-                error("Can't find root fragment for reference $reference")
+        val referenceRoot = reference.root()
+        val rootFragment = loadMap(referenceRoot.filePath)
+        var currentValue: Any? = rootFragment
+        reference.fragmentPath.forEach { key ->
+            val currentValueLocal = currentValue ?: return null
+            if (key != "") currentValue = when (currentValueLocal) {
+                is Map<*, *> -> currentValueLocal[key]
+                is List<*> -> currentValueLocal[key.toInt()]
+                else -> error("Can't get inner elements of ${currentValueLocal.javaClass} " +
+                        "for reference $reference")
             }
         }
+        return currentValue
     }
 
-    private tailrec fun resolveRecursively(reference: Reference): Reference {
+    private fun resolveRecursively(reference: Reference): Reference {
         val fragment = getValue(reference)
 
         return if (fragment is Map<*, *>) {

@@ -1,0 +1,39 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: TODO
+servers:
+  - url: http://localhost/
+paths:
+  /:
+    post:
+      operationId: create
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'item.yaml'
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                type: string
+  /{id}:
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                $ref: 'item.yaml'
