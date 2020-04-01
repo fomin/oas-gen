@@ -1,6 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
-version = "0.0.6-SNAPSHOT"
 description = "Just another OpenAPI code generator"
 
 plugins {
@@ -10,6 +9,8 @@ plugins {
 }
 
 allprojects {
+    version = file("$rootDir/version.txt").readText().trim()
+
     repositories {
         jcenter()
     }
