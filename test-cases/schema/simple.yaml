@@ -37,3 +37,24 @@ paths:
             application/json:
               schema:
                 $ref: 'item.yaml'
+  /find:
+    get:
+      operationId: find
+      parameters:
+        - name: param1
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: param2
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                $ref: 'item.yaml'

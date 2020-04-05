@@ -65,4 +65,30 @@ public class SimpleClient {
         return restOperations.exchange(request, com.example.Item.class);
     }
 
+    public ResponseEntity<com.example.Item> find(
+            java.lang.String param1,
+            java.lang.String param2
+    ) {
+        return find$0(
+                param1,
+            param2
+        );
+    }
+
+    private ResponseEntity<com.example.Item> find$0(
+            java.lang.String param0,
+            java.lang.String param1
+    ) {
+        Map<String, Object> uriVariables = Collections.emptyMap();
+        URI uri = UriComponentsBuilder
+                .fromUriString(baseUrl + "/find")
+                .queryParam("param1", param0)
+                .queryParam("param2", param1)
+                .build(uriVariables);
+        RequestEntity<java.lang.Void> request = RequestEntity
+                .get(uri)
+                .build();
+        return restOperations.exchange(request, com.example.Item.class);
+    }
+
 }
