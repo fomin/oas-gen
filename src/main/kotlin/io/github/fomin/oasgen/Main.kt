@@ -1,5 +1,7 @@
 package io.github.fomin.oasgen
 
+import io.github.fomin.oasgen.java.reactor.netty.ReactorNettyClientWriter
+import io.github.fomin.oasgen.java.reactor.netty.ReactorNettyServerWriter
 import io.github.fomin.oasgen.java.rest.operations.JavaSpringRestOperationsWriter
 import io.github.fomin.oasgen.java.spring.mvc.JavaSrpingMvcServerWriter
 import io.github.fomin.oasgen.typescript.axios.AxiosClientWriter
@@ -17,6 +19,8 @@ const val GENERATOR = "generator"
 private val writerFactories = mapOf(
         "java-spring-mvc" to ::JavaSrpingMvcServerWriter,
         "java-spring-rest-operations" to ::JavaSpringRestOperationsWriter,
+        "java-reactor-netty-server" to ::ReactorNettyServerWriter,
+        "java-reactor-netty-client" to ::ReactorNettyClientWriter,
         "typescript-axios" to ::AxiosClientWriter
 )
 

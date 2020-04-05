@@ -1,5 +1,7 @@
 package io.github.fomin.oasgen
 
+import io.github.fomin.oasgen.java.reactor.netty.ReactorNettyClientWriter
+import io.github.fomin.oasgen.java.reactor.netty.ReactorNettyServerWriter
 import io.github.fomin.oasgen.java.rest.operations.JavaSpringRestOperationsWriter
 import io.github.fomin.oasgen.java.spring.mvc.JavaSrpingMvcServerWriter
 import io.github.fomin.oasgen.typescript.axios.AxiosClientWriter
@@ -51,6 +53,18 @@ internal class OpenApiTestCases {
                         File("test-cases/schema"),
                         "simple.yaml",
                         File("test-cases/spring-rest-operations-client/src/expected/java")
+                ),
+                TestCase(
+                        ReactorNettyServerWriter("com.example"),
+                        File("test-cases/schema"),
+                        "simple.yaml",
+                        File("test-cases/reactor-netty-server/src/expected/java")
+                ),
+                TestCase(
+                        ReactorNettyClientWriter("com.example"),
+                        File("test-cases/schema"),
+                        "simple.yaml",
+                        File("test-cases/reactor-netty-client/src/expected/java")
                 ),
                 TestCase(
                         AxiosClientWriter("com.example"),
