@@ -15,7 +15,7 @@ public class ServerMain {
         JsonFactory jsonFactory = new JsonFactory();
         DisposableServer httpServer = HttpServer.create()
                 .port(8080)
-                .route(new SimpleRoutes(jsonFactory, baseUrl) {
+                .route(new SimpleRoutes(jsonFactory, "") {
                     @Override
                     public Mono<String> create(Mono<Item> itemMono) {
                         return itemMono.map(it -> it.property1 + " " + it.property2.property21 + " " + it.property2.property22);
