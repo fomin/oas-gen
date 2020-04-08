@@ -21,22 +21,6 @@ paths:
             application/json:
               schema:
                 type: string
-  /{id}:
-    get:
-      operationId: get
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: description
-          content:
-            application/json:
-              schema:
-                $ref: 'item.yaml'
   /find:
     get:
       operationId: find
@@ -48,6 +32,22 @@ paths:
             type: string
         - name: param2
           in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                $ref: 'item.yaml'
+  /{id}:
+    get:
+      operationId: get
+      parameters:
+        - name: id
+          in: path
           required: true
           schema:
             type: string

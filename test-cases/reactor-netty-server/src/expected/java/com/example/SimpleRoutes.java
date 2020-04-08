@@ -19,9 +19,9 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
 
     public abstract Mono<java.lang.String> create(Mono<com.example.Item> requestBodyMono);
 
-    public abstract Mono<com.example.Item> get(java.lang.String id);
-
     public abstract Mono<com.example.Item> find(java.lang.String param1, java.lang.String param2);
+
+    public abstract Mono<com.example.Item> get(java.lang.String id);
 
     @Override
     public final void accept(HttpServerRoutes httpServerRoutes) {
@@ -33,19 +33,19 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 Mono<java.lang.String> responseMono = create(requestMono);
                 return response.send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
             })
-            .get(baseUrl + "/{id}", (request, response) -> {
-
-                java.lang.String param0 = request.param("id");
-
-                Mono<com.example.Item> responseMono = get(param0);
-                return response.send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
-            })
             .get(baseUrl + "/find", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
                 java.lang.String param0 = queryParams.get("param1");
                 java.lang.String param1 = queryParams.get("param2");
 
                 Mono<com.example.Item> responseMono = find(param0, param1);
+                return response.send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
+            })
+            .get(baseUrl + "/{id}", (request, response) -> {
+
+                java.lang.String param0 = request.param("id");
+
+                Mono<com.example.Item> responseMono = get(param0);
                 return response.send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
             })
         ;

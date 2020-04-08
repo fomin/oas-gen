@@ -10,15 +10,15 @@ public interface SimpleRoutes {
             @RequestBody com.example.Item item
     );
 
-    @GetMapping(path = "/{id}", produces = "application/json")
-    ResponseEntity<com.example.Item> get(
-            @PathVariable("id") java.lang.String id
-    );
-
     @GetMapping(path = "/find", produces = "application/json")
     ResponseEntity<com.example.Item> find(
             @RequestParam("param1") java.lang.String param1,
             @RequestParam("param2") java.lang.String param2
+    );
+
+    @GetMapping(path = "/{id}", produces = "application/json")
+    ResponseEntity<com.example.Item> get(
+            @PathVariable("id") java.lang.String id
     );
 
 }

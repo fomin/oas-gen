@@ -36,9 +36,9 @@ public class ClientMain {
         String id = idMono.block();
         System.out.println(id);
 
-//        Mono<Item> itemMono = simpleClient.get("id");
-//        Item item = itemMono.block();
-//        System.out.println(item);
+        Mono<Item> itemMono = simpleClient.get("id");
+        Item item = itemMono.block();
+        System.out.println(item);
 
         Mono<Item> foundItemMono = simpleClient.find("value 1", "value 2");
         Item foundItem = foundItemMono.block();

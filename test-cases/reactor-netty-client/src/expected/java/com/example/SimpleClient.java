@@ -39,25 +39,6 @@ public class SimpleClient {
         return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.ScalarParser.createStringParser());
     }
 
-    public Mono<com.example.Item> get(
-            java.lang.String id
-    ) {
-        return get$0(
-                id
-        );
-    }
-
-    private Mono<com.example.Item> get$0(
-            java.lang.String param0
-    ) {
-        Flux<ByteBuf> responseByteBufFlux = httpClient
-                .get()
-                .uri(UrlEncoderUtils.encodeUrl("/" + UrlEncoderUtils.encode(param0)))
-
-                .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());
-    }
-
     public Mono<com.example.Item> find(
             java.lang.String param1,
             java.lang.String param2
@@ -75,6 +56,25 @@ public class SimpleClient {
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .get()
                 .uri(UrlEncoderUtils.encodeUrl("/find", "param1", param0, "param2", param1))
+
+                .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
+        return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());
+    }
+
+    public Mono<com.example.Item> get(
+            java.lang.String id
+    ) {
+        return get$0(
+                id
+        );
+    }
+
+    private Mono<com.example.Item> get$0(
+            java.lang.String param0
+    ) {
+        Flux<ByteBuf> responseByteBufFlux = httpClient
+                .get()
+                .uri(UrlEncoderUtils.encodeUrl("/" + UrlEncoderUtils.encode(param0)))
 
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
         return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());

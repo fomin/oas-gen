@@ -6,12 +6,12 @@ export function create(axios: AxiosInstance, body: Item): Promise<string> {
     return axios.post(`/`, itemToJson(body)).then(value => value.data);
 }
 
-export function get(axios: AxiosInstance, id: string): Promise<Item> {
-    return axios.get(`/${id}`).then(value => itemFromJson(value.data));
-}
-
 export function find(axios: AxiosInstance, param1: string, param2: string): Promise<Item> {
     return axios.get(`/find`).then(value => itemFromJson(value.data));
+}
+
+export function get(axios: AxiosInstance, id: string): Promise<Item> {
+    return axios.get(`/${id}`).then(value => itemFromJson(value.data));
 }
 
 /**

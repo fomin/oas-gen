@@ -42,29 +42,6 @@ public class SimpleClient {
         return restOperations.exchange(request, java.lang.String.class);
     }
 
-    public ResponseEntity<com.example.Item> get(
-            java.lang.String id
-    ) {
-        return get$0(
-                id
-        );
-    }
-
-    private ResponseEntity<com.example.Item> get$0(
-            java.lang.String param0
-    ) {
-        Map<String, Object> uriVariables = new HashMap<>();
-        uriVariables.put("id", param0);
-        URI uri = UriComponentsBuilder
-                .fromUriString(baseUrl + "/{id}")
-
-                .build(uriVariables);
-        RequestEntity<java.lang.Void> request = RequestEntity
-                .get(uri)
-                .build();
-        return restOperations.exchange(request, com.example.Item.class);
-    }
-
     public ResponseEntity<com.example.Item> find(
             java.lang.String param1,
             java.lang.String param2
@@ -84,6 +61,29 @@ public class SimpleClient {
                 .fromUriString(baseUrl + "/find")
                 .queryParam("param1", param0)
                 .queryParam("param2", param1)
+                .build(uriVariables);
+        RequestEntity<java.lang.Void> request = RequestEntity
+                .get(uri)
+                .build();
+        return restOperations.exchange(request, com.example.Item.class);
+    }
+
+    public ResponseEntity<com.example.Item> get(
+            java.lang.String id
+    ) {
+        return get$0(
+                id
+        );
+    }
+
+    private ResponseEntity<com.example.Item> get$0(
+            java.lang.String param0
+    ) {
+        Map<String, Object> uriVariables = new HashMap<>();
+        uriVariables.put("id", param0);
+        URI uri = UriComponentsBuilder
+                .fromUriString(baseUrl + "/{id}")
+
                 .build(uriVariables);
         RequestEntity<java.lang.Void> request = RequestEntity
                 .get(uri)
