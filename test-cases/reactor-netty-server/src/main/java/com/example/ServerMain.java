@@ -22,6 +22,11 @@ public class ServerMain {
                     }
 
                     @Override
+                    public Mono<String> postWithoutRequestBody() {
+                        return Mono.just("test");
+                    }
+
+                    @Override
                     public Mono<Item> get(String id) {
                         return Mono.just(
                                 new Item(

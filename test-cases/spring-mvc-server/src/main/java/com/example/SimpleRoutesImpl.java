@@ -17,6 +17,11 @@ public class SimpleRoutesImpl implements SimpleRoutes {
     }
 
     @Override
+    public ResponseEntity<String> postWithoutRequestBody() {
+        return ResponseEntity.ok("test");
+    }
+
+    @Override
     public ResponseEntity<Item> get(String id) {
         Item item = new Item(
                 "common property 1",

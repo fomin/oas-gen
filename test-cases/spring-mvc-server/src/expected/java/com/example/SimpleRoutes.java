@@ -10,6 +10,11 @@ public interface SimpleRoutes {
             @RequestBody com.example.Item item
     );
 
+    @PostMapping(path = "/post-without-request-body", produces = "application/json")
+    ResponseEntity<java.lang.String> postWithoutRequestBody(
+
+    );
+
     @GetMapping(path = "/find", produces = "application/json")
     ResponseEntity<com.example.Item> find(
             @RequestParam("param1") java.lang.String param1,

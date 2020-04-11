@@ -39,6 +39,25 @@ public class SimpleClient {
         return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.ScalarParser.createStringParser());
     }
 
+    public Mono<java.lang.String> postWithoutRequestBody(
+
+    ) {
+        return postWithoutRequestBody$0(
+
+        );
+    }
+
+    private Mono<java.lang.String> postWithoutRequestBody$0(
+
+    ) {
+        Flux<ByteBuf> responseByteBufFlux = httpClient
+                .post()
+                .uri(UrlEncoderUtils.encodeUrl("/post-without-request-body"))
+
+                .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
+        return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.ScalarParser.createStringParser());
+    }
+
     public Mono<com.example.Item> find(
             java.lang.String param1,
             java.lang.String param2

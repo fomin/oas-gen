@@ -21,6 +21,16 @@ paths:
             application/json:
               schema:
                 type: string
+  /post-without-request-body:
+    post:
+      operationId: post-without-request-body
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                type: string
   /find:
     get:
       operationId: find

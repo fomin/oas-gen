@@ -42,6 +42,28 @@ public class SimpleClient {
         return restOperations.exchange(request, java.lang.String.class);
     }
 
+    public ResponseEntity<java.lang.String> postWithoutRequestBody(
+
+    ) {
+        return postWithoutRequestBody$0(
+
+        );
+    }
+
+    private ResponseEntity<java.lang.String> postWithoutRequestBody$0(
+
+    ) {
+        Map<String, Object> uriVariables = Collections.emptyMap();
+        URI uri = UriComponentsBuilder
+                .fromUriString(baseUrl + "/post-without-request-body")
+
+                .build(uriVariables);
+        RequestEntity<java.lang.Void> request = RequestEntity
+                .post(uri)
+                .build();
+        return restOperations.exchange(request, java.lang.String.class);
+    }
+
     public ResponseEntity<com.example.Item> find(
             java.lang.String param1,
             java.lang.String param2

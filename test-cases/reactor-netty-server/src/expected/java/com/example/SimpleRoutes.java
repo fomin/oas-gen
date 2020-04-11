@@ -19,6 +19,8 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
 
     public abstract Mono<java.lang.String> create(Mono<com.example.Item> requestBodyMono);
 
+    public abstract Mono<java.lang.String> postWithoutRequestBody();
+
     public abstract Mono<com.example.Item> find(java.lang.String param1, java.lang.String param2);
 
     public abstract Mono<com.example.Item> get(java.lang.String id);
@@ -31,6 +33,13 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
 
                 Mono<com.example.Item> requestMono = byteBufConverter.parse(request.receive(), new com.example.Item.Parser());
                 Mono<java.lang.String> responseMono = create(requestMono);
+                return response.send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
+            })
+            .post(baseUrl + "/post-without-request-body", (request, response) -> {
+
+
+
+                Mono<java.lang.String> responseMono = postWithoutRequestBody();
                 return response.send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
             })
             .get(baseUrl + "/find", (request, response) -> {
