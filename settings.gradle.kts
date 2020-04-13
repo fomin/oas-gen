@@ -1,12 +1,27 @@
 rootProject.name = "oas-gen"
 
-include(":java:oas-gen-jackson-rt")
-include(":java:oas-gen-reactor-netty-rt")
+pluginManagement {
+    plugins {
+        kotlin("jvm") version "1.3.71"
+    }
+}
 
-include(":test-cases:spring-mvc-server")
+include(":core")
+include(":cli")
+include(":test-utils")
 
-include(":test-cases:spring-rest-operations-client")
+include(":generators:java:dto:generator")
+include(":generators:java:dto:runtime")
 
-include(":test-cases:reactor-netty-server")
+include(":generators:java:reactor-netty:generator")
+include(":generators:java:reactor-netty:runtime")
+include(":generators:java:reactor-netty:expected-server")
+include(":generators:java:reactor-netty:expected-client")
 
-include(":test-cases:reactor-netty-client")
+include(":generators:java:spring-web:generator")
+include(":generators:java:spring-web:expected-server")
+include(":generators:java:spring-web:expected-client")
+
+include(":generators:typescript:axios:generator")
+include(":generators:typescript:axios:runtime")
+include(":generators:typescript:axios:expected-client")
