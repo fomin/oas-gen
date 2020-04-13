@@ -13,6 +13,7 @@ class JavaSpringRestOperationsWriter(
         val outputFiles = mutableListOf<OutputFile>()
 
         val converterRegistry = ConverterRegistry(listOf(
+                ZonedDateTimeConverterMatcher(),
                 LocalDateConverterMatcher(),
                 LocalDateTimeConverterMatcher(),
                 ArrayConverterMatcher(),
