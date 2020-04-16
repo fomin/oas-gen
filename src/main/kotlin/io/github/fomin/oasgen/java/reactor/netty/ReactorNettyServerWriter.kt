@@ -84,7 +84,10 @@ class ReactorNettyServerWriter(
                         "Mono<${javaOperation.responseVariable.type}> responseMono = ${javaOperation.methodName}($args);"
                 val returnStatement = when (val responseSchema = javaOperation.responseVariable.schema) {
                     null -> "return response.send();"
-                    else -> "return response.send(byteBufConverter.write(response, responseMono, ${converterRegistry[responseSchema].writerCreateExpression()}));"
+                    else -> """|return response
+                               |        .header("Content-Type", "application/json")
+                               |        .send(byteBufConverter.write(response, responseMono, ${converterRegistry[responseSchema].writerCreateExpression()}));
+                            """.trimMargin()
                 }
 
                 val routeMethod = javaOperation.operation.operationType.name.toLowerCase()
@@ -93,7 +96,7 @@ class ReactorNettyServerWriter(
                    |    ${parameterDeclarations.indentWithMargin(1)}
                    |    ${requestMonoDeclaration.indentWithMargin(1)}
                    |    $responseMonoDeclaration
-                   |    $returnStatement
+                   |    ${returnStatement.indentWithMargin(1)}
                    |})
                 """.trimMargin()
 

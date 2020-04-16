@@ -33,14 +33,18 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
 
                 Mono<com.example.Item> requestMono = byteBufConverter.parse(request.receive(), new com.example.Item.Parser());
                 Mono<java.lang.String> responseMono = create(requestMono);
-                return response.send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
+                return response
+                        .header("Content-Type", "application/json")
+                        .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
             })
             .post(baseUrl + "/post-without-request-body", (request, response) -> {
 
 
 
                 Mono<java.lang.String> responseMono = postWithoutRequestBody();
-                return response.send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
+                return response
+                        .header("Content-Type", "application/json")
+                        .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
             })
             .get(baseUrl + "/find", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
@@ -48,14 +52,18 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 java.lang.String param1 = queryParams.get("param2");
 
                 Mono<com.example.Item> responseMono = find(param0, param1);
-                return response.send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
+                return response
+                        .header("Content-Type", "application/json")
+                        .send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
             })
             .get(baseUrl + "/{id}", (request, response) -> {
 
                 java.lang.String param0 = request.param("id");
 
                 Mono<com.example.Item> responseMono = get(param0);
-                return response.send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
+                return response
+                        .header("Content-Type", "application/json")
+                        .send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
             })
         ;
     }
