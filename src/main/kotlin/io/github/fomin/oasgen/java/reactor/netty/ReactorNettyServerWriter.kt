@@ -12,7 +12,7 @@ class ReactorNettyServerWriter(
         val outputFiles = mutableListOf<OutputFile>()
 
         val converterRegistry = ConverterRegistry(listOf(
-                ZonedDateTimeConverterMatcher(),
+                OffsetDateTimeConverterMatcher(),
                 LocalDateConverterMatcher(),
                 LocalDateTimeConverterMatcher(),
                 ArrayConverterMatcher(),
