@@ -5,7 +5,7 @@ import io.github.fomin.oasgen.java.*
 import io.github.fomin.oasgen.java.jackson.*
 import java.util.*
 
-class JavaSrpingMvcServerWriter(
+class JavaSpringMvcServerWriter(
         private val basePackage: String
 ) : Writer<OpenApiSchema> {
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {

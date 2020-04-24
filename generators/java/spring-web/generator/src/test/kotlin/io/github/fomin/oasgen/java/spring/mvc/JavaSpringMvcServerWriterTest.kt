@@ -4,11 +4,11 @@ import io.github.fomin.oasgen.testCase
 import org.junit.jupiter.api.Test
 import java.io.File
 
-internal class JavaSrpingMvcServerWriterTest {
+internal class JavaSpringMvcServerWriterTest {
     @Test
     fun `generator should create expected output`() {
         testCase(
-                JavaSrpingMvcServerWriter("com.example"),
+                JavaSpringMvcServerWriter("com.example"),
                 File("../../../../simple-schema"),
                 "simple.yaml",
                 File("../expected-server/src/main/java")
