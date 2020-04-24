@@ -1,10 +1,5 @@
 package io.github.fomin.oasgen
 
-import io.github.fomin.oasgen.java.reactor.netty.ReactorNettyClientWriter
-import io.github.fomin.oasgen.java.reactor.netty.ReactorNettyServerWriter
-import io.github.fomin.oasgen.java.rest.operations.JavaSpringRestOperationsWriter
-import io.github.fomin.oasgen.java.spring.mvc.JavaSpringMvcServerWriter
-import io.github.fomin.oasgen.typescript.axios.AxiosClientWriter
 import org.apache.commons.cli.*
 import java.io.File
 import kotlin.system.exitProcess
@@ -15,14 +10,6 @@ const val SCHEMA = "schema"
 const val OUTPUT_DIR = "output-dir"
 const val NAMESPACE = "namespace"
 const val GENERATOR = "generator"
-
-private val writerFactories = mapOf(
-        "java-spring-mvc" to ::JavaSpringMvcServerWriter,
-        "java-spring-rest-operations" to ::JavaSpringRestOperationsWriter,
-        "java-reactor-netty-server" to ::ReactorNettyServerWriter,
-        "java-reactor-netty-client" to ::ReactorNettyClientWriter,
-        "typescript-axios" to ::AxiosClientWriter
-)
 
 fun main(args: Array<String>) {
     val options = Options()
@@ -57,19 +44,7 @@ fun main(args: Array<String>) {
     } else {
         Pair(File(baseDirArg), schemaPathArg)
     }
-    val fragmentRegistry = FragmentRegistry(baseDir)
-    val openApiSchema = OpenApiSchema(fragmentRegistry.get(Reference.root(schemaPath)), null)
 
-    val writerFactory = writerFactories[generatorId] ?: error("Can't find generator $generatorId")
-    val writer = writerFactory(namespaceArg)
-
-    val outputFiles = writer.write(listOf(openApiSchema))
     val outputDir = File(outputDirArg)
-    outputDir.mkdirs()
-    outputFiles.forEach { outputFile ->
-        val generatedFile = File(outputDir, outputFile.path)
-        generatedFile.parentFile.mkdirs()
-        generatedFile.writeText(outputFile.content)
-    }
-
+    openApiGenerate(generatorId, baseDir, outputDir, schemaPath, namespaceArg)
 }

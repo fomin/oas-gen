@@ -1,0 +1,2 @@
+io.github.fomin.oasgen.java.reactor.netty.ReactorNettyClientWriterProvider
+io.github.fomin.oasgen.java.reactor.netty.ReactorNettyServerWriterProvider
