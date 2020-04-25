@@ -1,7 +1,11 @@
 import io.github.fomin.oasgen.gradle.*
 
+description = "oas-gen - test utils"
+
 plugins {
     kotlin("jvm")
+    `maven-publish`
+    signing
 }
 
 dependencies {
@@ -12,3 +16,5 @@ dependencies {
     implementation("org.eclipse.jgit", "org.eclipse.jgit", JGIT_VERSION)
     implementation("ch.qos.logback", "logback-classic", LOGBACK_VERSION)
 }
+
+addPublications("oas-gen-test-utils")
