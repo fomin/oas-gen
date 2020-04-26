@@ -10,6 +10,8 @@ include(":core")
 include(":cli")
 include(":test-utils")
 
+include(":generators:java:url-utils")
+
 include(":generators:java:dto:generator")
 include(":generators:java:dto:runtime")
 
