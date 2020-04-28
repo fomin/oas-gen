@@ -9,6 +9,7 @@ pluginManagement {
 include(":core")
 include(":cli")
 include(":test-utils")
+include(":client-test-utils")
 
 include(":generators:java:url-utils")
 

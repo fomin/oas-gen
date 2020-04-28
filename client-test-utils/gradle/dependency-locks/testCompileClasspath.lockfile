@@ -1,7 +1,6 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-com.fasterxml.jackson.core:jackson-core:2.11.0.rc1
 io.netty:netty-buffer:4.1.48.Final
 io.netty:netty-codec-http2:4.1.48.Final
 io.netty:netty-codec-http:4.1.48.Final
