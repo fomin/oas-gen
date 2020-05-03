@@ -34,8 +34,11 @@ class JsonSchema(override val fragment: Fragment, override val parent: TypedFrag
 
     fun items() = fragment.getOptional("items")?.let { JsonSchema(it, this) }
 
-    fun allOf() = fragment.getOptional("allOf")?.map { itemFragment ->
-        JsonSchema(itemFragment, this)
+    fun allOf() = when (val allOfFragment = fragment.getOptional("allOf")) {
+        null -> emptyList()
+        else -> allOfFragment.map { itemFragment ->
+            JsonSchema(itemFragment, this)
+        }
     }
 
     fun enum() = fragment.getOptional("enum")?.map { enumValue -> enumValue.asString() }
@@ -52,28 +55,23 @@ class JsonSchema(override val fragment: Fragment, override val parent: TypedFrag
     }
 }
 
-fun JsonSchema.jointProperties(): Map<String, JsonSchema> {
-    if (this.type != JsonType.OBJECT) error("This method can be called only for objects")
-    val jointProperties = mutableMapOf<String, JsonSchema>() //this.properties().toMutableMap()
+private fun JsonSchema.jointPropertiesList(): List<Pair<String, JsonSchema>> =
+        if (this.type == JsonType.OBJECT) {
+            val innerPropertiesList = allOf().flatMap { innerSchema ->
+                innerSchema.jointPropertiesList()
+            }
+            val propertiesList = properties().toList()
+            innerPropertiesList + propertiesList
+        } else error("This method can be called only for objects")
 
-    allOf()?.forEach { includedSchema ->
-        if (includedSchema.type != JsonType.OBJECT) error("Included schema should be an object")
-        includedSchema.jointProperties().forEach { (includedPropertyName, includedPropertySchema) ->
-            addJointProperty(jointProperties, includedPropertyName, includedPropertySchema)
+
+fun JsonSchema.jointProperties(): Map<String, JsonSchema> = jointPropertiesList()
+        .fold(mutableMapOf()) { acc, propertyPair ->
+            val propertyName = propertyPair.first
+            val propertySchema = propertyPair.second
+            val previousValue = acc.put(propertyName, propertySchema)
+            if (previousValue != null) {
+                error("Found duplicated property $propertyName in schema $this")
+            }
+            acc
         }
-    }
-
-    this.properties().forEach { (includedPropertyName, includedPropertySchema) ->
-        addJointProperty(jointProperties, includedPropertyName, includedPropertySchema)
-    }
-    return jointProperties
-}
-
-private fun JsonSchema.addJointProperty(
-        jointProperties: MutableMap<String, JsonSchema>,
-        includedPropertyName: String,
-        includedPropertySchema: JsonSchema) {
-    if (jointProperties.containsKey(includedPropertyName))
-        error("Found duplicated property $includedPropertyName in schema $this")
-    jointProperties[includedPropertyName] = includedPropertySchema
-}
