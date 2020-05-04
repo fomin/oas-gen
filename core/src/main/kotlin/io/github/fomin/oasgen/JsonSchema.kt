@@ -53,6 +53,16 @@ class JsonSchema(override val fragment: Fragment, override val parent: TypedFrag
             return JsonSchema(additionalPropertiesFragment, this)
         }
     }
+
+    fun required() = when (val requiredFragment = fragment.getOptional("required")) {
+        null -> emptySet()
+        else -> requiredFragment.map { propertyNameFragment -> propertyNameFragment.asString() }.toSet()
+    }
+}
+
+fun JsonSchema.jointRequired() = when (this.type) {
+    JsonType.OBJECT -> (required() + allOf().flatMap { it.required() }).toSet()
+    else -> error("This method can be called only for objects")
 }
 
 private fun JsonSchema.jointPropertiesList(): List<Pair<String, JsonSchema>> =

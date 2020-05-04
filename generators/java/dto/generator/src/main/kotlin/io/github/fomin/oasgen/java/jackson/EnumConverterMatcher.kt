@@ -36,13 +36,16 @@ class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
                 val content = """
                        |package ${getPackage(className)};
                        |
+                       |import javax.annotation.Nonnull;
+                       |
                        |$classJavaDoc
                        |public enum ${getSimpleName(className)} {
                        |    ${valueDeclarations.indentWithMargin(1)};
                        |
+                       |    @Nonnull
                        |    public final String strValue;
                        |
-                       |    ${getSimpleName(className)}(String strValue) {
+                       |    ${getSimpleName(className)}(@Nonnull String strValue) {
                        |        this.strValue = strValue;
                        |    }
                        |

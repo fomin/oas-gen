@@ -40,6 +40,8 @@ class ReactorNettyClientWriter(
                     "import io.github.fomin.oasgen.ByteBufConverter;",
                     "import io.github.fomin.oasgen.UrlEncoderUtils;",
                     "import io.netty.buffer.ByteBuf;",
+                    "import javax.annotation.Nonnull;",
+                    "import javax.annotation.Nullable;",
                     "import reactor.core.publisher.Flux;",
                     "import reactor.core.publisher.Mono;",
                     "import reactor.netty.http.client.HttpClient;"
@@ -50,7 +52,7 @@ class ReactorNettyClientWriter(
 
             val operationMethods = javaOperations.map { javaOperation ->
                 val requestBodyArgDeclaration = javaOperation.requestVariable?.let { requestVariable ->
-                    "Mono<${requestVariable.type}> ${toVariableName(getSimpleName(requestVariable.type))}"
+                    "@Nonnull Mono<${requestVariable.type}> ${toVariableName(getSimpleName(requestVariable.type))}"
                 }
                 val requestBodyInternalArgDeclaration = javaOperation.requestVariable?.let { requestVariable ->
                     "Mono<${requestVariable.type}> bodyArg"
@@ -59,7 +61,11 @@ class ReactorNettyClientWriter(
                     toVariableName(getSimpleName(requestVariable.type))
                 }
                 val parameterArgDeclarations = javaOperation.parameters.map { javaParameter ->
-                    """${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
+                    val annotation = when (javaParameter.schemaParameter.required) {
+                        true -> "@Nonnull"
+                        false -> "@Nullable"
+                    }
+                    """$annotation ${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
                 }
                 val parameterInternalArgDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
                     """${javaParameter.javaVariable.type} param$index"""
@@ -97,7 +103,8 @@ class ReactorNettyClientWriter(
                     }
                 }.joinToString("")
 
-                """|public Mono<$responseType> ${javaOperation.methodName}(
+                """|@Nonnull
+                   |public Mono<$responseType> ${javaOperation.methodName}(
                    |        ${methodArgDeclarations.indentWithMargin(2)}
                    |) {
                    |    return ${javaOperation.methodName}$0(
@@ -127,7 +134,7 @@ class ReactorNettyClientWriter(
                |    private final ByteBufConverter byteBufConverter;
                |    private final HttpClient httpClient;
                |
-               |    public ${getSimpleName(clientClassName)}(JsonFactory jsonFactory, HttpClient httpClient) {
+               |    public ${getSimpleName(clientClassName)}(@Nonnull JsonFactory jsonFactory, @Nonnull HttpClient httpClient) {
                |        this.byteBufConverter = new ByteBufConverter(jsonFactory);
                |        this.httpClient = httpClient;
                |    }

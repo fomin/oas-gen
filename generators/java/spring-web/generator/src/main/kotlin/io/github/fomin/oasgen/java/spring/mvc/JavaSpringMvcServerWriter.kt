@@ -34,6 +34,8 @@ class JavaSpringMvcServerWriter(
             val importDeclarations = TreeSet<String>()
 
             importDeclarations.addAll(listOf(
+                    "import javax.annotation.Nonnull;",
+                    "import javax.annotation.Nullable;",
                     "import org.springframework.http.ResponseEntity;",
                     "import org.springframework.web.bind.annotation.*;"
             ))
@@ -52,18 +54,23 @@ class JavaSpringMvcServerWriter(
                     else -> ""
                 }
                 val requestBodyArg = javaOperation.requestVariable?.let { requestVariable ->
-                    "@RequestBody ${requestVariable.type} ${toVariableName(getSimpleName(requestVariable.type))}"
+                    "@Nonnull @RequestBody ${requestVariable.type} ${toVariableName(getSimpleName(requestVariable.type))}"
                 }
                 val parameterArgs = javaOperation.parameters.map { javaParameter ->
-                    val annotation = when (javaParameter.schemaParameter.parameterIn) {
+                    val mappingAnnotation = when (javaParameter.schemaParameter.parameterIn) {
                         ParameterIn.PATH -> "PathVariable"
                         ParameterIn.QUERY -> "RequestParam"
                     }
-                    """@$annotation("${javaParameter.name}") ${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
+                    val nullAnnotation = when (javaParameter.schemaParameter.required) {
+                        true -> "@Nonnull"
+                        false -> "@Nullable"
+                    }
+                    """$nullAnnotation @$mappingAnnotation("${javaParameter.name}") ${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
                 }
                 val methodArgs = (parameterArgs + requestBodyArg).filterNotNull().joinToString(",\n")
                 val responseType = javaOperation.responseVariable.type ?: "java.lang.Void"
-                """|@$mappingAnnotationName(path = "${javaOperation.pathTemplate}", produces = "${javaOperation.responseVariable.contentType}"$consumesPart)
+                """|@Nonnull
+                   |@$mappingAnnotationName(path = "${javaOperation.pathTemplate}", produces = "${javaOperation.responseVariable.contentType}"$consumesPart)
                    |ResponseEntity<$responseType> ${javaOperation.methodName}(
                    |        ${methodArgs.indentWithMargin(2)}
                    |);

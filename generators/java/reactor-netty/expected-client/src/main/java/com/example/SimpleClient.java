@@ -4,6 +4,8 @@ import com.fasterxml.jackson.core.JsonFactory;
 import io.github.fomin.oasgen.ByteBufConverter;
 import io.github.fomin.oasgen.UrlEncoderUtils;
 import io.netty.buffer.ByteBuf;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
@@ -12,13 +14,14 @@ public class SimpleClient {
     private final ByteBufConverter byteBufConverter;
     private final HttpClient httpClient;
 
-    public SimpleClient(JsonFactory jsonFactory, HttpClient httpClient) {
+    public SimpleClient(@Nonnull JsonFactory jsonFactory, @Nonnull HttpClient httpClient) {
         this.byteBufConverter = new ByteBufConverter(jsonFactory);
         this.httpClient = httpClient;
     }
 
+    @Nonnull
     public Mono<java.lang.String> create(
-            Mono<com.example.Item> item
+            @Nonnull Mono<com.example.Item> item
     ) {
         return create$0(
                 item
@@ -39,6 +42,7 @@ public class SimpleClient {
         return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.ScalarParser.createStringParser());
     }
 
+    @Nonnull
     public Mono<java.lang.String> postWithoutRequestBody(
 
     ) {
@@ -58,9 +62,10 @@ public class SimpleClient {
         return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.ScalarParser.createStringParser());
     }
 
+    @Nonnull
     public Mono<com.example.Item> find(
-            java.lang.String param1,
-            java.lang.String param2
+            @Nonnull java.lang.String param1,
+            @Nullable java.lang.String param2
     ) {
         return find$0(
                 param1,
@@ -80,8 +85,9 @@ public class SimpleClient {
         return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());
     }
 
+    @Nonnull
     public Mono<com.example.Item> get(
-            java.lang.String id
+            @Nonnull java.lang.String id
     ) {
         return get$0(
                 id

@@ -11,7 +11,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
             val variableName: String,
             val type: String,
             val jsonSchema: JsonSchema,
-            val internalVariableName: String
+            val internalVariableName: String,
+            val nullAnnotation: String
     )
 
     class JacksonParserWriter(private val converterRegistry: ConverterRegistry) {
@@ -34,7 +35,9 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     "java.io.IOException",
                     "io.github.fomin.oasgen.NonBlockingParser",
                     "io.github.fomin.oasgen.ObjectParserState",
-                    "io.github.fomin.oasgen.ParseResult"
+                    "io.github.fomin.oasgen.ParseResult",
+                    "javax.annotation.Nonnull",
+                    "javax.annotation.Nullable"
             )
 
             val jointProperties = jsonSchema.jointProperties()
@@ -227,12 +230,17 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     val javaProperties = jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
                         val propertyConverterWriter = converterRegistry[propertySchema]
                         val propertyType = propertyConverterWriter.valueType()
+                        val nullAnnotation = when {
+                            jsonSchema.jointRequired().contains(propertyName) -> "@Nonnull"
+                            else -> "@Nullable"
+                        }
                         JavaProperty(
                                 propertyName,
                                 toVariableName(propertyName),
                                 propertyType,
                                 propertySchema,
-                                "p$index"
+                                "p$index",
+                                nullAnnotation
                         )
                     }
 
@@ -243,10 +251,13 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                | */""".trimMargin()
                         } ?: ""
                         """|$javaDoc
+                           |${javaProperty.nullAnnotation}
                            |public final ${javaProperty.type} ${javaProperty.variableName};""".trimMargin()
                     }
 
-                    val constructorArgs = javaProperties.joinToString(",\n") { "${it.type} ${it.variableName}" }
+                    val constructorArgs = javaProperties.joinToString(",\n") {
+                        "${it.nullAnnotation} ${it.type} ${it.variableName}"
+                    }
                     val constructorAssignments = javaProperties.map { javaProperty ->
                         "this.${javaProperty.variableName} = ${javaProperty.variableName};"
                     }

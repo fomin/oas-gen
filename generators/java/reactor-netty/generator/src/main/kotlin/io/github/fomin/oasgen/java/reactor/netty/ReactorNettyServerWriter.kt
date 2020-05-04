@@ -41,6 +41,8 @@ class ReactorNettyServerWriter(
                     "import io.github.fomin.oasgen.UrlEncoderUtils;",
                     "import java.util.Map;",
                     "import java.util.function.Consumer;",
+                    "import javax.annotation.Nonnull;",
+                    "import javax.annotation.Nullable;",
                     "import reactor.core.publisher.Mono;",
                     "import reactor.netty.http.server.HttpServerRoutes;"
             ))
@@ -49,15 +51,23 @@ class ReactorNettyServerWriter(
             val javaOperations = toJavaOperations(converterRegistry, paths)
 
             val operationMethods = javaOperations.map { javaOperation ->
-                val args = (javaOperation.parameters.map { it.javaVariable } + javaOperation.requestVariable?.let {
-                    JavaVariable("Mono<${it.type}>", "requestBodyMono")
-                })
-                        .filterNotNull()
-                        .joinToString(", ") {
-                            "${it.type} ${it.name}"
-                        }
+                val parameterArgs = javaOperation.parameters.map { javaParameter ->
+                    val nullAnnotation = when (javaParameter.schemaParameter.required) {
+                        true -> "@Nonnull"
+                        false -> "@Nullable"
+                    }
+                    "$nullAnnotation ${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"
+                }
+                val requestBodyArg = javaOperation.requestVariable?.let { requestVariable ->
+                    "@Nonnull Mono<${requestVariable.type}> requestBodyMono"
+                }
 
-                """|public abstract Mono<${javaOperation.responseVariable.type}> ${javaOperation.methodName}($args);
+                val args = (parameterArgs + requestBodyArg)
+                        .filterNotNull()
+                        .joinToString(", ")
+
+                """|@Nonnull
+                   |public abstract Mono<${javaOperation.responseVariable.type}> ${javaOperation.methodName}($args);
                    |
                 """.trimMargin()
             }

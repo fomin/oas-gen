@@ -39,6 +39,8 @@ class JavaSpringRestOperationsWriter(
                     "import java.util.Collections;",
                     "import java.util.HashMap;",
                     "import java.util.Map;",
+                    "import javax.annotation.Nonnull;",
+                    "import javax.annotation.Nullable;",
                     "import org.springframework.http.MediaType;",
                     "import org.springframework.http.RequestEntity;",
                     "import org.springframework.http.ResponseEntity;",
@@ -52,7 +54,7 @@ class JavaSpringRestOperationsWriter(
             val operationMethods = javaOperations.map { javaOperation ->
                 val requestVariable = javaOperation.requestVariable
                 val requestBodyArgDeclaration = requestVariable?.let {
-                    "${it.type} ${toVariableName(getSimpleName(it.type))}"
+                    "@Nonnull ${it.type} ${toVariableName(getSimpleName(it.type))}"
                 }
                 val requestBodyInternalArgDeclaration = requestVariable?.let {
                     "${it.type} bodyArg"
@@ -61,7 +63,11 @@ class JavaSpringRestOperationsWriter(
                     toVariableName(getSimpleName(it.type))
                 }
                 val parameterArgDeclarations = javaOperation.parameters.map { javaParameter ->
-                    """${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
+                    val nullAnnotation = when (javaParameter.schemaParameter.required) {
+                        true -> "@Nonnull"
+                        false -> "@Nullable"
+                    }
+                    """$nullAnnotation ${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
                 }
                 val parameterInternalArgDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
                     """${javaParameter.javaVariable.type} param$index"""
@@ -107,7 +113,8 @@ class JavaSpringRestOperationsWriter(
                         null
                 }
 
-                """|public ResponseEntity<$responseType> ${javaOperation.methodName}(
+                """|@Nonnull
+                   |public ResponseEntity<$responseType> ${javaOperation.methodName}(
                    |        ${methodArgDeclarations.indentWithMargin(2)}
                    |) {
                    |    return ${javaOperation.methodName}$0(
@@ -140,7 +147,7 @@ class JavaSpringRestOperationsWriter(
                |    private final RestOperations restOperations;
                |    private final String baseUrl;
                |
-               |    public ${getSimpleName(clientClassName)}(RestOperations restOperations, String baseUrl) {
+               |    public ${getSimpleName(clientClassName)}(@Nonnull RestOperations restOperations, @Nonnull String baseUrl) {
                |        this.restOperations = restOperations;
                |        this.baseUrl = baseUrl;
                |    }

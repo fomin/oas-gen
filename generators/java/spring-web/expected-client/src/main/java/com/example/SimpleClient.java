@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -14,13 +16,14 @@ public class SimpleClient {
     private final RestOperations restOperations;
     private final String baseUrl;
 
-    public SimpleClient(RestOperations restOperations, String baseUrl) {
+    public SimpleClient(@Nonnull RestOperations restOperations, @Nonnull String baseUrl) {
         this.restOperations = restOperations;
         this.baseUrl = baseUrl;
     }
 
+    @Nonnull
     public ResponseEntity<java.lang.String> create(
-            com.example.Item item
+            @Nonnull com.example.Item item
     ) {
         return create$0(
                 item
@@ -42,6 +45,7 @@ public class SimpleClient {
         return restOperations.exchange(request, java.lang.String.class);
     }
 
+    @Nonnull
     public ResponseEntity<java.lang.String> postWithoutRequestBody(
 
     ) {
@@ -64,9 +68,10 @@ public class SimpleClient {
         return restOperations.exchange(request, java.lang.String.class);
     }
 
+    @Nonnull
     public ResponseEntity<com.example.Item> find(
-            java.lang.String param1,
-            java.lang.String param2
+            @Nonnull java.lang.String param1,
+            @Nullable java.lang.String param2
     ) {
         return find$0(
                 param1,
@@ -90,8 +95,9 @@ public class SimpleClient {
         return restOperations.exchange(request, com.example.Item.class);
     }
 
+    @Nonnull
     public ResponseEntity<com.example.Item> get(
-            java.lang.String id
+            @Nonnull java.lang.String id
     ) {
         return get$0(
                 id

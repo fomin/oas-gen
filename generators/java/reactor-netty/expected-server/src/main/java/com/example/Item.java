@@ -7,6 +7,8 @@ import io.github.fomin.oasgen.NonBlockingParser;
 import io.github.fomin.oasgen.ObjectParserState;
 import io.github.fomin.oasgen.ParseResult;
 import java.io.IOException;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 /**
  * Item
@@ -16,40 +18,47 @@ public final class Item {
     /**
      * Common property 1
      */
+    @Nullable
     public final java.lang.String commonProperty1;
     /**
      * Property 1
      */
+    @Nonnull
     public final java.lang.String property1;
     /**
      * Property 2
      */
+    @Nonnull
     public final com.example.ItemProperty2 property2;
     /**
      * Decimal property
      */
+    @Nullable
     public final java.math.BigDecimal decimalProperty;
     /**
      * Local date time property
      */
+    @Nullable
     public final java.time.LocalDateTime localDateTimeProperty;
     /**
      * String array property
      */
+    @Nullable
     public final java.util.List<java.lang.String> stringArrayProperty;
     /**
      * Map property
      */
+    @Nullable
     public final java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty;
 
     public Item(
-            java.lang.String commonProperty1,
-            java.lang.String property1,
-            com.example.ItemProperty2 property2,
-            java.math.BigDecimal decimalProperty,
-            java.time.LocalDateTime localDateTimeProperty,
-            java.util.List<java.lang.String> stringArrayProperty,
-            java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty
+            @Nullable java.lang.String commonProperty1,
+            @Nonnull java.lang.String property1,
+            @Nonnull com.example.ItemProperty2 property2,
+            @Nullable java.math.BigDecimal decimalProperty,
+            @Nullable java.time.LocalDateTime localDateTimeProperty,
+            @Nullable java.util.List<java.lang.String> stringArrayProperty,
+            @Nullable java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty
     ) {
         this.commonProperty1 = commonProperty1;
         this.property1 = property1;

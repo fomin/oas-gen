@@ -5,6 +5,8 @@ import io.github.fomin.oasgen.ByteBufConverter;
 import io.github.fomin.oasgen.UrlEncoderUtils;
 import java.util.Map;
 import java.util.function.Consumer;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.server.HttpServerRoutes;
 
@@ -17,13 +19,17 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
         this.baseUrl = baseUrl;
     }
 
-    public abstract Mono<java.lang.String> create(Mono<com.example.Item> requestBodyMono);
+    @Nonnull
+    public abstract Mono<java.lang.String> create(@Nonnull Mono<com.example.Item> requestBodyMono);
 
+    @Nonnull
     public abstract Mono<java.lang.String> postWithoutRequestBody();
 
-    public abstract Mono<com.example.Item> find(java.lang.String param1, java.lang.String param2);
+    @Nonnull
+    public abstract Mono<com.example.Item> find(@Nonnull java.lang.String param1, @Nullable java.lang.String param2);
 
-    public abstract Mono<com.example.Item> get(java.lang.String id);
+    @Nonnull
+    public abstract Mono<com.example.Item> get(@Nonnull java.lang.String id);
 
     @Override
     public final void accept(HttpServerRoutes httpServerRoutes) {

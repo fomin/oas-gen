@@ -63,6 +63,7 @@ enum class ParameterIn {
 class Parameter(override val fragment: Fragment, override val parent: TypedFragment?) : TypedFragment() {
     val name = fragment["name"].asString()
     val parameterIn = ParameterIn.valueOf(fragment["in"].asString().toUpperCase())
+    val required = fragment.getOptional("required")?.asBoolean() ?: false
 
     fun schema() = JsonSchema(fragment["schema"], this)
 }

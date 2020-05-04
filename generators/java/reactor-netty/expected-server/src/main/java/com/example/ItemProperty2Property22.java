@@ -1,5 +1,7 @@
 package com.example;
 
+import javax.annotation.Nonnull;
+
 /**
  * Property 22
  */
@@ -8,9 +10,10 @@ public enum ItemProperty2Property22 {
     VALUE2("value2"),
     VALUE3("value3");
 
+    @Nonnull
     public final String strValue;
 
-    ItemProperty2Property22(String strValue) {
+    ItemProperty2Property22(@Nonnull String strValue) {
         this.strValue = strValue;
     }
 
