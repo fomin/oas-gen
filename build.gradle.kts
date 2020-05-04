@@ -72,6 +72,7 @@ allprojects {
     }
 
     tasks.withType<Test> {
+        inputs.dir("$rootDir/simple-schema")
         useJUnitPlatform()
     }
 
