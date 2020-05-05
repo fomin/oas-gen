@@ -52,7 +52,87 @@ fun toTypeName(typedFragment: TypedFragment, suffix: String? = null): TypeName {
 
 fun toMethodName(vararg parts: String) = toLowerCamelCase(*parts)
 
-fun toVariableName(vararg parts: String) = toLowerCamelCase(*parts)
+val replacementChars = listOf(
+        "@" to "At-",
+        "/" to "Slash-"
+)
+
+val reservedWords = setOf(
+        "_",
+        "abstract",
+        "assert",
+        "boolean",
+        "break",
+        "byte",
+        "case",
+        "catch",
+        "char",
+        "class",
+        "const",
+        "continue",
+        "default",
+        "do",
+        "double",
+        "else",
+        "enum",
+        "extends",
+        "false",
+        "final",
+        "finally",
+        "float",
+        "for",
+        "goto",
+        "if",
+        "implements",
+        "import",
+        "instanceof",
+        "int",
+        "interface",
+        "long",
+        "native",
+        "new",
+        "null",
+        "package",
+        "private",
+        "protected",
+        "public",
+        "return",
+        "short",
+        "static",
+        "strictfp",
+        "super",
+        "switch",
+        "synchronized",
+        "this",
+        "throw",
+        "throws",
+        "transient",
+        "true",
+        "try",
+        "var",
+        "void",
+        "volatile",
+        "while"
+)
+
+fun toVariableName(vararg parts: String): String {
+    val filteredParts = parts.map { part ->
+        replacementChars.fold(part) {acc, replacementPair ->
+            acc.replace(replacementPair.first, replacementPair.second)
+        }
+    }
+
+    return when (filteredParts.size) {
+        1 -> {
+            val singlePart = filteredParts[0]
+            when {
+                reservedWords.contains(singlePart) -> toLowerCamelCase(singlePart, "$")
+                else -> toLowerCamelCase(singlePart)
+            }
+        }
+        else -> toLowerCamelCase(*filteredParts.toTypedArray())
+    }
+}
 
 //private fun toPackagePart(pathComponents: List<String>): String {
 //    val sb = StringBuilder()
