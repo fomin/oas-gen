@@ -74,6 +74,19 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     .joinToString(", ") { "this.p${it}" }
 
             val resetFieldExpressions = jointProperties.entries.mapIndexed { index, _ -> "this.p$index = null;" }
+            val parseFieldValueCase = when (parseValueCases.isNotEmpty()) {
+                true ->
+                    """|case PARSE_FIELD_VALUE:
+                       |    switch (currentField) {
+                       |        ${parseValueCases.indentWithMargin(2)}
+                       |        default:
+                       |            throw new UnsupportedOperationException("Unexpected field " + currentField);
+                       |    }
+                       |    break;
+                       |
+                    """.trimMargin()
+                false -> ""
+            }
 
             val content = """
                |public static class Parser implements NonBlockingParser<$dtoClassName> {
@@ -121,13 +134,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |                        }
                |                    }
                |                    break;
-               |                case PARSE_FIELD_VALUE:
-               |                    switch (currentField) {
-               |                        ${parseValueCases.indentWithMargin(6)}
-               |                        default:
-               |                            throw new UnsupportedOperationException("Unexpected field " + currentField);
-               |                    }
-               |                    break;
+               |                ${parseFieldValueCase.indentWithMargin(4)}
                |                default:
                |                    throw new RuntimeException("unexpected state " + objectParserState);
                |            }
