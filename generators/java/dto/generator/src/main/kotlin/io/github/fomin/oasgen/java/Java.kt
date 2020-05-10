@@ -1,7 +1,7 @@
 package io.github.fomin.oasgen.java
 
 import io.github.fomin.oasgen.*
-import io.github.fomin.oasgen.java.jackson.ConverterRegistry
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterRegistry
 
 data class JavaVariable(
         val type: String,

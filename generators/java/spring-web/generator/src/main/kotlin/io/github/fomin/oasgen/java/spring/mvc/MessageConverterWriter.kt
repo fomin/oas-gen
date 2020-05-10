@@ -4,7 +4,7 @@ import io.github.fomin.oasgen.OutputFile
 import io.github.fomin.oasgen.indentWithMargin
 import io.github.fomin.oasgen.java.JavaOperation
 import io.github.fomin.oasgen.java.getFilePath
-import io.github.fomin.oasgen.java.jackson.ConverterRegistry
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterRegistry
 
 class MessageConverterWriter {
     fun write(

@@ -2,7 +2,7 @@ package io.github.fomin.oasgen.java.rest.operations
 
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*
-import io.github.fomin.oasgen.java.jackson.*
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.*
 import io.github.fomin.oasgen.java.spring.mvc.MessageConverterWriter
 import java.util.*
 

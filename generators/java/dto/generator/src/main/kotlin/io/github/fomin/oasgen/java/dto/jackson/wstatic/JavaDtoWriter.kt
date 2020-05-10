@@ -1,9 +1,8 @@
-package io.github.fomin.oasgen.java
+package io.github.fomin.oasgen.java.dto.jackson.wstatic
 
 import io.github.fomin.oasgen.JsonSchema
 import io.github.fomin.oasgen.OutputFile
 import io.github.fomin.oasgen.Writer
-import io.github.fomin.oasgen.java.jackson.ConverterRegistry
 
 class JavaDtoWriter(
         private val converterRegistry: ConverterRegistry

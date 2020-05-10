@@ -1,4 +1,4 @@
-package io.github.fomin.oasgen.java.jackson
+package io.github.fomin.oasgen.java.dto.jackson.wstatic
 
 import java.util.*
 

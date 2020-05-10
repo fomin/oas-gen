@@ -2,7 +2,7 @@ package io.github.fomin.oasgen.java.reactor.netty
 
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*
-import io.github.fomin.oasgen.java.jackson.*
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.*
 import java.util.*
 
 class ReactorNettyClientWriter(
