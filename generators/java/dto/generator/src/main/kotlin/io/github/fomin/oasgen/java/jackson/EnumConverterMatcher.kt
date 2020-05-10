@@ -7,6 +7,12 @@ import io.github.fomin.oasgen.indentWithMargin
 import io.github.fomin.oasgen.java.*
 
 class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
+    class Provider : ConverterMatcherProvider {
+        override val id = "enum"
+        override fun provide(basePackage: String) = EnumConverterMatcher(basePackage)
+    }
+
+
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
         return if (jsonSchema.type is JsonType.Scalar.STRING && jsonSchema.enum() != null) object : ConverterWriter {
             override val jsonSchema = jsonSchema

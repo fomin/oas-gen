@@ -4,6 +4,11 @@ import io.github.fomin.oasgen.JsonSchema
 import io.github.fomin.oasgen.JsonType
 
 class StringConverterMatcher : ConverterMatcher {
+    class Provider : ConverterMatcherProvider {
+        override val id = "string"
+        override fun provide(basePackage: String) = StringConverterMatcher()
+    }
+
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
         return when (jsonSchema.type) {
             is JsonType.Scalar.STRING -> object : ConverterWriter {

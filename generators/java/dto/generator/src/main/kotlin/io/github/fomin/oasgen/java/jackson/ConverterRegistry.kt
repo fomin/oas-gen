@@ -2,12 +2,9 @@ package io.github.fomin.oasgen.java.jackson
 
 import io.github.fomin.oasgen.JsonSchema
 
-class ConverterRegistry(private val converterMatchers: List<ConverterMatcher>) {
+class ConverterRegistry(private val converterMatcher: ConverterMatcher) {
     operator fun get(jsonSchema: JsonSchema): ConverterWriter {
-        converterMatchers.forEach { converterMatcher ->
-            val converterWriter = converterMatcher.match(this, jsonSchema)
-            if (converterWriter != null) return converterWriter
-        }
+        return converterMatcher.match(this, jsonSchema) ?:
         error("Can't find converter for schema $jsonSchema")
     }
 }

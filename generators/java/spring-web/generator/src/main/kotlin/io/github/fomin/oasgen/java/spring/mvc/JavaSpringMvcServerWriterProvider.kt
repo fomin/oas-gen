@@ -4,5 +4,6 @@ import io.github.fomin.oasgen.OpenApiWriterProvider
 
 class JavaSpringMvcServerWriterProvider : OpenApiWriterProvider {
     override val id = "java-spring-mvc"
-    override fun provide(namespace: String) = JavaSpringMvcServerWriter(namespace)
+    override fun provide(namespace: String, converterIds: List<String>) =
+            JavaSpringMvcServerWriter(namespace, converterIds)
 }

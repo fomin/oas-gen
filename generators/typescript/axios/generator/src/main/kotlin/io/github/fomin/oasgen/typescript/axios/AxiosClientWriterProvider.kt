@@ -4,5 +4,5 @@ import io.github.fomin.oasgen.OpenApiWriterProvider
 
 class AxiosClientWriterProvider : OpenApiWriterProvider {
     override val id = "typescript-axios"
-    override fun provide(namespace: String) = AxiosClientWriter(namespace)
+    override fun provide(namespace: String, converterIds: List<String>) = AxiosClientWriter(namespace)
 }

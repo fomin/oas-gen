@@ -4,6 +4,11 @@ import io.github.fomin.oasgen.JsonSchema
 import io.github.fomin.oasgen.JsonType
 
 class IntegerConverterMatcher : ConverterMatcher {
+    class Provider : ConverterMatcherProvider {
+        override val id = "integer"
+        override fun provide(basePackage: String) = IntegerConverterMatcher()
+    }
+
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
         return if (jsonSchema.type is JsonType.Scalar.INTEGER) object : ConverterWriter {
             override val jsonSchema = jsonSchema

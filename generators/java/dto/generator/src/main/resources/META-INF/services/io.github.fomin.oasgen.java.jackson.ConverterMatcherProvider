@@ -1,0 +1,13 @@
+io.github.fomin.oasgen.java.jackson.ArrayConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.BooleanConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.EnumConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.Int32ConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.Int64ConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.IntegerConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.LocalDateConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.LocalDateTimeConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.MapConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.NumberConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.ObjectConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.OffsetDateTimeConverterMatcher$Provider
+io.github.fomin.oasgen.java.jackson.StringConverterMatcher$Provider

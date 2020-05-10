@@ -8,7 +8,7 @@ internal class JavaSpringRestOperationsWriterTest {
     @Test
     fun `generator should create expected output`() {
         testCase(
-                JavaSpringRestOperationsWriter("com.example"),
+                JavaSpringRestOperationsWriter("com.example", emptyList()),
                 File("../../../../simple-schema"),
                 "simple.yaml",
                 File("../expected-client/src/main/java")

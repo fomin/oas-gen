@@ -10,6 +10,7 @@ const val SCHEMA = "schema"
 const val OUTPUT_DIR = "output-dir"
 const val NAMESPACE = "namespace"
 const val GENERATOR = "generator"
+const val CONVERTERS = "converters"
 
 fun main(args: Array<String>) {
     val options = Options()
@@ -19,6 +20,13 @@ fun main(args: Array<String>) {
             .addRequiredOption("o", OUTPUT_DIR, true, "output directory")
             .addRequiredOption("n", NAMESPACE, true, "namespace")
             .addRequiredOption("g", GENERATOR, true, "generator identifier")
+            .addOption(
+                    Option.builder("c")
+                            .longOpt(CONVERTERS)
+                            .hasArgs()
+                            .desc("converter identifiers")
+                            .build()
+            )
 
     val parser = DefaultParser()
     val commandLine: CommandLine
@@ -37,6 +45,8 @@ fun main(args: Array<String>) {
     val outputDirArg = commandLine.getOptionValue(OUTPUT_DIR)
     val namespaceArg = commandLine.getOptionValue(NAMESPACE)
     val generatorId = commandLine.getOptionValue(GENERATOR)
+    val converterIdsArray = commandLine.getOptionValues(CONVERTERS)
+    val converterIds = converterIdsArray?.toList() ?: emptyList<String>()
 
     val (baseDir, schemaPath) = if (baseDirArg == null) {
         val schemaFile = File(schemaFileArg)
@@ -46,5 +56,5 @@ fun main(args: Array<String>) {
     }
 
     val outputDir = File(outputDirArg)
-    openApiGenerate(generatorId, baseDir, outputDir, schemaPath, namespaceArg)
+    openApiGenerate(generatorId, baseDir, outputDir, schemaPath, namespaceArg, converterIds)
 }

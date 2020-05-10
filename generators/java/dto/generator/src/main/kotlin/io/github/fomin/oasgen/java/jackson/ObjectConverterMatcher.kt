@@ -6,6 +6,11 @@ import io.github.fomin.oasgen.java.*
 data class ClassMember(val content: String, val importedClasses: List<String>)
 
 class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
+    class Provider : ConverterMatcherProvider {
+        override val id = "object"
+        override fun provide(basePackage: String) = ObjectConverterMatcher(basePackage)
+    }
+
     data class JavaProperty(
             val name: String,
             val variableName: String,

@@ -8,7 +8,7 @@ internal class JavaSpringMvcServerWriterTest {
     @Test
     fun `generator should create expected output`() {
         testCase(
-                JavaSpringMvcServerWriter("com.example"),
+                JavaSpringMvcServerWriter("com.example", emptyList()),
                 File("../../../../simple-schema"),
                 "simple.yaml",
                 File("../expected-server/src/main/java")

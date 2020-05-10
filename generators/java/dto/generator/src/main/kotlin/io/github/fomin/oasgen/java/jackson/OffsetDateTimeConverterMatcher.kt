@@ -4,6 +4,11 @@ import io.github.fomin.oasgen.JsonSchema
 import io.github.fomin.oasgen.JsonType
 
 class OffsetDateTimeConverterMatcher : ConverterMatcher {
+    class Provider : ConverterMatcherProvider {
+        override val id = "date-time"
+        override fun provide(basePackage: String) = OffsetDateTimeConverterMatcher()
+    }
+
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
         return if (jsonSchema.type is JsonType.Scalar.STRING && (jsonSchema.format == "date-time"))
             object : ConverterWriter {

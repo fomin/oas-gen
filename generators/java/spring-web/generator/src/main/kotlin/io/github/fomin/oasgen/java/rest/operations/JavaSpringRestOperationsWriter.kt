@@ -7,26 +7,14 @@ import io.github.fomin.oasgen.java.spring.mvc.MessageConverterWriter
 import java.util.*
 
 class JavaSpringRestOperationsWriter(
-        private val basePackage: String
+        private val basePackage: String,
+        private val converterIds: List<String>
 ) : Writer<OpenApiSchema> {
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
-        val converterRegistry = ConverterRegistry(listOf(
-                OffsetDateTimeConverterMatcher(),
-                LocalDateConverterMatcher(),
-                LocalDateTimeConverterMatcher(),
-                ArrayConverterMatcher(),
-                MapConverterMatcher(),
-                ObjectConverterMatcher(basePackage),
-                Int32ConverterMatcher(),
-                Int64ConverterMatcher(),
-                IntegerConverterMatcher(),
-                NumberConverterMatcher(),
-                BooleanConverterMatcher(),
-                EnumConverterMatcher(basePackage),
-                StringConverterMatcher()
-        ))
+        val converterMatcher = ConverterMatcherProvider.provide(basePackage, converterIds)
+        val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
         items.forEach { openApiSchema ->
             val clientClassName = toJavaClassName(basePackage, openApiSchema, "client")

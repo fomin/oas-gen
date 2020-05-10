@@ -3,7 +3,14 @@ package io.github.fomin.oasgen
 import java.io.File
 import java.util.*
 
-fun openApiGenerate(generatorId: String, baseDir: File, outputDir: File, schemaPath: String, namespace: String) {
+fun openApiGenerate(
+        generatorId: String,
+        baseDir: File,
+        outputDir: File,
+        schemaPath: String,
+        namespace: String,
+        converterIds: List<String>
+) {
     val serviceLoader = ServiceLoader.load(OpenApiWriterProvider::class.java)
     val providerMap = serviceLoader.iterator()
             .asSequence()
@@ -17,7 +24,7 @@ fun openApiGenerate(generatorId: String, baseDir: File, outputDir: File, schemaP
     val fragmentRegistry = FragmentRegistry(baseDir)
     val openApiSchema = OpenApiSchema(fragmentRegistry.get(Reference.root(schemaPath)), null)
 
-    val writer = openApiWriterProvider.provide(namespace)
+    val writer = openApiWriterProvider.provide(namespace, converterIds)
 
     val outputFiles = writer.write(listOf(openApiSchema))
     outputDir.mkdirs()
