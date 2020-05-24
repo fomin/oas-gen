@@ -11,14 +11,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReferenceServer {
     public static final String BASE_PATH = "/base";
+    private static final String TEST_ITEM_STR = "{\"commonProperty1\":\"common property 1 value\",\"property1\":\"property 1 value\",\"property2\":{\"commonProperty1\":\"inner common property 1 value\",\"property21\":\"property 21 value\",\"property22\":\"value1\"},\"decimalProperty\":1,\"localDateTimeProperty\":\"2020-01-01T01:01:00\",\"stringArrayProperty\":[\"array value 1\",\"array value 2\"],\"mapProperty\":{\"key 1\":10}}";
 
-    public static DisposableServer create() {
-        HttpServer httpServer = HttpServer.create().route(httpServerRoutes ->
+    public static DisposableServer create(int port) {
+        HttpServer httpServer = HttpServer.create().port(port).port(port).route(httpServerRoutes ->
                 httpServerRoutes
                         .post(BASE_PATH + "/", (request, response) -> {
                             Mono<String> requestMono = request.receive().aggregate().asString();
                             Mono<String> responseMono = requestMono.map(requestBodyString -> {
-                                assertEquals("{\"commonProperty1\":\"common property 1 value\",\"property1\":\"property 1 value\",\"property2\":{\"commonProperty1\":\"inner common property 1 value\",\"property21\":\"property 21 value\",\"property22\":\"value1\"},\"decimalProperty\":1,\"localDateTimeProperty\":\"2020-01-01T01:01\",\"stringArrayProperty\":[\"array value 1\",\"array value 2\"],\"mapProperty\":{\"key 1\":10}}", requestBodyString);
+                                assertEquals(TEST_ITEM_STR, requestBodyString);
                                 return "\"idValue\"";
                             });
                             return response
@@ -41,14 +42,14 @@ public class ReferenceServer {
                             assertEquals("param2Value", queryParams.get("param2"));
                             return response
                                     .header("Content-Type", "application/json")
-                                    .sendString(Mono.just("{\"commonProperty1\":\"commonProperty1\",\"property1\":\"property1\",\"property2\":{\"commonProperty1\":\"commonProperty1\",\"property21\":\"property21\",\"property22\":\"value1\"},\"decimalProperty\":1,\"localDateTimeProperty\":\"2020-04-03T15:22:22.140600\",\"stringArrayProperty\":[\"item1\",\"item2\"],\"mapProperty\":{\"key\":0}}"));
+                                    .sendString(Mono.just(TEST_ITEM_STR));
                         })
                         .get(BASE_PATH + "/{id}", (request, response) -> {
                             String param0 = request.param("id");
                             assertEquals("idValue", param0);
                             return response
                                     .header("Content-Type", "application/json")
-                                    .sendString(Mono.just("{\"commonProperty1\":\"commonProperty1\",\"property1\":\"property1\",\"property2\":{\"commonProperty1\":\"commonProperty1\",\"property21\":\"property21\",\"property22\":\"value1\"},\"decimalProperty\":1,\"localDateTimeProperty\":\"2020-04-03T15:22:22.140600\",\"stringArrayProperty\":[\"item1\",\"item2\"],\"mapProperty\":{\"key\":0}}"));
+                                    .sendString(Mono.just(TEST_ITEM_STR));
                         }));
         return httpServer.bindNow();
     }

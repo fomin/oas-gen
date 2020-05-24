@@ -9,7 +9,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":generators:java:dto:generator"))
+    api(project(":generators:java:annotated-dto:generator"))
     testImplementation(project(":test-utils"))
 }
 

@@ -20,14 +20,15 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SimpleClientTest implements ClientTest {
 
+    private static final int PORT = 8083;
+
     private static DisposableServer referenceServer;
     private static SimpleClient simpleClient;
 
     @BeforeAll
     public static void beforeAll() {
-        referenceServer = ReferenceServer.create();
-        int port = referenceServer.port();
-        HttpClient httpClient = HttpClient.create().baseUrl("http://localhost:" + port + ReferenceServer.BASE_PATH);
+        referenceServer = ReferenceServer.create(PORT);
+        HttpClient httpClient = HttpClient.create().baseUrl("http://localhost:" + PORT + ReferenceServer.BASE_PATH);
         simpleClient = new SimpleClient(new JsonFactory(), httpClient);
     }
 
@@ -36,7 +37,6 @@ class SimpleClientTest implements ClientTest {
         referenceServer.disposeNow();
     }
 
-    @Test
     @Override
     public void testFind() {
         Mono<Item> itemMono = simpleClient.find("param1Value", "param2Value");

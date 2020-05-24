@@ -2,14 +2,20 @@ package io.github.fomin.oasgen.java.rest.operations
 
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*
-import io.github.fomin.oasgen.java.dto.jackson.wstatic.*
-import io.github.fomin.oasgen.java.spring.mvc.MessageConverterWriter
+import io.github.fomin.oasgen.java.dto.jackson.annotated.ConverterMatcherProvider
+import io.github.fomin.oasgen.java.dto.jackson.annotated.ConverterRegistry
+import io.github.fomin.oasgen.java.dto.jackson.annotated.JavaDtoWriter
 import java.util.*
 
 class JavaSpringRestOperationsWriter(
         private val basePackage: String,
         private val converterIds: List<String>
 ) : Writer<OpenApiSchema> {
+    private data class OperationOutput(
+            val methodContent: String,
+            val dtoSchemas: List<JsonSchema>
+    )
+
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
@@ -36,95 +42,133 @@ class JavaSpringRestOperationsWriter(
                     "import org.springframework.web.util.UriComponentsBuilder;"
             ))
 
-            val paths = openApiSchema.paths()
-            val javaOperations = toJavaOperations(converterRegistry, paths)
-
-            val operationMethods = javaOperations.map { javaOperation ->
-                val requestVariable = javaOperation.requestVariable
-                val requestBodyArgDeclaration = requestVariable?.let {
-                    "@Nonnull ${it.type} ${toVariableName(getSimpleName(it.type))}"
-                }
-                val requestBodyInternalArgDeclaration = requestVariable?.let {
-                    "${it.type} bodyArg"
-                }
-                val requestBodyArg = requestVariable?.let {
-                    toVariableName(getSimpleName(it.type))
-                }
-                val parameterArgDeclarations = javaOperation.parameters.map { javaParameter ->
-                    val nullAnnotation = when (javaParameter.schemaParameter.required) {
-                        true -> "@Nonnull"
-                        false -> "@Nullable"
+            val methodOutputs = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
+                pathItem.operations().map { operation ->
+                    val response200 = operation.responses().byCode()[HttpResponseCode.CODE_200]
+                    val responseEntry = response200?.let { response ->
+                        val entries = response.content().entries
+                        if (entries.isEmpty()) {
+                            null
+                        } else {
+                            entries.single()
+                        }
                     }
-                    """$nullAnnotation ${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
-                }
-                val parameterInternalArgDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
-                    """${javaParameter.javaVariable.type} param$index"""
-                }
-                val parameterArgs = javaOperation.parameters.map { javaParameter ->
-                    javaParameter.javaVariable.name
-                }
-                val methodArgDeclarations = (parameterArgDeclarations + requestBodyArgDeclaration)
-                        .filterNotNull().joinToString(",\n")
-                val methodInternalArgDeclarations = (parameterInternalArgDeclarations + requestBodyInternalArgDeclaration)
-                        .filterNotNull().joinToString(",\n")
-                val methodArgs = (parameterArgs + requestBodyArg)
-                        .filterNotNull().joinToString(",\n")
-                val responseType = javaOperation.responseVariable.type ?: "java.lang.Void"
+                    val responseSchema: JsonSchema?
+                    val responseType: String
+                    if (responseEntry != null) {
+                        responseSchema = responseEntry.value.schema()
+                        responseType = converterRegistry[responseSchema].valueType()
+                    } else {
+                        responseSchema = null
+                        responseType = "java.lang.Void"
+                    }
 
-                val pathParameters = javaOperation.parameters.filter { it.schemaParameter.parameterIn == ParameterIn.PATH }
+                    val requestBody = operation.requestBody()
+                    val bodySchema: JsonSchema?
+                    val requestBodyArgDeclaration: String?
+                    val requestBodyInternalArgDeclaration: String?
+                    val requestBodyArg: String?
+                    val requestType: String
+                    val buildRequestExpression: String
 
-                val uriVariablesBlock = if (pathParameters.isEmpty()) {
-                    "Map<String, Object> uriVariables = Collections.emptyMap();"
-                } else {
-                    """|Map<String, Object> uriVariables = new HashMap<>();
-                       |${pathParameters.map { "uriVariables.put(\"${it.name}\", param${it.index});" }.indentWithMargin(0)}
-                    """.trimMargin()
-                }
+                    if (requestBody != null) {
+                        val entry = requestBody.content().entries.single()
+                        bodySchema = entry.value.schema()
+                        requestType = converterRegistry[bodySchema].valueType()
+                        requestBodyArgDeclaration = "@Nonnull $requestType ${toVariableName(getSimpleName(requestType))}"
+                        requestBodyInternalArgDeclaration = "$requestType bodyArg"
+                        requestBodyArg = toVariableName(getSimpleName(requestType))
+                        buildRequestExpression =
+                                """|.contentType(MediaType.APPLICATION_JSON)
+                                   |.body(bodyArg, ${requestType}.class);
+                                   |""".trimMargin()
+                    } else {
+                        bodySchema = null
+                        requestBodyArgDeclaration = null
+                        requestType = "java.lang.Void"
+                        requestBodyInternalArgDeclaration = null
+                        requestBodyArg = null
+                        buildRequestExpression = ".build();"
+                    }
 
-                val (requestType, buildRequestExpression) = when {
-                    requestVariable != null -> Pair(
-                            requestVariable.type,
-                            """|.contentType(MediaType.APPLICATION_JSON)
-                               |.body(bodyArg, ${requestVariable.type}.class);
+                    val parameterArgDeclarations = operation.parameters().map { parameter ->
+                        val nullAnnotation = when (parameter.required) {
+                            true -> "@Nonnull"
+                            false -> "@Nullable"
+                        }
+                        val parameterType = converterRegistry[parameter.schema()].valueType()
+                        """$nullAnnotation $parameterType ${toVariableName(parameter.name)}"""
+                    }
+                    val parameterInternalArgDeclarations = operation.parameters().mapIndexed { index, parameter ->
+                        val parameterType = converterRegistry[parameter.schema()].valueType()
+                        """$parameterType param$index"""
+                    }
+                    val parameterArgs = operation.parameters().map { parameter ->
+                        toVariableName(parameter.name)
+                    }
+                    val methodArgDeclarations = (parameterArgDeclarations + requestBodyArgDeclaration)
+                            .filterNotNull().joinToString(",\n")
+                    val methodInternalArgDeclarations = (parameterInternalArgDeclarations + requestBodyInternalArgDeclaration)
+                            .filterNotNull().joinToString(",\n")
+                    val methodArgs = (parameterArgs + requestBodyArg)
+                            .filterNotNull().joinToString(",\n")
+
+                    val pathParameterEntries = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        if (parameter.parameterIn == ParameterIn.PATH) {
+                            "uriVariables.put(\"${parameter.name}\", param${index});"
+                        } else {
+                            null
+                        }
+                    }
+                    val uriVariablesBlock = if (pathParameterEntries.isEmpty()) {
+                        "Map<String, Object> uriVariables = Collections.emptyMap();"
+                    } else {
+                        """|Map<String, Object> uriVariables = new HashMap<>();
+                           |${pathParameterEntries.indentWithMargin(0)}
+                        """.trimMargin()
+                    }
+
+                    val queryParameterCalls = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        if (parameter.parameterIn == ParameterIn.QUERY)
+                            """.queryParam("${parameter.name}", param${index})"""
+                        else
+                            null
+                    }
+                    val methodName = toMethodName(operation.operationId)
+                    val methodContent =
+                            """|@Nonnull
+                               |public ResponseEntity<$responseType> $methodName(
+                               |        ${methodArgDeclarations.indentWithMargin(2)}
+                               |) {
+                               |    return $methodName$0(
+                               |            ${methodArgs.indentWithMargin(2)}
+                               |    );
+                               |}
+                               |
+                               |private ResponseEntity<$responseType> $methodName$0(
+                               |        ${methodInternalArgDeclarations.indentWithMargin(2)}
+                               |) {
+                               |    ${uriVariablesBlock.indentWithMargin(1)}
+                               |    URI uri = UriComponentsBuilder
+                               |            .fromUriString(baseUrl + "$pathTemplate")
+                               |            ${queryParameterCalls.indentWithMargin(3)}
+                               |            .build(uriVariables);
+                               |    RequestEntity<$requestType> request = RequestEntity
+                               |            .${operation.operationType.name.toLowerCase()}(uri)
+                               |            ${buildRequestExpression.indentWithMargin(3)}
+                               |    return restOperations.exchange(request, $responseType.class);
+                               |}
                                |""".trimMargin()
+                    val dtoSchemas = listOfNotNull(
+                            bodySchema,
+                            responseSchema
                     )
-                    else -> Pair(
-                            "java.lang.Void",
-                            ".build();"
-                    )
+                    OperationOutput(methodContent, dtoSchemas)
                 }
-
-                val queryParameterCalls = javaOperation.parameters.mapNotNull { javaParameter ->
-                    if (javaParameter.schemaParameter.parameterIn == ParameterIn.QUERY)
-                        """.queryParam("${javaParameter.schemaParameter.name}", param${javaParameter.index})"""
-                    else
-                        null
-                }
-
-                """|@Nonnull
-                   |public ResponseEntity<$responseType> ${javaOperation.methodName}(
-                   |        ${methodArgDeclarations.indentWithMargin(2)}
-                   |) {
-                   |    return ${javaOperation.methodName}$0(
-                   |            ${methodArgs.indentWithMargin(2)}
-                   |    );
-                   |}
-                   |
-                   |private ResponseEntity<$responseType> ${javaOperation.methodName}$0(
-                   |        ${methodInternalArgDeclarations.indentWithMargin(2)}
-                   |) {
-                   |    ${uriVariablesBlock.indentWithMargin(1)}
-                   |    URI uri = UriComponentsBuilder
-                   |            .fromUriString(baseUrl + "${javaOperation.pathTemplate}")
-                   |            ${queryParameterCalls.indentWithMargin(3)}
-                   |            .build(uriVariables);
-                   |    RequestEntity<$requestType> request = RequestEntity
-                   |            .${javaOperation.operation.operationType.name.toLowerCase()}(uri)
-                   |            ${buildRequestExpression.indentWithMargin(3)}
-                   |    return restOperations.exchange(request, $responseType.class);
-                   |}
-                   |""".trimMargin()
             }
+
+            val methodContentList = methodOutputs.map { it.methodContent }
+            val dtoSchemas = methodOutputs.flatMap { it.dtoSchemas }
 
             val content = """
                |package ${getPackage(clientClassName)};
@@ -140,20 +184,12 @@ class JavaSpringRestOperationsWriter(
                |        this.baseUrl = baseUrl;
                |    }
                |
-               |    ${operationMethods.indentWithMargin(1)}
+               |    ${methodContentList.indentWithMargin(1)}
                |
                |}
                |
             """.trimMargin()
 
-            val messageConverterWriter = MessageConverterWriter()
-            val messageConverterClassSimpleName = getSimpleName(toJavaClassName(basePackage, openApiSchema, "message-converter"))
-            val messageConverterOutputFile = messageConverterWriter.write(basePackage, messageConverterClassSimpleName, converterRegistry, javaOperations)
-            outputFiles.add(messageConverterOutputFile)
-
-            val dtoSchemas = mutableListOf<JsonSchema>()
-            dtoSchemas.addAll(javaOperations.mapNotNull { it.responseVariable.schema })
-            dtoSchemas.addAll(javaOperations.mapNotNull { it.requestVariable?.schema })
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
             outputFiles.add(OutputFile(filePath, content))

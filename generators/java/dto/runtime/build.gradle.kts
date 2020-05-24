@@ -15,7 +15,7 @@ java {
 
 dependencies {
     api("com.fasterxml.jackson.core","jackson-core", JACKSON_VERSION)
-    api("com.google.code.findbugs", "jsr305", "3.0.2")
+    api("com.google.code.findbugs", "jsr305", JSR_305_VERSION)
 }
 
 addPublications("oas-gen-java-dto-runtime")
