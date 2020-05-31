@@ -3,6 +3,7 @@ package io.github.fomin.oasgen;
 import com.fasterxml.jackson.core.JsonToken;
 
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 public class OffsetDateTimeConverter {
     public static NonBlockingParser<OffsetDateTime> createParser() {
@@ -13,6 +14,8 @@ public class OffsetDateTimeConverter {
     }
 
     public static final Writer<OffsetDateTime> WRITER =
-            (jsonGenerator, offsetDateTime) -> jsonGenerator.writeString(offsetDateTime.toString());
+            (jsonGenerator, offsetDateTime) -> jsonGenerator.writeString(
+                    offsetDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)
+            );
 
 }
