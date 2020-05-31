@@ -6,6 +6,8 @@ pluginManagement {
     }
 }
 
+enableFeaturePreview("ONE_LOCKFILE_PER_PROJECT")
+
 include(":core")
 include(":cli")
 include(":test-utils")

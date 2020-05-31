@@ -1,0 +1,6 @@
+# This is a Gradle generated file for dependency locking.
+# Manual edits can break the build and are not advised.
+# This file is expected to be part of source control.
+com.fasterxml.jackson.core:jackson-core:2.11.0=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.google.code.findbugs:jsr305:3.0.2=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+empty=annotationProcessor,archives,compile,compileOnly,runtime,signatures,testAnnotationProcessor,testCompile,testCompileOnly,testRuntime
