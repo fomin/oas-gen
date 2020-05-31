@@ -13,4 +13,9 @@ dependencies {
     testImplementation(project(":test-utils"))
 }
 
+tasks.test {
+    inputs.dir("../expected-client/src/main")
+    inputs.dir("../expected-server/src/main")
+}
+
 addPublications("oas-gen-reactor-netty-generator")
