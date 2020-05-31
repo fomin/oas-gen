@@ -80,12 +80,12 @@ public final class Item {
         private java.time.LocalDateTime p4; // localDateTimeProperty
         private java.util.List<java.lang.String> p5; // stringArrayProperty
         private java.util.Map<java.lang.String, java.math.BigDecimal> p6; // mapProperty
-        private final io.github.fomin.oasgen.NonBlockingParser<java.math.BigDecimal> parser0 = io.github.fomin.oasgen.ScalarParser.createNumberParser();
-        private final io.github.fomin.oasgen.NonBlockingParser<java.time.LocalDateTime> parser1 = io.github.fomin.oasgen.ScalarParser.createStringLocalDateTimeParser();
-        private final io.github.fomin.oasgen.NonBlockingParser<java.lang.String> parser2 = io.github.fomin.oasgen.ScalarParser.createStringParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<java.time.LocalDateTime> parser0 = io.github.fomin.oasgen.LocalDateTimeConverter.createParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<java.math.BigDecimal> parser1 = io.github.fomin.oasgen.NumberConverter.createParser();
+        private final io.github.fomin.oasgen.NonBlockingParser<java.lang.String> parser2 = io.github.fomin.oasgen.StringConverter.createParser();
         private final io.github.fomin.oasgen.NonBlockingParser<com.example.ItemProperty2> parser3 = new com.example.ItemProperty2.Parser();
-        private final io.github.fomin.oasgen.NonBlockingParser<java.util.List<java.lang.String>> parser4 = new io.github.fomin.oasgen.ArrayParser<>(io.github.fomin.oasgen.ScalarParser.createStringParser());
-        private final io.github.fomin.oasgen.NonBlockingParser<java.util.Map<java.lang.String, java.math.BigDecimal>> parser5 = new io.github.fomin.oasgen.MapParser<>(io.github.fomin.oasgen.ScalarParser.createNumberParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.List<java.lang.String>> parser4 = new io.github.fomin.oasgen.ArrayParser<>(io.github.fomin.oasgen.StringConverter.createParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.Map<java.lang.String, java.math.BigDecimal>> parser5 = new io.github.fomin.oasgen.MapParser<>(io.github.fomin.oasgen.NumberConverter.createParser());
 
         @Override
         public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
@@ -155,15 +155,15 @@ public final class Item {
                                 }
                                 break;
                             case "decimalProperty":
-                                if (parser0.parseNext(jsonParser)) {
-                                    ParseResult<java.math.BigDecimal> parseResult = parser0.build();
+                                if (parser1.parseNext(jsonParser)) {
+                                    ParseResult<java.math.BigDecimal> parseResult = parser1.build();
                                     this.p3 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                                 }
                                 break;
                             case "localDateTimeProperty":
-                                if (parser1.parseNext(jsonParser)) {
-                                    ParseResult<java.time.LocalDateTime> parseResult = parser1.build();
+                                if (parser0.parseNext(jsonParser)) {
+                                    ParseResult<java.time.LocalDateTime> parseResult = parser0.build();
                                     this.p4 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                                 }
@@ -215,11 +215,11 @@ public final class Item {
     public static class Writer implements io.github.fomin.oasgen.Writer<com.example.Item> {
         public static final Writer INSTANCE = new Writer();
         private static final io.github.fomin.oasgen.Writer<com.example.ItemProperty2> WRITER_0 = com.example.ItemProperty2.Writer.INSTANCE;
-        private static final io.github.fomin.oasgen.Writer<java.math.BigDecimal> WRITER_1 = io.github.fomin.oasgen.ScalarWriter.NUMBER_WRITER;
-        private static final io.github.fomin.oasgen.Writer<java.time.LocalDateTime> WRITER_2 = io.github.fomin.oasgen.ScalarWriter.STRING_LOCAL_DATE_TIME_WRITER;
-        private static final io.github.fomin.oasgen.Writer<java.lang.String> WRITER_3 = io.github.fomin.oasgen.ScalarWriter.STRING_WRITER;
-        private static final io.github.fomin.oasgen.Writer<java.util.List<java.lang.String>> WRITER_4 = new io.github.fomin.oasgen.ArrayWriter<>(io.github.fomin.oasgen.ScalarWriter.STRING_WRITER);
-        private static final io.github.fomin.oasgen.Writer<java.util.Map<java.lang.String, java.math.BigDecimal>> WRITER_5 = new io.github.fomin.oasgen.MapWriter<>(io.github.fomin.oasgen.ScalarWriter.NUMBER_WRITER);
+        private static final io.github.fomin.oasgen.Writer<java.time.LocalDateTime> WRITER_1 = io.github.fomin.oasgen.LocalDateTimeConverter.WRITER;
+        private static final io.github.fomin.oasgen.Writer<java.math.BigDecimal> WRITER_2 = io.github.fomin.oasgen.NumberConverter.WRITER;
+        private static final io.github.fomin.oasgen.Writer<java.lang.String> WRITER_3 = io.github.fomin.oasgen.StringConverter.WRITER;
+        private static final io.github.fomin.oasgen.Writer<java.util.List<java.lang.String>> WRITER_4 = new io.github.fomin.oasgen.ArrayWriter<>(io.github.fomin.oasgen.StringConverter.WRITER);
+        private static final io.github.fomin.oasgen.Writer<java.util.Map<java.lang.String, java.math.BigDecimal>> WRITER_5 = new io.github.fomin.oasgen.MapWriter<>(io.github.fomin.oasgen.NumberConverter.WRITER);
 
         @Override
         public void write(JsonGenerator jsonGenerator, com.example.Item value) throws IOException {
@@ -238,11 +238,11 @@ public final class Item {
             }
             if (value.decimalProperty != null) {
                 jsonGenerator.writeFieldName("decimalProperty");
-                WRITER_1.write(jsonGenerator, value.decimalProperty);
+                WRITER_2.write(jsonGenerator, value.decimalProperty);
             }
             if (value.localDateTimeProperty != null) {
                 jsonGenerator.writeFieldName("localDateTimeProperty");
-                WRITER_2.write(jsonGenerator, value.localDateTimeProperty);
+                WRITER_1.write(jsonGenerator, value.localDateTimeProperty);
             }
             if (value.stringArrayProperty != null) {
                 jsonGenerator.writeFieldName("stringArrayProperty");

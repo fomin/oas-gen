@@ -39,7 +39,7 @@ public class SimpleClient {
                     return nettyOutbound.send(byteBufMono);
                 })
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.ScalarParser.createStringParser());
+        return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.StringConverter.createParser());
     }
 
     @Nonnull
@@ -59,7 +59,7 @@ public class SimpleClient {
                 .uri(UrlEncoderUtils.encodeUrl("/post-without-request-body"))
 
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.ScalarParser.createStringParser());
+        return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.StringConverter.createParser());
     }
 
     @Nonnull

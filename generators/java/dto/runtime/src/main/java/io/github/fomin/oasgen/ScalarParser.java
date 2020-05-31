@@ -5,35 +5,12 @@ import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.json.async.NonBlockingJsonParser;
 
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.function.Predicate;
 
 public class ScalarParser<T> implements NonBlockingParser<T> {
 
     public interface Reader<T> {
         T readValue(JsonParser jsonParser) throws IOException;
-    }
-
-    public static ScalarParser<String> createStringParser() {
-        return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_STRING,
-                JsonParser::getText
-        );
-    }
-
-    public static ScalarParser<LocalDateTime> createStringLocalDateTimeParser() {
-        return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_STRING,
-                jsonParser -> LocalDateTime.parse(jsonParser.getText())
-        );
-    }
-
-    public static ScalarParser<BigDecimal> createNumberParser() {
-        return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_NUMBER_FLOAT || token == JsonToken.VALUE_NUMBER_INT,
-                JsonParser::getDecimalValue
-        );
     }
 
     private final Predicate<JsonToken> jsonTokenPredicate;

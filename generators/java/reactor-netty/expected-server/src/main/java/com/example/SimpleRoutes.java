@@ -41,7 +41,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 Mono<java.lang.String> responseMono = create(requestMono);
                 return response
                         .header("Content-Type", "application/json")
-                        .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
+                        .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.StringConverter.WRITER));
             })
             .post(baseUrl + "/post-without-request-body", (request, response) -> {
 
@@ -50,7 +50,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 Mono<java.lang.String> responseMono = postWithoutRequestBody();
                 return response
                         .header("Content-Type", "application/json")
-                        .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.ScalarWriter.STRING_WRITER));
+                        .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.StringConverter.WRITER));
             })
             .get(baseUrl + "/find", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());

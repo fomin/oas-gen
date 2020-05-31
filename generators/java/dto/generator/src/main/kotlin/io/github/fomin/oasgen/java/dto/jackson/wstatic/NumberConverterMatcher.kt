@@ -14,8 +14,8 @@ class NumberConverterMatcher : ConverterMatcher {
             is JsonType.Scalar.NUMBER -> object : ConverterWriter {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.math.BigDecimal"
-                override fun parserCreateExpression() = "io.github.fomin.oasgen.ScalarParser.createNumberParser()"
-                override fun writerCreateExpression() = "io.github.fomin.oasgen.ScalarWriter.NUMBER_WRITER"
+                override fun parserCreateExpression() = "io.github.fomin.oasgen.NumberConverter.createParser()"
+                override fun writerCreateExpression() = "io.github.fomin.oasgen.NumberConverter.WRITER"
                 override fun generate() = ConverterWriter.Result(null, emptyList())
             }
             else -> null

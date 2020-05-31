@@ -14,8 +14,8 @@ class LocalDateTimeConverterMatcher : ConverterMatcher {
             object : ConverterWriter {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.time.LocalDateTime"
-                override fun parserCreateExpression() = "io.github.fomin.oasgen.ScalarParser.createStringLocalDateTimeParser()"
-                override fun writerCreateExpression() = "io.github.fomin.oasgen.ScalarWriter.STRING_LOCAL_DATE_TIME_WRITER"
+                override fun parserCreateExpression() = "io.github.fomin.oasgen.LocalDateTimeConverter.createParser()"
+                override fun writerCreateExpression() = "io.github.fomin.oasgen.LocalDateTimeConverter.WRITER"
                 override fun generate() = ConverterWriter.Result(null, emptyList())
             }
         else null
