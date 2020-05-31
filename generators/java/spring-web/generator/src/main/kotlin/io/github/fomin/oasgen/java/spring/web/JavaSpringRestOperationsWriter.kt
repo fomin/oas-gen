@@ -1,4 +1,4 @@
-package io.github.fomin.oasgen.java.rest.operations
+package io.github.fomin.oasgen.java.spring.web
 
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*

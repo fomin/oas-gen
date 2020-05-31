@@ -1,17 +1,17 @@
-package io.github.fomin.oasgen.java.rest.operations
+package io.github.fomin.oasgen.java.spring.web
 
 import io.github.fomin.oasgen.testCase
 import org.junit.jupiter.api.Test
 import java.io.File
 
-internal class JavaSpringRestOperationsWriterTest {
+internal class JavaSpringMvcServerWriterTest {
     @Test
     fun `generator should create expected output`() {
         testCase(
-                JavaSpringRestOperationsWriter("com.example", emptyList()),
+                JavaSpringMvcServerWriter("com.example", emptyList()),
                 File("../../../../simple-schema"),
                 "simple.yaml",
-                File("../expected-client/src/main/java")
+                File("../expected-server/src/main/java")
         )
     }
 }
