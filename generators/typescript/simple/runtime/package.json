@@ -1,0 +1,17 @@
+{
+  "name": "simple-client-runtime",
+  "version": "1.0.0",
+  "description": "",
+  "main": "out/index.js",
+  "types": "out/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node out/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "tslib": "^1.13.0"
+  }
+}

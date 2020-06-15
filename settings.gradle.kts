@@ -3,6 +3,7 @@ rootProject.name = "oas-gen"
 pluginManagement {
     plugins {
         kotlin("jvm") version "1.3.71"
+        id("com.github.node-gradle.node") version "2.2.4"
     }
 }
 
@@ -30,6 +31,8 @@ include(":generators:java:spring-web:generator")
 include(":generators:java:spring-web:expected-server")
 include(":generators:java:spring-web:expected-client")
 
-include(":generators:typescript:axios:generator")
-include(":generators:typescript:axios:runtime")
-include(":generators:typescript:axios:expected-client")
+include(":generators:typescript:dto:generator")
+
+include(":generators:typescript:simple:generator")
+include(":generators:typescript:simple:runtime")
+include(":generators:typescript:simple:expected-client")
