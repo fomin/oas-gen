@@ -14,6 +14,7 @@ interface ConverterMatcherProvider {
                     listOf(
                             OffsetDateTimeConverterMatcher(),
                             LocalDateConverterMatcher(),
+                            CustomLocalDateTimeConverterMatcher(),
                             LocalDateTimeConverterMatcher(),
                             ArrayConverterMatcher(),
                             MapConverterMatcher(),

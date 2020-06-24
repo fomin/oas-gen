@@ -1,5 +1,6 @@
 io.github.fomin.oasgen.java.dto.jackson.wstatic.ArrayConverterMatcher$Provider
 io.github.fomin.oasgen.java.dto.jackson.wstatic.BooleanConverterMatcher$Provider
+io.github.fomin.oasgen.java.dto.jackson.wstatic.CustomLocalDateTimeConverterMatcher$Provider
 io.github.fomin.oasgen.java.dto.jackson.wstatic.EnumConverterMatcher$Provider
 io.github.fomin.oasgen.java.dto.jackson.wstatic.Int32ConverterMatcher$Provider
 io.github.fomin.oasgen.java.dto.jackson.wstatic.Int64ConverterMatcher$Provider
