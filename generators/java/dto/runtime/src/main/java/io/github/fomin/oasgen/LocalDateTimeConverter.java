@@ -29,7 +29,7 @@ public class LocalDateTimeConverter {
     public static Writer<LocalDateTime> createWriter(String pattern) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatterCache.get(pattern);
         return (jsonGenerator, localDateTime) -> jsonGenerator.writeString(
-                localDateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                localDateTime.format(dateTimeFormatter)
         );
     }
 }
