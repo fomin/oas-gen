@@ -5,8 +5,17 @@ import io.github.fomin.oasgen.*
 
 fun toJavaClassName(basePackage: String, typedFragment: TypedFragment, suffix: String? = null): String {
     val typeName = toTypeName(typedFragment, suffix)
-    val package_ = typeName.namespace.joinToString("") { "${it.toLowerCase()}." }
-    return "$basePackage.$package_${typeName.name}"
+    val package_ = typeName.namespace.joinToString("") {
+        when {
+            reservedWords.contains(it) -> "${it.toLowerCase()}$."
+            else -> "${it.toLowerCase()}."
+        }
+    }
+    val escapedName = when (val name = typeName.name) {
+        in reservedWords -> "$name$"
+        else -> name
+    }
+    return "$basePackage.$package_$escapedName"
 }
 
 data class TypeName(
