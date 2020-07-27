@@ -21,7 +21,7 @@ public class MapParser<T> implements NonBlockingParser<Map<String, T>> {
 
     @Override
     public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
-        while (jsonParser.currentToken() == null || jsonParser.currentToken() != JsonToken.NOT_AVAILABLE) {
+        while (true) {
             JsonToken token;
             switch (objectParserState) {
                 case PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL:
@@ -40,6 +40,8 @@ public class MapParser<T> implements NonBlockingParser<Map<String, T>> {
                             default:
                                 throw new RuntimeException("Unexpected token " + token);
                         }
+                    } else {
+                        return false;
                     }
                     break;
                 case PARSE_FIELD_NAME_OR_END_OBJECT:
@@ -55,6 +57,8 @@ public class MapParser<T> implements NonBlockingParser<Map<String, T>> {
                             default:
                                 throw new RuntimeException("Unexpected token " + token);
                         }
+                    } else {
+                        return false;
                     }
                     break;
                 case PARSE_FIELD_VALUE:
@@ -71,13 +75,14 @@ public class MapParser<T> implements NonBlockingParser<Map<String, T>> {
                             items.put(currentField, value);
                             objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                         }
+                    } else {
+                        return false;
                     }
                     break;
                 default:
                     throw new RuntimeException("unexpected state " + objectParserState);
             }
         }
-        return false;
     }
 
     @Override

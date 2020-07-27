@@ -25,30 +25,29 @@ public class ScalarParser<T> implements NonBlockingParser<T> {
 
     @Override
     public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
-        if (jsonParser.currentToken() == null || jsonParser.currentToken() != JsonToken.NOT_AVAILABLE) {
+        if (scalarParserState == ScalarParserState.PARSE_VALUE_OR_NULL_VALUE_OR_END_ARRAY) {
             JsonToken token;
-            if (scalarParserState == ScalarParserState.PARSE_VALUE_OR_NULL_VALUE_OR_END_ARRAY) {
-                if ((token = jsonParser.nextToken()) != JsonToken.NOT_AVAILABLE) {
-                    if (jsonTokenPredicate.test(token)) {
-                        scalarParserState = ScalarParserState.FINISHED_VALUE;
-                        value = reader.readValue(jsonParser);
-                        return true;
-                    } else if (token == JsonToken.VALUE_NULL) {
-                        scalarParserState = ScalarParserState.FINISHED_NULL;
-                        value = null;
-                        return true;
-                    } else if (token == JsonToken.END_ARRAY) {
-                        scalarParserState = ScalarParserState.FINISHED_ARRAY;
-                        value = null;
-                        return true;
-                    }
-                    throw new RuntimeException("Unexpected token " + token + " " + jsonParser.getValueAsString());
+            if ((token = jsonParser.nextToken()) != JsonToken.NOT_AVAILABLE) {
+                if (jsonTokenPredicate.test(token)) {
+                    scalarParserState = ScalarParserState.FINISHED_VALUE;
+                    value = reader.readValue(jsonParser);
+                    return true;
+                } else if (token == JsonToken.VALUE_NULL) {
+                    scalarParserState = ScalarParserState.FINISHED_NULL;
+                    value = null;
+                    return true;
+                } else if (token == JsonToken.END_ARRAY) {
+                    scalarParserState = ScalarParserState.FINISHED_ARRAY;
+                    value = null;
+                    return true;
                 }
+                throw new RuntimeException("Unexpected token " + token + " " + jsonParser.getValueAsString());
             } else {
-                throw new RuntimeException("unexpected state " + scalarParserState);
+                return false;
             }
+        } else {
+            throw new RuntimeException("unexpected state " + scalarParserState);
         }
-        return false;
     }
 
     @Override

@@ -69,6 +69,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |        ParseResult<${converterWriter.valueType()}> parseResult = parser${parserIndex}.build();
                |        this.p${index} = parseResult.getValue();
                |        objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+               |    } else {
+               |        return false;
                |    }
                |    break;
             """.trimMargin()
@@ -103,7 +105,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |
                |    @Override
                |    public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
-               |        while (jsonParser.currentToken() == null || jsonParser.currentToken() != JsonToken.NOT_AVAILABLE) {
+               |        while (true) {
                |            JsonToken token;
                |            switch (objectParserState) {
                |                case PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL:
@@ -122,6 +124,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |                            default:
                |                                throw new RuntimeException("Unexpected token " + token);
                |                        }
+               |                    } else {
+               |                        return false;
                |                    }
                |                    break;
                |                case PARSE_FIELD_NAME_OR_END_OBJECT:
@@ -137,6 +141,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |                            default:
                |                                throw new RuntimeException("Unexpected token " + token);
                |                        }
+               |                    } else {
+               |                        return false;
                |                    }
                |                    break;
                |                ${parseFieldValueCase.indentWithMargin(4)}
@@ -144,7 +150,6 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |                    throw new RuntimeException("unexpected state " + objectParserState);
                |            }
                |        }
-               |        return false;
                |    }
                |
                |    @Override

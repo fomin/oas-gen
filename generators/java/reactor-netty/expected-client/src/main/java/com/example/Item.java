@@ -89,7 +89,7 @@ public final class Item {
 
         @Override
         public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
-            while (jsonParser.currentToken() == null || jsonParser.currentToken() != JsonToken.NOT_AVAILABLE) {
+            while (true) {
                 JsonToken token;
                 switch (objectParserState) {
                     case PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL:
@@ -114,6 +114,8 @@ public final class Item {
                                 default:
                                     throw new RuntimeException("Unexpected token " + token);
                             }
+                        } else {
+                            return false;
                         }
                         break;
                     case PARSE_FIELD_NAME_OR_END_OBJECT:
@@ -129,6 +131,8 @@ public final class Item {
                                 default:
                                     throw new RuntimeException("Unexpected token " + token);
                             }
+                        } else {
+                            return false;
                         }
                         break;
                     case PARSE_FIELD_VALUE:
@@ -138,6 +142,8 @@ public final class Item {
                                     ParseResult<java.lang.String> parseResult = parser2.build();
                                     this.p0 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "property1":
@@ -145,6 +151,8 @@ public final class Item {
                                     ParseResult<java.lang.String> parseResult = parser2.build();
                                     this.p1 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "property2":
@@ -152,6 +160,8 @@ public final class Item {
                                     ParseResult<com.example.ItemProperty2> parseResult = parser3.build();
                                     this.p2 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "decimalProperty":
@@ -159,6 +169,8 @@ public final class Item {
                                     ParseResult<java.math.BigDecimal> parseResult = parser1.build();
                                     this.p3 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "localDateTimeProperty":
@@ -166,6 +178,8 @@ public final class Item {
                                     ParseResult<java.time.LocalDateTime> parseResult = parser0.build();
                                     this.p4 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "stringArrayProperty":
@@ -173,6 +187,8 @@ public final class Item {
                                     ParseResult<java.util.List<java.lang.String>> parseResult = parser4.build();
                                     this.p5 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "mapProperty":
@@ -180,6 +196,8 @@ public final class Item {
                                     ParseResult<java.util.Map<java.lang.String, java.math.BigDecimal>> parseResult = parser5.build();
                                     this.p6 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             default:
@@ -190,7 +208,6 @@ public final class Item {
                         throw new RuntimeException("unexpected state " + objectParserState);
                 }
             }
-            return false;
         }
 
         @Override

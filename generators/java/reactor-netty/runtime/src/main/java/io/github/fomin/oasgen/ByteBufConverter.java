@@ -68,8 +68,6 @@ public class ByteBufConverter {
                     T value = parseResult.getValue();
                     synchronousSink.next(value);
                 }
-            } else {
-                throw new RuntimeException("No more content but json value is not completed");
             }
         });
         return valueFlux.single();

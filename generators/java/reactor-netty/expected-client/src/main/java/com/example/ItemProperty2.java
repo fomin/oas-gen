@@ -53,7 +53,7 @@ public final class ItemProperty2 {
 
         @Override
         public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
-            while (jsonParser.currentToken() == null || jsonParser.currentToken() != JsonToken.NOT_AVAILABLE) {
+            while (true) {
                 JsonToken token;
                 switch (objectParserState) {
                     case PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL:
@@ -74,6 +74,8 @@ public final class ItemProperty2 {
                                 default:
                                     throw new RuntimeException("Unexpected token " + token);
                             }
+                        } else {
+                            return false;
                         }
                         break;
                     case PARSE_FIELD_NAME_OR_END_OBJECT:
@@ -89,6 +91,8 @@ public final class ItemProperty2 {
                                 default:
                                     throw new RuntimeException("Unexpected token " + token);
                             }
+                        } else {
+                            return false;
                         }
                         break;
                     case PARSE_FIELD_VALUE:
@@ -98,6 +102,8 @@ public final class ItemProperty2 {
                                     ParseResult<java.lang.String> parseResult = parser1.build();
                                     this.p0 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "property21":
@@ -105,6 +111,8 @@ public final class ItemProperty2 {
                                     ParseResult<java.lang.String> parseResult = parser1.build();
                                     this.p1 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             case "property22":
@@ -112,6 +120,8 @@ public final class ItemProperty2 {
                                     ParseResult<com.example.ItemProperty2Property22> parseResult = parser0.build();
                                     this.p2 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
                                 }
                                 break;
                             default:
@@ -122,7 +132,6 @@ public final class ItemProperty2 {
                         throw new RuntimeException("unexpected state " + objectParserState);
                 }
             }
-            return false;
         }
 
         @Override

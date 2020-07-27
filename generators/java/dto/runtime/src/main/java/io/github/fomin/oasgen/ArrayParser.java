@@ -20,7 +20,7 @@ public class ArrayParser<T> implements NonBlockingParser<List<T>> {
 
     @Override
     public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
-        while (jsonParser.currentToken() == null || jsonParser.currentToken() != JsonToken.NOT_AVAILABLE) {
+        while (true) {
             JsonToken token;
             switch (arrayParserState) {
                 case PARSE_START_ARRAY_OR_NULL_VALUE_OR_END_ARRAY:
@@ -39,6 +39,8 @@ public class ArrayParser<T> implements NonBlockingParser<List<T>> {
                             default:
                                 throw new RuntimeException("Unexpected token " + token);
                         }
+                    } else {
+                        return false;
                     }
                     break;
                 case PARSE_VALUE:
@@ -53,13 +55,14 @@ public class ArrayParser<T> implements NonBlockingParser<List<T>> {
                             T value = parseResult.getValue();
                             items.add(value);
                         }
+                    } else {
+                        return false;
                     }
                     break;
                 default:
                     throw new RuntimeException("unexpected state " + arrayParserState);
             }
         }
-        return false;
     }
 
     @Override
