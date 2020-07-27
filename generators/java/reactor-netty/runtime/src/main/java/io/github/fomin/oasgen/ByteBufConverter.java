@@ -8,11 +8,18 @@ import io.netty.buffer.ByteBufOutputStream;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.NettyOutbound;
+import reactor.util.Logger;
+import reactor.util.Loggers;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 
 public class ByteBufConverter {
+    private static final Logger logger = Loggers.getLogger(ByteBufConverter.class);
+    static final boolean PARSE_LOG_ENABLED =
+            Boolean.parseBoolean(System.getProperty("io.github.fomin.oasgen.parseLogEnabled", "false"));
+
     private final JsonFactory jsonFactory;
 
     public ByteBufConverter(JsonFactory jsonFactory) {
@@ -37,6 +44,10 @@ public class ByteBufConverter {
                 }
                 int bytesToRead = Math.min(readableBytes, buffer.length);
                 byteBuf.readBytes(buffer, 0, bytesToRead);
+                if (PARSE_LOG_ENABLED) {
+                    String input = new String(buffer, 0, bytesToRead, StandardCharsets.UTF_8);
+                    logger.info("Feed body content: " + input);
+                }
                 try {
                     jsonParser.feedInput(buffer, 0, bytesToRead);
                     done = parser.parseNext(jsonParser);
