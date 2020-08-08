@@ -34,6 +34,7 @@ public final class ItemProperty2 {
             @Nullable @JsonProperty("property21") java.lang.String property21,
             @Nullable @JsonProperty("property22") com.example.ItemProperty2Property22 property22
     ) {
+
         this.commonProperty1 = commonProperty1;
         this.property21 = property21;
         this.property22 = property22;

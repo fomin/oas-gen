@@ -45,6 +45,18 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                         ).joinToString(" ")
                     }
 
+                    val constructorChecks = jointProperties.mapNotNull { (propertyName, _) ->
+                        if (jsonSchema.required().contains(propertyName)) {
+                            val variableName = toVariableName(propertyName)
+                            """|if ($variableName == null) {
+                               |    throw new NullPointerException("$variableName must be not null");
+                               |}
+                            """.trimMargin()
+                        } else {
+                            null
+                        }
+                    }
+
                     val constructorAssignments = jointProperties.map { (propertyName, _) ->
                         val variableName = toVariableName(propertyName)
                         """this.$variableName = $variableName;"""
@@ -69,11 +81,12 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                |    public $simpleName(
                                |            ${constructorArguments.joinToString(",\n").indentWithMargin(3)}
                                |    ) {
+                               |        ${constructorChecks.indentWithMargin(2)}
                                |        ${constructorAssignments.indentWithMargin(2)}
                                |    }
                                |}
                                |
-                            """.trimMargin()
+                            """.trimMargin().trimEndings()
                     val filePath = getFilePath(valueType())
                     return ConverterOutput(OutputFile(filePath, content), jointProperties.map { it.value })
                 }

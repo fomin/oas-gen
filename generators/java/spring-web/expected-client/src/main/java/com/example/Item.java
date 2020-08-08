@@ -62,6 +62,12 @@ public final class Item {
             @Nullable @JsonProperty("stringArrayProperty") java.util.List<java.lang.String> stringArrayProperty,
             @Nullable @JsonProperty("mapProperty") java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty
     ) {
+        if (property1 == null) {
+            throw new NullPointerException("property1 must be not null");
+        }
+        if (property2 == null) {
+            throw new NullPointerException("property2 must be not null");
+        }
         this.commonProperty1 = commonProperty1;
         this.property1 = property1;
         this.property2 = property2;

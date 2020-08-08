@@ -275,6 +275,17 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     val constructorArgs = javaProperties.joinToString(",\n") {
                         "${it.nullAnnotation} ${it.type} ${it.variableName}"
                     }
+                    val constructorChecks = jointProperties.mapNotNull { (propertyName, _) ->
+                        if (jsonSchema.required().contains(propertyName)) {
+                            val variableName = toVariableName(propertyName)
+                            """|if ($variableName == null) {
+                               |    throw new NullPointerException("$variableName must be not null");
+                               |}
+                            """.trimMargin()
+                        } else {
+                            null
+                        }
+                    }
                     val constructorAssignments = javaProperties.map { javaProperty ->
                         "this.${javaProperty.variableName} = ${javaProperty.variableName};"
                     }
@@ -303,6 +314,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                        |    public ${getSimpleName(valueType())}(
                        |            ${constructorArgs.indentWithMargin(3)}
                        |    ) {
+                       |        ${constructorChecks.indentWithMargin(2)}
                        |        ${constructorAssignments.indentWithMargin(2)}
                        |    }
                        |
@@ -311,7 +323,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                        |    ${writerContent.indentWithMargin(1)}
                        |}
                        |
-                    """.trimMargin()
+                    """.trimMargin().trimEndings()
 
                     val propertySchemas = jointProperties.map { it.value }
                     return ConverterWriter.Result(OutputFile(filePath, content), propertySchemas)

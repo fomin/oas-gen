@@ -21,3 +21,5 @@ fun Iterable<String>.indentWithMargin(indentLevel: Int): String {
     }.toString()
     return this.indentWithMargin(indent)
 }
+
+fun String.trimEndings(): String = this.lines().map { it.trimEnd() }.joinToString("\n")
