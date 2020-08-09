@@ -290,32 +290,70 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                         "this.${javaProperty.variableName} = ${javaProperty.variableName};"
                     }
 
+                    val equalsComparisons = jointProperties.map { (propertyName, _) ->
+                        val variableName = toVariableName(propertyName)
+                        "Objects.equals($variableName, other.$variableName)"
+                    }.joinToString(" &&\n")
+
+                    val hashArgs = jointProperties.map { (propertyName, _) ->
+                        toVariableName(propertyName)
+                    }.joinToString(",\n")
+
+                    val toStringParts = jointProperties.entries.mapIndexed { index, (propertyName, _) ->
+                        val variableName = toVariableName(propertyName)
+                        """"${if (index == 0) "" else ", "}$variableName='" + $variableName + '\'' +"""
+                    }
+
                     val jacksonParserWriter = JacksonParserWriter(converterRegistry)
                     val (parserContent, parserImports) = jacksonParserWriter.write(jsonSchema, valueType())
                     val jacksonWriterWriter = JacksonWriterWriter(converterRegistry)
                     val (writerContent, writerImports) = jacksonWriterWriter.write(jsonSchema, valueType())
-                    val importDeclarations = (parserImports + writerImports).map { "import $it;" }.toSortedSet()
+                    val importDeclarations = (parserImports + writerImports + "java.util.Objects")
+                            .map { "import $it;" }.toSortedSet()
                     val classJavaDoc = jsonSchema.title?.let { title ->
                         """|/**
                            | * $title
                            | */""".trimMargin()
                     } ?: ""
 
+                    val simpleName = getSimpleName(valueType())
                     val content = """
                        |package ${getPackage(valueType())};
                        |
                        |${importDeclarations.indentWithMargin(0)}
                        |
                        |$classJavaDoc
-                       |public final class ${getSimpleName(valueType())} {
+                       |public final class $simpleName {
                        |
                        |    ${fieldDeclarations.indentWithMargin(1)}
                        |
-                       |    public ${getSimpleName(valueType())}(
+                       |    public $simpleName(
                        |            ${constructorArgs.indentWithMargin(3)}
                        |    ) {
                        |        ${constructorChecks.indentWithMargin(2)}
                        |        ${constructorAssignments.indentWithMargin(2)}
+                       |    }
+                       |
+                       |    @Override
+                       |    public boolean equals(Object o) {
+                       |        if (this == o) return true;
+                       |        if (o == null || getClass() != o.getClass()) return false;
+                       |        ${valueType()} other = (${valueType()}) o;
+                       |        return ${equalsComparisons.indentWithMargin(4)};
+                       |    }
+                       |
+                       |    @Override
+                       |    public int hashCode() {
+                       |        return Objects.hash(
+                       |                ${hashArgs.indentWithMargin(4)}
+                       |        );
+                       |    }
+                       |
+                       |    @Override
+                       |    public String toString() {
+                       |        return "$simpleName{" +
+                       |                ${toStringParts.indentWithMargin(4)}
+                       |                '}';
                        |    }
                        |
                        |    ${parserContent.indentWithMargin(1)}

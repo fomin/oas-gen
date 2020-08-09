@@ -62,6 +62,20 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                         """this.$variableName = $variableName;"""
                     }
 
+                    val equalsComparisons = jointProperties.map { (propertyName, _) ->
+                        val variableName = toVariableName(propertyName)
+                        "Objects.equals($variableName, other.$variableName)"
+                    }.joinToString(" &&\n")
+
+                    val hashArgs = jointProperties.map { (propertyName, _) ->
+                        toVariableName(propertyName)
+                    }.joinToString(",\n")
+
+                    val toStringParts = jointProperties.entries.mapIndexed { index, (propertyName, _) ->
+                        val variableName = toVariableName(propertyName)
+                        """"${if (index == 0) "" else ", "}$variableName='" + $variableName + '\'' +"""
+                    }
+
                     val content =
                             """|package ${getPackage(valueType())};
                                |
@@ -69,6 +83,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                |import com.fasterxml.jackson.annotation.JsonProperty;
                                |import javax.annotation.Nonnull;
                                |import javax.annotation.Nullable;
+                               |import java.util.Objects;
                                |
                                |/**
                                | * ${jsonSchema.title}
@@ -83,6 +98,28 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                |    ) {
                                |        ${constructorChecks.indentWithMargin(2)}
                                |        ${constructorAssignments.indentWithMargin(2)}
+                               |    }
+                               |
+                               |    @Override
+                               |    public boolean equals(Object o) {
+                               |        if (this == o) return true;
+                               |        if (o == null || getClass() != o.getClass()) return false;
+                               |        ${valueType()} other = (${valueType()}) o;
+                               |        return ${equalsComparisons.indentWithMargin(4)};
+                               |    }
+                               |
+                               |    @Override
+                               |    public int hashCode() {
+                               |        return Objects.hash(
+                               |                ${hashArgs.indentWithMargin(4)}
+                               |        );
+                               |    }
+                               |
+                               |    @Override
+                               |    public String toString() {
+                               |        return "$simpleName{" +
+                               |                ${toStringParts.indentWithMargin(4)}
+                               |                '}';
                                |    }
                                |}
                                |

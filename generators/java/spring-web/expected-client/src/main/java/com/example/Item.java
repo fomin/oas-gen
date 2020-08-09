@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Objects;
 
 /**
  * Item
@@ -75,5 +76,45 @@ public final class Item {
         this.localDateTimeProperty = localDateTimeProperty;
         this.stringArrayProperty = stringArrayProperty;
         this.mapProperty = mapProperty;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        com.example.Item other = (com.example.Item) o;
+        return Objects.equals(commonProperty1, other.commonProperty1) &&
+                Objects.equals(property1, other.property1) &&
+                Objects.equals(property2, other.property2) &&
+                Objects.equals(decimalProperty, other.decimalProperty) &&
+                Objects.equals(localDateTimeProperty, other.localDateTimeProperty) &&
+                Objects.equals(stringArrayProperty, other.stringArrayProperty) &&
+                Objects.equals(mapProperty, other.mapProperty);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                commonProperty1,
+                property1,
+                property2,
+                decimalProperty,
+                localDateTimeProperty,
+                stringArrayProperty,
+                mapProperty
+        );
+    }
+
+    @Override
+    public String toString() {
+        return "Item{" +
+                "commonProperty1='" + commonProperty1 + '\'' +
+                ", property1='" + property1 + '\'' +
+                ", property2='" + property2 + '\'' +
+                ", decimalProperty='" + decimalProperty + '\'' +
+                ", localDateTimeProperty='" + localDateTimeProperty + '\'' +
+                ", stringArrayProperty='" + stringArrayProperty + '\'' +
+                ", mapProperty='" + mapProperty + '\'' +
+                '}';
     }
 }

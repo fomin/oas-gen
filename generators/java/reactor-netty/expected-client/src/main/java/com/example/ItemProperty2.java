@@ -7,6 +7,7 @@ import io.github.fomin.oasgen.NonBlockingParser;
 import io.github.fomin.oasgen.ObjectParserState;
 import io.github.fomin.oasgen.ParseResult;
 import java.io.IOException;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
@@ -40,6 +41,34 @@ public final class ItemProperty2 {
         this.commonProperty1 = commonProperty1;
         this.property21 = property21;
         this.property22 = property22;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        com.example.ItemProperty2 other = (com.example.ItemProperty2) o;
+        return Objects.equals(commonProperty1, other.commonProperty1) &&
+                Objects.equals(property21, other.property21) &&
+                Objects.equals(property22, other.property22);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                commonProperty1,
+                property21,
+                property22
+        );
+    }
+
+    @Override
+    public String toString() {
+        return "ItemProperty2{" +
+                "commonProperty1='" + commonProperty1 + '\'' +
+                ", property21='" + property21 + '\'' +
+                ", property22='" + property22 + '\'' +
+                '}';
     }
 
     public static class Parser implements NonBlockingParser<com.example.ItemProperty2> {
