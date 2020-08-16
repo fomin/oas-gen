@@ -129,6 +129,7 @@ export interface Item {
     readonly mapProperty: Record<string, number>;
 }
 
+// @ts-ignore
 function itemFromJson(json: any): Item {
     return mapObjectProperties(json, (key, value) => {
         switch (key) {
@@ -140,6 +141,7 @@ function itemFromJson(json: any): Item {
     });
 }
 
+// @ts-ignore
 function itemToJson(obj: Item): any {
     return mapObjectProperties(obj, (key, value) => {
         switch (key) {

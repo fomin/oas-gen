@@ -68,7 +68,8 @@ class ObjectConverterMatcher : TypeConverterMatcher {
                         }
 
                         override fun content() =
-                                """|function ${toVariableName(typeName.name, "from", "json")}(json: any): ${type()} {
+                                """|// @ts-ignore
+                                   |function ${toVariableName(typeName.name, "from", "json")}(json: any): ${type()} {
                                    |    return mapObjectProperties(json, (key, value) => {
                                    |        switch (key) {
                                    |            ${switchCases { "${it.fromJson()}(value)" }.indentWithMargin(3)}
@@ -78,6 +79,7 @@ class ObjectConverterMatcher : TypeConverterMatcher {
                                    |    });
                                    |}
                                    |
+                                   |// @ts-ignore
                                    |function ${toVariableName(typeName.name, "to", "json")}(obj: ${type()}): any {
                                    |    return mapObjectProperties(obj, (key, value) => {
                                    |        switch (key) {
