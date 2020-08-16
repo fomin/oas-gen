@@ -9,20 +9,13 @@ private class ClientFunction(
         val dtoSchemas: List<JsonSchema>
 )
 
-class SimpleClientWriter : Writer<OpenApiSchema> {
+class SimpleClientWriter(
+        private val converterIds: List<String>
+) : Writer<OpenApiSchema> {
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
 
-        val typeConverterRegistry = TypeConverterRegistry(listOf(
-                LocalDateTimeConverterMatcher(),
-                StringEnumConverterMatcher(),
-                MapConverterMatcher(),
-                ArrayConverterMatcher(),
-                BooleanConverterMatcher(),
-                NumberConverterMatcher(),
-                IntegerConverterMatcher(),
-                StringConverterMatcher(),
-                ObjectConverterMatcher()
-        ))
+        val typeConverterMatcher = TypeConverterMatcherProvider.provide(converterIds)
+        val typeConverterRegistry = TypeConverterRegistry(typeConverterMatcher)
 
         return items.map { openApiSchema ->
             val clientFunctions = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
@@ -109,7 +102,7 @@ class SimpleClientWriter : Writer<OpenApiSchema> {
                     TypeScriptDtoWriter().write(typeConverterRegistry, clientFunctions.flatMap { it.dtoSchemas })
 
             val importDeclarations = dtoImportDeclarations + listOf(
-                    ImportDeclaration("RestRequest", "simple-client-runtime")
+                    ImportDeclaration("RestRequest", "@andrey.n.fomin/oas-gen-typescript-dto-runtime")
             )
 
             val content =

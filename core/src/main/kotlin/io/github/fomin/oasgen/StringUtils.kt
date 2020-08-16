@@ -23,3 +23,23 @@ fun Iterable<String>.indentWithMargin(indentLevel: Int): String {
 }
 
 fun String.trimEndings(): String = this.lines().map { it.trimEnd() }.joinToString("\n")
+
+fun escapeReservedWordsAndChars(replacementChars: List<Pair<String, String>>, reservedWords: Set<String>, vararg parts: String): List<String> {
+    val filteredParts = parts.map { part ->
+        replacementChars.fold(part) { acc, replacementPair ->
+            acc.replace(replacementPair.first, replacementPair.second)
+        }
+    }
+
+    return when (filteredParts.size) {
+        1 -> {
+            val singlePart = filteredParts[0]
+            when {
+                reservedWords.contains(singlePart) -> listOf("$singlePart$")
+                else -> listOf(singlePart)
+            }
+        }
+        else -> return filteredParts
+    }
+
+}

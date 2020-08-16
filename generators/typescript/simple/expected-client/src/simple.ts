@@ -1,5 +1,5 @@
 import {DateTimeFormatter, LocalDateTime} from "@js-joda/core";
-import {RestRequest, mapObjectProperties} from "simple-client-runtime";
+import {RestRequest, mapObjectProperties} from "@andrey.n.fomin/oas-gen-typescript-dto-runtime";
 
 export function create(
     baseUrl: string,

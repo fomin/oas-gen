@@ -8,7 +8,7 @@ internal class SimpleClientWriterTest {
     @Test
     fun `generator should create expected output`() {
         testCase(
-                SimpleClientWriter(),
+                SimpleClientWriter(emptyList()),
                 File("../../../../simple-schema"),
                 "simple.yaml",
                 File("../expected-client/src")

@@ -4,5 +4,5 @@ import io.github.fomin.oasgen.OpenApiWriterProvider
 
 class SimpleClientWriterProvider : OpenApiWriterProvider {
     override val id = "typescript-simple"
-    override fun provide(namespace: String, converterIds: List<String>) = SimpleClientWriter()
+    override fun provide(namespace: String, converterIds: List<String>) = SimpleClientWriter(converterIds)
 }
