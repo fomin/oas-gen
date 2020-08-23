@@ -1,13 +1,13 @@
 package io.github.fomin.oasgen
 
 enum class OperationType {
-    GET, POST, DELETE;
+    GET, POST, PUT, DELETE;
 
     fun key() = name.toLowerCase()
 }
 
 enum class HttpResponseCode {
-    CODE_200, CODE_500;
+    CODE_200, CODE_400, CODE_404, CODE_500;
 
     fun key() = name.substring(5)
 }
