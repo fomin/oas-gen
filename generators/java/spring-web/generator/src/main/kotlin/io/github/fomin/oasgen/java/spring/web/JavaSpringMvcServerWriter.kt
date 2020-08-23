@@ -62,6 +62,7 @@ class JavaSpringMvcServerWriter(
                     val mappingAnnotationName = when (operation.operationType) {
                         OperationType.GET -> "GetMapping"
                         OperationType.POST -> "PostMapping"
+                        OperationType.PUT -> "PutMapping"
                         OperationType.DELETE -> "DeleteMapping"
                     }
 
@@ -69,6 +70,7 @@ class JavaSpringMvcServerWriter(
                     val bodySchema: JsonSchema?
                     val requestBodyArg: String?
                     val consumesPart: String
+                    val parametersSchemas = mutableSetOf<JsonSchema>()
 
                     if (requestBody != null) {
                         val entry = requestBody.content().entries.single()
@@ -93,6 +95,9 @@ class JavaSpringMvcServerWriter(
                         }
                         val variableName = toVariableName(parameter.name)
                         val variableType = converterRegistry[parameter.schema()].valueType()
+                        if ("java.lang.String" != variableType) {
+                            parametersSchemas.add(parameter.schema())
+                        }
                         """$nullAnnotation @$mappingAnnotation("${parameter.name}") $variableType $variableName"""
                     }
                     val methodArgs = (parameterArgs + requestBodyArg).filterNotNull().joinToString(",\n")
@@ -108,7 +113,7 @@ class JavaSpringMvcServerWriter(
                     val dtoSchemas = listOfNotNull(
                             bodySchema,
                             responseSchema
-                    )
+                    ) + parametersSchemas
                     OperationOutput(methodContent, dtoSchemas)
                 }
             }

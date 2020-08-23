@@ -45,6 +45,12 @@ paths:
           required: false
           schema:
             type: string
+        - name: param3
+          in: query
+          required: false
+          schema:
+            $ref: 'enum-item.yaml'
+          example: 'VALUE_1'
       responses:
         '200':
           description: description

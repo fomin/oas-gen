@@ -65,10 +65,17 @@ class ReactorNettyServerWriter(
                 else
                     ""
                 val parameterDeclarations = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
+                    val type = javaParameter.javaVariable.type
                     when (val paramterIn = javaParameter.schemaParameter.parameterIn) {
-                        ParameterIn.PATH -> """${javaParameter.javaVariable.type} param$index = request.param("${javaParameter.name}");"""
-                        ParameterIn.QUERY -> """${javaParameter.javaVariable.type} param$index = queryParams.get("${javaParameter.name}");"""
-                        else -> error("unsupported paramter type $paramterIn")
+                        ParameterIn.PATH -> """$type param$index = request.param("${javaParameter.name}");"""
+                        ParameterIn.QUERY -> {
+                            val paramStrValue = """queryParams.get("${javaParameter.name}")"""
+                            when(type) {
+                                "java.lang.String" -> """$type param$index = ${paramStrValue};"""
+                                else -> """$type param$index = $type.of($paramStrValue);"""
+                            }
+                        }
+                        else -> error("unsupported parameter type $paramterIn")
                     }
                 }
                 val requestMonoDeclaration = javaOperation.requestVariable?.let { requestVariable ->
@@ -128,6 +135,8 @@ class ReactorNettyServerWriter(
             val dtoSchemas = mutableListOf<JsonSchema>()
             dtoSchemas.addAll(javaOperations.mapNotNull { it.responseVariable.schema })
             dtoSchemas.addAll(javaOperations.mapNotNull { it.requestVariable?.schema })
+            dtoSchemas.addAll(javaOperations.flatMap { it.parameters.mapNotNull {
+                param -> param.schemaParameter.schema() }})
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
             outputFiles.add(OutputFile(filePath, content))

@@ -21,7 +21,7 @@ public abstract class BaseServerTest {
     public void testFind() {
         String body = httpClient
                 .get()
-                .uri("/find?param1=param1Value&param2=param2Value")
+                .uri("/find?param1=param1Value&param2=param2Value&param3=value_1")
                 .responseSingle((httpClientResponse, byteBufMono) -> {
                     assertEquals(OK, httpClientResponse.status());
                     return byteBufMono.asString();

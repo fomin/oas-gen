@@ -48,6 +48,7 @@ export function find(
     baseUrl: string,
     param1: string,
     param2: string,
+    param3: EnumItem,
     timeout?: number,
     onLoadCallback?: (value: Item) => void,
     onErrorCallback?: (reason: any) => void,
@@ -55,7 +56,7 @@ export function find(
     onAbortCallback?: () => void
 ): RestRequest<Item> {
     return new RestRequest<Item>(
-        `${baseUrl}/find?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
+        `${baseUrl}/find?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}&param3=${encodeURIComponent(param3)}`,
         "GET",
         itemFromJson,
         undefined,
@@ -149,6 +150,14 @@ function itemToJson(obj: Item): any {
                 return value;
         }
     });
+}
+
+/**
+ * enum item
+ */
+export const enum EnumItem {
+    Value_1 = "value_1",
+    Value_2 = "value_2"
 }
 
 /**

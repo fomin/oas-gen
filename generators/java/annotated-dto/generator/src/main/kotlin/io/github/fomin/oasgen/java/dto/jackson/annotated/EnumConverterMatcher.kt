@@ -17,6 +17,11 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
                     """${toUpperSnakeCase(enumValue)}("$enumValue")"""
                 }
 
+                val parserCases = enumValues.map { enumValue ->
+                    """|case "$enumValue":
+                       |    return ${toUpperSnakeCase(enumValue)};""".trimMargin()
+                }
+
                 val content =
                         """|package ${getPackage(valueType())};
                            |
@@ -36,6 +41,14 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
                            |
                            |    $simpleName(@Nonnull String strValue) {
                            |        this.strValue = strValue;
+                           |    }
+                           |
+                           |    public static $simpleName of(String value) {
+                           |        switch (value) {
+                           |            ${parserCases.indentWithMargin(3)}
+                           |            default:
+                           |                throw new UnsupportedOperationException("Unsupported value " + value);
+                           |        }
                            |    }
                            |
                            |}

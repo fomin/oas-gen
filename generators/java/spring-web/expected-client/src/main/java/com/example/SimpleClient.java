@@ -71,23 +71,27 @@ public class SimpleClient {
     @Nonnull
     public ResponseEntity<com.example.Item> find(
             @Nonnull java.lang.String param1,
-            @Nullable java.lang.String param2
+            @Nullable java.lang.String param2,
+            @Nullable com.example.EnumItem param3
     ) {
         return find$0(
                 param1,
-            param2
+            param2,
+            param3
         );
     }
 
     private ResponseEntity<com.example.Item> find$0(
             java.lang.String param0,
-            java.lang.String param1
+            java.lang.String param1,
+            com.example.EnumItem param2
     ) {
         Map<String, Object> uriVariables = Collections.emptyMap();
         URI uri = UriComponentsBuilder
                 .fromUriString(baseUrl + "/find")
                 .queryParam("param1", param0)
                 .queryParam("param2", param1)
+                .queryParam("param3", param2.strValue)
                 .build(uriVariables);
         RequestEntity<java.lang.Void> request = RequestEntity
                 .get(uri)

@@ -65,6 +65,8 @@ class JavaSpringRestOperationsWriter(
 
                     val requestBody = operation.requestBody()
                     val bodySchema: JsonSchema?
+                    val pathParametersSchemas = mutableSetOf<JsonSchema>()
+                    val queryParametersSchemas = mutableSetOf<JsonSchema>()
                     val requestBodyArgDeclaration: String?
                     val requestBodyInternalArgDeclaration: String?
                     val requestBodyArg: String?
@@ -115,7 +117,14 @@ class JavaSpringRestOperationsWriter(
 
                     val pathParameterEntries = operation.parameters().mapIndexedNotNull { index, parameter ->
                         if (parameter.parameterIn == ParameterIn.PATH) {
-                            "uriVariables.put(\"${parameter.name}\", param${index});"
+                            val suffix = when (converterRegistry[parameter.schema()].valueType()) {
+                                "java.lang.String" -> ""
+                                else -> {
+                                    pathParametersSchemas.add(parameter.schema())
+                                    ".strValue"
+                                }
+                            }
+                            "uriVariables.put(\"${parameter.name}\", param${index}${suffix});"
                         } else {
                             null
                         }
@@ -129,9 +138,16 @@ class JavaSpringRestOperationsWriter(
                     }
 
                     val queryParameterCalls = operation.parameters().mapIndexedNotNull { index, parameter ->
-                        if (parameter.parameterIn == ParameterIn.QUERY)
-                            """.queryParam("${parameter.name}", param${index})"""
-                        else
+                        if (parameter.parameterIn == ParameterIn.QUERY) {
+                            val suffix = when (converterRegistry[parameter.schema()].valueType()) {
+                                "java.lang.String" -> ""
+                                else -> {
+                                    pathParametersSchemas.add(parameter.schema())
+                                    ".strValue"
+                                }
+                            }
+                            """.queryParam("${parameter.name}", param${index}${suffix})"""
+                        } else
                             null
                     }
                     val methodName = toMethodName(operation.operationId)
@@ -162,7 +178,7 @@ class JavaSpringRestOperationsWriter(
                     val dtoSchemas = listOfNotNull(
                             bodySchema,
                             responseSchema
-                    )
+                    ) + queryParametersSchemas + pathParametersSchemas
                     OperationOutput(methodContent, dtoSchemas)
                 }
             }

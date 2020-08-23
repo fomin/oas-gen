@@ -50,7 +50,12 @@ class SimpleClientWriter : Writer<OpenApiSchema> {
                     }
                     val bodyArguments = if (bodySchema == null) emptyList()
                     else listOf("body: ${typeConverterRegistry[bodySchema].type()}")
+                    val parameterTypeSchemas = mutableSetOf<JsonSchema>()
                     val queryString = operation.parameters().mapNotNull { parameter ->
+                        val parameterType = typeConverterRegistry[parameter.schema()].type()
+                        if ("string" != parameterType) {
+                            parameterTypeSchemas.add(parameter.schema())
+                        }
                         when (parameter.parameterIn) {
                             ParameterIn.QUERY -> "${parameter.name}=${'$'}{encodeURIComponent(${toVariableName(parameter.name)})}"
                             else -> null
@@ -97,7 +102,7 @@ class SimpleClientWriter : Writer<OpenApiSchema> {
                                |    )
                                |}
                                |""".trimMargin(),
-                            listOfNotNull(bodySchema, responseSchema)
+                            listOfNotNull(bodySchema, responseSchema) + parameterTypeSchemas
                     )
                 }
             }

@@ -65,21 +65,24 @@ public class SimpleClient {
     @Nonnull
     public Mono<com.example.Item> find(
             @Nonnull java.lang.String param1,
-            @Nullable java.lang.String param2
+            @Nullable java.lang.String param2,
+            @Nullable com.example.EnumItem param3
     ) {
         return find$0(
                 param1,
-                param2
+                param2,
+                param3
         );
     }
 
     private Mono<com.example.Item> find$0(
             java.lang.String param0,
-            java.lang.String param1
+            java.lang.String param1,
+            com.example.EnumItem param2
     ) {
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .get()
-                .uri(UrlEncoderUtils.encodeUrl("/find", "param1", param0, "param2", param1))
+                .uri(UrlEncoderUtils.encodeUrl("/find", "param1", param0, "param2", param1, "param3", param2.strValue))
 
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
         return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());

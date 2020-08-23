@@ -68,7 +68,7 @@ class SimpleClientTest implements ClientTest {
     @Override
     @Test
     public void testFind() {
-        ResponseEntity<Item> responseEntity = simpleClient.find("param1Value", "param2Value");
+        ResponseEntity<Item> responseEntity = simpleClient.find("param1Value", "param2Value", EnumItem.VALUE_1);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
     }

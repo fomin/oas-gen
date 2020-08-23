@@ -9,10 +9,12 @@ import org.springframework.boot.web.server.WebServerFactoryCustomizer;
 import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.format.FormatterRegistry;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,7 +49,12 @@ class SimpleRoutesTest extends BaseServerTest {
 
     @SpringBootApplication
     @EnableWebMvc
-    public static class TestApplication {
+    public static class TestApplication implements WebMvcConfigurer{
+
+        @Override
+        public void addFormatters(FormatterRegistry registry) {
+            registry.addConverter(String.class, EnumItem.class, EnumItem::of);
+        }
 
         @Bean
         public SimpleRoutes simpleRoutes() {
@@ -81,9 +88,10 @@ class SimpleRoutesTest extends BaseServerTest {
 
         @Nonnull
         @Override
-        public ResponseEntity<Item> find(@Nonnull String param1, @Nullable String param2) {
+        public ResponseEntity<Item> find(@Nonnull String param1, @Nullable String param2, @Nullable EnumItem param3) {
             assertEquals("param1Value", param1);
             assertEquals("param2Value", param2);
+            assertEquals(EnumItem.VALUE_1, param3);
             return ResponseEntity.ok(TEST_ITEM);
         }
 

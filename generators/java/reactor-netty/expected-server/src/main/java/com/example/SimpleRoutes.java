@@ -26,7 +26,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     public abstract Mono<java.lang.String> postWithoutRequestBody();
 
     @Nonnull
-    public abstract Mono<com.example.Item> find(@Nonnull java.lang.String param1, @Nullable java.lang.String param2);
+    public abstract Mono<com.example.Item> find(@Nonnull java.lang.String param1, @Nullable java.lang.String param2, @Nullable com.example.EnumItem param3);
 
     @Nonnull
     public abstract Mono<com.example.Item> get(@Nonnull java.lang.String id);
@@ -56,8 +56,9 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
                 java.lang.String param0 = queryParams.get("param1");
                 java.lang.String param1 = queryParams.get("param2");
+                com.example.EnumItem param2 = com.example.EnumItem.of(queryParams.get("param3"));
 
-                Mono<com.example.Item> responseMono = find(param0, param1);
+                Mono<com.example.Item> responseMono = find(param0, param1, param2);
                 return response
                         .header("Content-Type", "application/json")
                         .send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));

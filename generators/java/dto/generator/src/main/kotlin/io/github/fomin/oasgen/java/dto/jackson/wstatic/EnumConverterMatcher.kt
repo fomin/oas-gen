@@ -58,19 +58,20 @@ class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
                        |    public static io.github.fomin.oasgen.NonBlockingParser<$className> createParser() {
                        |        return new io.github.fomin.oasgen.ScalarParser<>(
                        |                token -> token == com.fasterxml.jackson.core.JsonToken.VALUE_STRING,
-                       |                jsonParser -> {
-                       |                    String value = jsonParser.getText();
-                       |                    switch (value) {
-                       |                        ${parserCases.indentWithMargin(6)}
-                       |                        default:
-                       |                            throw new UnsupportedOperationException("Unsupported value " + value);
-                       |                    }
-                       |                }
+                       |                jsonParser -> of(jsonParser.getText())
                        |        );
                        |    }
                        |
                        |    public static final io.github.fomin.oasgen.Writer<$className> WRITER =
                        |            (jsonGenerator, value) -> jsonGenerator.writeString(value.strValue);
+                       |
+                       |    public static ${getSimpleName(className)} of(String value) {
+                       |        switch (value) {
+                       |            ${parserCases.indentWithMargin(3)}
+                       |            default:
+                       |                throw new UnsupportedOperationException("Unsupported value " + value);
+                       |        }
+                       |    }
                        |
                        |}
                        |

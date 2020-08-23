@@ -23,7 +23,8 @@ public interface SimpleRoutes {
     @GetMapping(path = "/find", produces = "application/json")
     ResponseEntity<com.example.Item> find(
             @Nonnull @RequestParam("param1") java.lang.String param1,
-            @Nullable @RequestParam("param2") java.lang.String param2
+            @Nullable @RequestParam("param2") java.lang.String param2,
+            @Nullable @RequestParam("param3") com.example.EnumItem param3
     );
 
     @Nonnull

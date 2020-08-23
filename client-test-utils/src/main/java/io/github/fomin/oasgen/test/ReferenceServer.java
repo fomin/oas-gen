@@ -40,6 +40,7 @@ public class ReferenceServer {
                             Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
                             assertEquals("param1Value", queryParams.get("param1"));
                             assertEquals("param2Value", queryParams.get("param2"));
+                            assertEquals("value_1", queryParams.get("param3"));
                             return response
                                     .header("Content-Type", "application/json")
                                     .sendString(Mono.just(TEST_ITEM_STR));

@@ -84,7 +84,11 @@ class ReactorNettyClientWriter(
 
                 val queryParameterArgs = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
                     if (javaParameter.schemaParameter.parameterIn == ParameterIn.QUERY) {
-                        """, "${javaParameter.name}", param$index"""
+                        val suffix = when (javaParameter.javaVariable.type) {
+                            "java.lang.String" -> ""
+                            else -> ".strValue"
+                        }
+                        """, "${javaParameter.name}", param$index$suffix"""
                     } else {
                         null
                     }
@@ -135,6 +139,8 @@ class ReactorNettyClientWriter(
             val dtoSchemas = mutableListOf<JsonSchema>()
             dtoSchemas.addAll(javaOperations.mapNotNull { it.responseVariable.schema })
             dtoSchemas.addAll(javaOperations.mapNotNull { it.requestVariable?.schema })
+            dtoSchemas.addAll(javaOperations.flatMap { it.parameters.mapNotNull {
+                param -> param.schemaParameter.schema() }})
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
             outputFiles.add(OutputFile(filePath, content))

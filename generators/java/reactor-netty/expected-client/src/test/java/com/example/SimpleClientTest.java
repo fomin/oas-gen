@@ -39,7 +39,7 @@ class SimpleClientTest implements ClientTest {
 
     @Override
     public void testFind() {
-        Mono<Item> itemMono = simpleClient.find("param1Value", "param2Value");
+        Mono<Item> itemMono = simpleClient.find("param1Value", "param2Value", EnumItem.VALUE_1);
         Item item = itemMono.block();
         assertNotNull(item);
     }

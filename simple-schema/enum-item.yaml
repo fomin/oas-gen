@@ -1,0 +1,6 @@
+title: 'enum item'
+type: string
+enum:
+  - value_1
+  - value_2
+description: 'enum-item'
