@@ -1,7 +1,7 @@
 package io.github.fomin.oasgen
 
 enum class OperationType {
-    GET, POST, DELETE;
+    GET, DELETE, POST, PUT;
 
     fun key() = name.toLowerCase()
 }

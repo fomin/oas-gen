@@ -61,8 +61,9 @@ class JavaSpringMvcServerWriter(
 
                     val mappingAnnotationName = when (operation.operationType) {
                         OperationType.GET -> "GetMapping"
-                        OperationType.POST -> "PostMapping"
                         OperationType.DELETE -> "DeleteMapping"
+                        OperationType.POST -> "PostMapping"
+                        OperationType.PUT -> "PutMapping"
                     }
 
                     val requestBody = operation.requestBody()
