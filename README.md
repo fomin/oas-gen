@@ -2,7 +2,7 @@
 
 Just another OpenAPI code generator
 
-## How to run
+## How to run via command line
 
 ```shell script
 java -cp <classpath> io.github.fomin.oasgen.java.MainKt \
@@ -11,7 +11,33 @@ java -cp <classpath> io.github.fomin.oasgen.java.MainKt \
         -s <schema-file> \
         -o <output-directory> \
         -n <namespace> \
-        -g <generator-id>
+        -g <generator-id> \
+        -c <converter-id> ...
+```
+
+## How to use with gradle
+
+```kotlin
+plugins {
+    id("io.github.fomin.oas-gen") version "<PLUGIN_VERSION>"
+}
+
+dependencies {
+    // add generators to configuration "oas-gen"
+    // there is example for reactor-netty generator
+    oasGen("io.github.fomin.oas-gen", "oas-gen-reactor-netty-generator", "0.0.18")
+}
+
+oasGen {
+    generate(
+            generatorId = "java-reactor-netty-client",
+            baseDir = file("../../simple-schema"),
+            schemaPath = "simple.yaml",
+            namespace = "com.example",
+            // create java source-set with generated files
+            javaSources = true
+    )
+}
 ```
 
 ## Links and Trademarks
