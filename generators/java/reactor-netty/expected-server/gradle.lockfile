@@ -1,21 +1,21 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-com.fasterxml.jackson.core:jackson-core:2.11.0=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-core:2.11.2=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.google.code.findbugs:jsr305:3.0.2=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-buffer:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec-http2:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec-http:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec-socks:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-common:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-handler-proxy:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-handler:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-resolver:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-transport-native-epoll:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-transport-native-unix-common:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-transport:4.1.50.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.projectreactor.netty:reactor-netty:0.9.9.RELEASE=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.projectreactor:reactor-core:3.3.7.RELEASE=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-buffer:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec-http2:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec-http:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec-socks:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-common:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-handler-proxy:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-handler:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-resolver:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-transport-native-epoll:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-transport-native-unix-common:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-transport:4.1.51.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.projectreactor.netty:reactor-netty:0.9.11.RELEASE=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.projectreactor:reactor-core:3.3.9.RELEASE=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.reactivestreams:reactive-streams:1.0.3=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 empty=annotationProcessor,archives,compile,compileOnly,runtime,testAnnotationProcessor,testCompile,testCompileOnly,testRuntime

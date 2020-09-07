@@ -3,13 +3,13 @@
 # This file is expected to be part of source control.
 ch.qos.logback:logback-classic:1.2.3=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
 ch.qos.logback:logback-core:1.2.3=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
-com.fasterxml.jackson.core:jackson-annotations:2.11.0=default,runtimeClasspath,testRuntimeClasspath
-com.fasterxml.jackson.core:jackson-core:2.11.0=default,runtimeClasspath,testRuntimeClasspath
-com.fasterxml.jackson.core:jackson-databind:2.11.0=default,runtimeClasspath,testRuntimeClasspath
-com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.0=default,runtimeClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-annotations:2.11.2=default,runtimeClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-core:2.11.2=default,runtimeClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-databind:2.11.2=default,runtimeClasspath,testRuntimeClasspath
+com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.11.2=default,runtimeClasspath,testRuntimeClasspath
 com.googlecode.javaewah:JavaEWAH:1.1.7=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
 org.apiguardian:apiguardian-api:1.1.0=apiDependenciesMetadata,compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
-org.eclipse.jgit:org.eclipse.jgit:5.8.0.202006091008-r=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
+org.eclipse.jgit:org.eclipse.jgit:5.8.1.202007141445-r=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
 org.jetbrains.intellij.deps:trove4j:1.0.20181211=kotlinCompilerClasspath
 org.jetbrains.kotlin:kotlin-compiler-embeddable:1.3.71=kotlinCompilerClasspath
 org.jetbrains.kotlin:kotlin-daemon-embeddable:1.3.71=kotlinCompilerClasspath
