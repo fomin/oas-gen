@@ -14,6 +14,10 @@ class MapConverterMatcher : ConverterMatcher {
 
             override fun extraAnnotations(): String? = null
 
+            override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
+
+            override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
+
             override fun output() = ConverterOutput.EMPTY
         }
         else null

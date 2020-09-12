@@ -10,11 +10,18 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
             override val jsonSchema = jsonSchema
             override fun valueType() = toJavaClassName(basePackage, jsonSchema)
             override fun extraAnnotations(): String? = null
+            override fun stringParseExpression(valueExpression: String) = "${valueType()}.parseString($valueExpression)"
+            override fun stringWriteExpression(valueExpression: String) = "${valueType()}.writeString($valueExpression)"
             override fun output(): ConverterOutput {
                 val simpleName = getSimpleName(valueType())
 
                 val valueDeclarations = enumValues.joinToString(",\n") { enumValue ->
                     """${toUpperSnakeCase(enumValue)}("$enumValue")"""
+                }
+
+                val parserCases = enumValues.map { enumValue ->
+                    """|case "$enumValue":
+                       |    return ${toUpperSnakeCase(enumValue)};""".trimMargin()
                 }
 
                 val content =
@@ -36,6 +43,18 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
                            |
                            |    $simpleName(@Nonnull String strValue) {
                            |        this.strValue = strValue;
+                           |    }
+                           |
+                           |    public static $simpleName parseString(String value) {
+                           |        switch (value) {
+                           |            ${parserCases.indentWithMargin(3)}
+                           |            default:
+                           |                throw new UnsupportedOperationException("Unsupported value " + value);
+                           |        }
+                           |    }
+                           |
+                           |    public static String writeString($simpleName value) {
+                           |        return value.strValue;
                            |    }
                            |
                            |}

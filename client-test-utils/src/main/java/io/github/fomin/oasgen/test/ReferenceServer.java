@@ -39,7 +39,7 @@ public class ReferenceServer {
                         .get(BASE_PATH + "/find", (request, response) -> {
                             Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
                             assertEquals("param1Value", queryParams.get("param1"));
-                            assertEquals("param2Value", queryParams.get("param2"));
+                            assertEquals("value2", queryParams.get("param2"));
                             return response
                                     .header("Content-Type", "application/json")
                                     .sendString(Mono.just(TEST_ITEM_STR));

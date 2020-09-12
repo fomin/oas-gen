@@ -39,6 +39,15 @@ fun toTypeName(typedFragment: TypedFragment, suffix: String? = null): TypeName {
         }
 
         val parent = currentFragment.parent ?: break
+        if (parent is Parameter) {
+            val parameterParent = parent.parent
+            if (parameterParent is Operation) {
+                nameParts.add(parameterParent.operationId)
+                nameParts.add("of")
+            }
+            nameParts.add(parent.name)
+            break
+        }
 
         if (parent is JsonSchema && parent.type == JsonType.ARRAY) {
             currentFragment = parent

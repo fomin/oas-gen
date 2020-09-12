@@ -23,6 +23,10 @@ class MapConverterMatcher : ConverterMatcher {
             override fun writerCreateExpression() =
                     "new io.github.fomin.oasgen.MapWriter<>(${converterRegistry[additionalProperties].writerCreateExpression()})"
 
+            override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
+
+            override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
+
             override fun generate(): ConverterWriter.Result {
                 return ConverterWriter.Result(null, listOf())
             }

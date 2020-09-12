@@ -4,36 +4,33 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import javax.annotation.Nonnull;
 
 /**
- * Property 22
+ * query parameter 2
  */
-public enum ItemProperty2Property22 {
+public enum Param2OfFind {
 
     VALUE1("value1"),
-    VALUE2("value2"),
-    VALUE3("value3");
+    VALUE2("value2");
 
     @Nonnull
     @JsonValue
     public final String strValue;
 
-    ItemProperty2Property22(@Nonnull String strValue) {
+    Param2OfFind(@Nonnull String strValue) {
         this.strValue = strValue;
     }
 
-    public static ItemProperty2Property22 parseString(String value) {
+    public static Param2OfFind parseString(String value) {
         switch (value) {
             case "value1":
                 return VALUE1;
             case "value2":
                 return VALUE2;
-            case "value3":
-                return VALUE3;
             default:
                 throw new UnsupportedOperationException("Unsupported value " + value);
         }
     }
 
-    public static String writeString(ItemProperty2Property22 value) {
+    public static String writeString(Param2OfFind value) {
         return value.strValue;
     }
 

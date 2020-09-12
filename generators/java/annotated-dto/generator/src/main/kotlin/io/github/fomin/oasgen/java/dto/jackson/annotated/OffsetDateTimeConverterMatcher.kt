@@ -10,6 +10,8 @@ class OffsetDateTimeConverterMatcher : ConverterMatcher {
                     override val jsonSchema = jsonSchema
                     override fun valueType() = "java.time.OffsetDateTime"
                     override fun extraAnnotations() = "@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING)"
+                    override fun stringParseExpression(valueExpression: String) = "java.time.OffsetDateTime.parse($valueExpression)"
+                    override fun stringWriteExpression(valueExpression: String) = "$valueExpression.format(java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME)"
                     override fun output() = ConverterOutput.EMPTY
                 }
             else null

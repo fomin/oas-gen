@@ -11,7 +11,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import javax.annotation.Nonnull;
@@ -50,8 +49,32 @@ class SimpleRoutesTest extends BaseServerTest {
     public static class TestApplication {
 
         @Bean
-        public SimpleRoutes simpleRoutes() {
-            return new SimpleRoutesImpl();
+        public SimpleRoutes.Operations simpleRoutesActions() {
+            return new SimpleRoutes.Operations() {
+                @Override
+                public ResponseEntity<String> create(@Nonnull Item item) {
+                    assertNotNull(item);
+                    return ResponseEntity.ok("id");
+                }
+
+                @Override
+                public ResponseEntity<String> postWithoutRequestBody() {
+                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+                }
+
+                @Override
+                public ResponseEntity<Item> find(@Nonnull String param1, @Nullable Param2OfFind param2) {
+                    assertEquals("param1Value", param1);
+                    assertEquals(Param2OfFind.VALUE2, param2);
+                    return ResponseEntity.ok(TEST_ITEM);
+                }
+
+                @Override
+                public ResponseEntity<Item> get(@Nonnull String id) {
+                    assertEquals("idValue", id);
+                    return ResponseEntity.ok(TEST_ITEM);
+                }
+            };
         }
 
         @Bean
@@ -60,38 +83,6 @@ class SimpleRoutesTest extends BaseServerTest {
                 factory.setPort(PORT);
                 factory.setContextPath(CONTEXT_PATH);
             };
-        }
-    }
-
-    @Controller
-    public static class SimpleRoutesImpl implements SimpleRoutes {
-
-        @Nonnull
-        @Override
-        public ResponseEntity<String> create(@Nonnull Item item) {
-            assertNotNull(item);
-            return ResponseEntity.ok("id");
-        }
-
-        @Nonnull
-        @Override
-        public ResponseEntity<String> postWithoutRequestBody() {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
-
-        @Nonnull
-        @Override
-        public ResponseEntity<Item> find(@Nonnull String param1, @Nullable String param2) {
-            assertEquals("param1Value", param1);
-            assertEquals("param2Value", param2);
-            return ResponseEntity.ok(TEST_ITEM);
-        }
-
-        @Nonnull
-        @Override
-        public ResponseEntity<Item> get(@Nonnull String id) {
-            assertEquals("idValue", id);
-            return ResponseEntity.ok(TEST_ITEM);
         }
     }
 

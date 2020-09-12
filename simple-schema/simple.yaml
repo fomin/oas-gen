@@ -44,7 +44,11 @@ paths:
           in: query
           required: false
           schema:
+            title: query parameter 2
             type: string
+            enum:
+              - value1
+              - value2
       responses:
         '200':
           description: description

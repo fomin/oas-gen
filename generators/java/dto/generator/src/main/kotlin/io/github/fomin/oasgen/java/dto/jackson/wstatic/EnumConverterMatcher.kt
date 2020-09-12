@@ -19,6 +19,8 @@ class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
             override fun valueType() = toJavaClassName(basePackage, jsonSchema)
             override fun parserCreateExpression() = "${valueType()}.createParser()"
             override fun writerCreateExpression() = "${valueType()}.WRITER"
+            override fun stringParseExpression(valueExpression: String) = "${valueType()}.parseString($valueExpression)"
+            override fun stringWriteExpression(valueExpression: String) = "${valueType()}.writeString($valueExpression)"
             override fun generate() : ConverterWriter.Result {
                 val className = valueType()
                 val filePath = getFilePath(className)
@@ -60,17 +62,25 @@ class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
                        |                token -> token == com.fasterxml.jackson.core.JsonToken.VALUE_STRING,
                        |                jsonParser -> {
                        |                    String value = jsonParser.getText();
-                       |                    switch (value) {
-                       |                        ${parserCases.indentWithMargin(6)}
-                       |                        default:
-                       |                            throw new UnsupportedOperationException("Unsupported value " + value);
-                       |                    }
+                       |                    return parseString(value);
                        |                }
                        |        );
                        |    }
                        |
                        |    public static final io.github.fomin.oasgen.Writer<$className> WRITER =
                        |            (jsonGenerator, value) -> jsonGenerator.writeString(value.strValue);
+                       |
+                       |    public static $className parseString(String value) {
+                       |        switch (value) {
+                       |            ${parserCases.indentWithMargin(3)}
+                       |            default:
+                       |                throw new UnsupportedOperationException("Unsupported value " + value);
+                       |        }
+                       |    }
+                       |
+                       |    public static String writeString($className value) {
+                       |        return value.strValue;
+                       |    }
                        |
                        |}
                        |

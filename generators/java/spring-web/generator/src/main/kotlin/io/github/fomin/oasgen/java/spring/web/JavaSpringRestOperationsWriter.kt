@@ -114,8 +114,10 @@ class JavaSpringRestOperationsWriter(
                             .filterNotNull().joinToString(",\n")
 
                     val pathParameterEntries = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        val stringWriteExpression =
+                                converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
                         if (parameter.parameterIn == ParameterIn.PATH) {
-                            "uriVariables.put(\"${parameter.name}\", param${index});"
+                            "uriVariables.put(\"${parameter.name}\", param${index} != null ? $stringWriteExpression : null);"
                         } else {
                             null
                         }
@@ -129,8 +131,10 @@ class JavaSpringRestOperationsWriter(
                     }
 
                     val queryParameterCalls = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        val stringWriteExpression =
+                                converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
                         if (parameter.parameterIn == ParameterIn.QUERY)
-                            """.queryParam("${parameter.name}", param${index})"""
+                            """.queryParam("${parameter.name}", param${index} != null ? $stringWriteExpression : null)"""
                         else
                             null
                     }
@@ -162,7 +166,7 @@ class JavaSpringRestOperationsWriter(
                     val dtoSchemas = listOfNotNull(
                             bodySchema,
                             responseSchema
-                    )
+                    ) + operation.parameters().map { it.schema() }
                     OperationOutput(methodContent, dtoSchemas)
                 }
             }

@@ -11,6 +11,8 @@ class CustomLocalDateTimeConverterMatcher : ConverterMatcher {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.time.LocalDateTime"
                 override fun extraAnnotations() = "@com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING, pattern=\"$pattern\")"
+                override fun stringParseExpression(valueExpression: String) = "java.time.LocalDateTime.parse($valueExpression, io.github.fomin.oasgen.DateTimeFormatterCache.get(\"$pattern\"))"
+                override fun stringWriteExpression(valueExpression: String) = "$valueExpression.format(io.github.fomin.oasgen.DateTimeFormatterCache.get(\"$pattern\"))"
                 override fun output() = ConverterOutput.EMPTY
             }
         else null

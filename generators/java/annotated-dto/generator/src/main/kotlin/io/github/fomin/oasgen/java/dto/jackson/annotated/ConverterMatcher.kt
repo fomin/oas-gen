@@ -18,6 +18,8 @@ interface Converter {
     val jsonSchema: JsonSchema
     fun valueType(): String
     fun extraAnnotations(): String?
+    fun stringParseExpression(valueExpression: String): String
+    fun stringWriteExpression(valueExpression: String): String
     fun output(): ConverterOutput
 }
 

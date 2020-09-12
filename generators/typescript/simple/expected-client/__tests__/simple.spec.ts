@@ -1,4 +1,4 @@
-import {create, find, get, Item, ItemProperty2Property22} from '../src/simple'
+import {create, find, get, Item, ItemProperty2Property22, Param2OfFind} from '../src/simple'
 import * as http from "http";
 import {LocalDate, LocalDateTime, LocalTime, Month} from "@js-joda/core";
 
@@ -21,7 +21,7 @@ let server = http.createServer((req, res) => {
         res.setHeader("Access-Control-Allow-Origin", "*")
         if (req.url == "/idValue" && req.method == 'GET') {
             res.end(testItemStr)
-        } else if (req.url == "/find?param1=param1Value&param2=param2Value" && req.method == "GET") {
+        } else if (req.url == "/find?param1=param1Value&param2=value2" && req.method == "GET") {
             res.end(testItemStr)
         } else if (req.url == "/" && req.method == "POST") {
             res.statusCode = 404
@@ -35,7 +35,7 @@ let server = http.createServer((req, res) => {
 server.timeout = 100;
 
 test('should find item', (done) => {
-    find('http://localhost:8080', 'param1Value', 'param2Value', 1000, value => {
+    find('http://localhost:8080', 'param1Value', Param2OfFind.Value2, 1000, value => {
         try {
             expect(value).toEqual(testItem)
             done()

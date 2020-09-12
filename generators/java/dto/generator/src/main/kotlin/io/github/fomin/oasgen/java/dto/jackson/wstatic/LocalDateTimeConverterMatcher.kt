@@ -16,6 +16,8 @@ class LocalDateTimeConverterMatcher : ConverterMatcher {
                 override fun valueType() = "java.time.LocalDateTime"
                 override fun parserCreateExpression() = "io.github.fomin.oasgen.LocalDateTimeConverter.createParser()"
                 override fun writerCreateExpression() = "io.github.fomin.oasgen.LocalDateTimeConverter.WRITER"
+                override fun stringParseExpression(valueExpression: String) = "java.time.LocalDateTime.parse($valueExpression)"
+                override fun stringWriteExpression(valueExpression: String) = "$valueExpression.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE_TIME)"
                 override fun generate() = ConverterWriter.Result(null, emptyList())
             }
         else null

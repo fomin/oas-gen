@@ -20,4 +20,21 @@ public enum ItemProperty2Property22 {
         this.strValue = strValue;
     }
 
+    public static ItemProperty2Property22 parseString(String value) {
+        switch (value) {
+            case "value1":
+                return VALUE1;
+            case "value2":
+                return VALUE2;
+            case "value3":
+                return VALUE3;
+            default:
+                throw new UnsupportedOperationException("Unsupported value " + value);
+        }
+    }
+
+    public static String writeString(ItemProperty2Property22 value) {
+        return value.strValue;
+    }
+
 }

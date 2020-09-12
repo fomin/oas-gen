@@ -10,5 +10,7 @@ interface ConverterWriter {
     fun valueType(): String
     fun parserCreateExpression(): String
     fun writerCreateExpression(): String
+    fun stringParseExpression(valueExpression: String): String
+    fun stringWriteExpression(valueExpression: String): String
     fun generate(): Result
 }

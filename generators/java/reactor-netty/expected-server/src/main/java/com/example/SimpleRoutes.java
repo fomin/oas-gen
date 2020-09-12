@@ -26,7 +26,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     public abstract Mono<java.lang.String> postWithoutRequestBody();
 
     @Nonnull
-    public abstract Mono<com.example.Item> find(@Nonnull java.lang.String param1, @Nullable java.lang.String param2);
+    public abstract Mono<com.example.Item> find(@Nonnull java.lang.String param1, @Nullable com.example.Param2OfFind param2);
 
     @Nonnull
     public abstract Mono<com.example.Item> get(@Nonnull java.lang.String id);
@@ -54,8 +54,10 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
             })
             .get(baseUrl + "/find", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
-                java.lang.String param0 = queryParams.get("param1");
-                java.lang.String param1 = queryParams.get("param2");
+                String param0Str = queryParams.get("param1");
+                java.lang.String param0 = param0Str != null ? param0Str : null;
+                String param1Str = queryParams.get("param2");
+                com.example.Param2OfFind param1 = param1Str != null ? com.example.Param2OfFind.parseString(param1Str) : null;
 
                 Mono<com.example.Item> responseMono = find(param0, param1);
                 return response
@@ -64,7 +66,8 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
             })
             .get(baseUrl + "/{id}", (request, response) -> {
 
-                java.lang.String param0 = request.param("id");
+                String param0Str = request.param("id");
+                java.lang.String param0 = param0Str != null ? param0Str : null;
 
                 Mono<com.example.Item> responseMono = get(param0);
                 return response

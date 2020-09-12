@@ -15,6 +15,8 @@ class Int64ConverterMatcher : ConverterMatcher {
             override fun valueType() = "java.lang.Long"
             override fun parserCreateExpression() = "io.github.fomin.oasgen.Int64Converter.createParser()"
             override fun writerCreateExpression() = "io.github.fomin.oasgen.Int64Converter.WRITER"
+            override fun stringParseExpression(valueExpression: String) = "java.lang.Long.parseLong($valueExpression)"
+            override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
             override fun generate() = ConverterWriter.Result(null, emptyList())
         }
         else null

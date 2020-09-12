@@ -47,7 +47,7 @@ export function postWithoutRequestBody(
 export function find(
     baseUrl: string,
     param1: string,
-    param2: string,
+    param2: Param2OfFind,
     timeout?: number,
     onLoadCallback?: (value: Item) => void,
     onErrorCallback?: (reason: any) => void,
@@ -151,6 +151,14 @@ function itemToJson(obj: Item): any {
                 return value;
         }
     });
+}
+
+/**
+ * query parameter 2
+ */
+export const enum Param2OfFind {
+    Value1 = "value1",
+    Value2 = "value2"
 }
 
 /**

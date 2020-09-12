@@ -64,12 +64,21 @@ class ReactorNettyServerWriter(
                     "Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());"
                 else
                     ""
-                val parameterDeclarations = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
-                    when (val paramterIn = javaParameter.schemaParameter.parameterIn) {
-                        ParameterIn.PATH -> """${javaParameter.javaVariable.type} param$index = request.param("${javaParameter.name}");"""
-                        ParameterIn.QUERY -> """${javaParameter.javaVariable.type} param$index = queryParams.get("${javaParameter.name}");"""
-                        else -> error("unsupported paramter type $paramterIn")
+                val parameterDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
+                    val javaType = javaParameter.javaVariable.type
+                    val schema = javaParameter.schemaParameter.schema()
+                    val converterWriter = converterRegistry[schema]
+                    val parameterStrExpression = when (val paramterIn = javaParameter.schemaParameter.parameterIn) {
+                        ParameterIn.PATH ->
+                            """request.param("${javaParameter.name}")"""
+                        ParameterIn.QUERY ->
+                            """queryParams.get("${javaParameter.name}")"""
+                        else -> error("unsupported parameter type $paramterIn")
                     }
+                    val stringParseExpression = converterWriter.stringParseExpression("param${index}Str")
+                    """|String param${index}Str = $parameterStrExpression;
+                       |$javaType param$index = param${index}Str != null ? $stringParseExpression : null;
+                    """.trimMargin()
                 }
                 val requestMonoDeclaration = javaOperation.requestVariable?.let { requestVariable ->
                     "Mono<${requestVariable.type}> requestMono = byteBufConverter.parse(request.receive(), ${converterRegistry[requestVariable.schema].parserCreateExpression()});"
@@ -128,6 +137,9 @@ class ReactorNettyServerWriter(
             val dtoSchemas = mutableListOf<JsonSchema>()
             dtoSchemas.addAll(javaOperations.mapNotNull { it.responseVariable.schema })
             dtoSchemas.addAll(javaOperations.mapNotNull { it.requestVariable?.schema })
+            dtoSchemas.addAll(javaOperations.flatMap { javaOperation ->
+                javaOperation.parameters.map { it.schemaParameter.schema() }
+            })
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
             outputFiles.add(OutputFile(filePath, content))

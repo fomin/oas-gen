@@ -12,8 +12,18 @@ class JavaSpringMvcServerWriter(
         private val converterIds: List<String>
 ) : Writer<OpenApiSchema> {
     private data class OperationOutput(
-            val methodContent: String,
+            val controllerMethodContent: String,
+            val interfaceMethodContent: String,
             val dtoSchemas: List<JsonSchema>
+    )
+
+    private data class OperationArg(
+            val name: String,
+            val mappingAnnotation: String,
+            val nullabilityAnnotation: String,
+            val interfaceType: String,
+            val controllerType: String,
+            val operationCallExpression: String
     )
 
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
@@ -32,6 +42,7 @@ class JavaSpringMvcServerWriter(
                     "import javax.annotation.Nonnull;",
                     "import javax.annotation.Nullable;",
                     "import org.springframework.http.ResponseEntity;",
+                    "import org.springframework.stereotype.Controller;",
                     "import org.springframework.web.bind.annotation.*;"
             ))
 
@@ -68,7 +79,7 @@ class JavaSpringMvcServerWriter(
 
                     val requestBody = operation.requestBody()
                     val bodySchema: JsonSchema?
-                    val requestBodyArg: String?
+                    val bodyArg: OperationArg?
                     val consumesPart: String
 
                     if (requestBody != null) {
@@ -76,11 +87,19 @@ class JavaSpringMvcServerWriter(
                         bodySchema = entry.value.schema()
                         consumesPart = """, consumes = "${entry.key}""""
                         val bodyType = converterRegistry[bodySchema].valueType()
-                        requestBodyArg = "@Nonnull @RequestBody $bodyType ${toVariableName(getSimpleName(bodyType))}"
+                        val name = toVariableName(getSimpleName(bodyType))
+                        bodyArg = OperationArg(
+                                name,
+                                "@RequestBody",
+                                "@Nonnull",
+                                bodyType,
+                                bodyType,
+                                name
+                        )
                     } else {
                         bodySchema = null
                         consumesPart = ""
-                        requestBodyArg = null
+                        bodyArg = null
                     }
 
                     val parameterArgs = operation.parameters().map { parameter ->
@@ -93,28 +112,57 @@ class JavaSpringMvcServerWriter(
                             false -> "@Nullable"
                         }
                         val variableName = toVariableName(parameter.name)
-                        val variableType = converterRegistry[parameter.schema()].valueType()
-                        """$nullAnnotation @$mappingAnnotation("${parameter.name}") $variableType $variableName"""
+                        val converter = converterRegistry[parameter.schema()]
+                        val variableType = converter.valueType()
+                        OperationArg(
+                                variableName,
+                                """@$mappingAnnotation("${parameter.name}")""",
+                                nullAnnotation,
+                                variableType,
+                                "java.lang.String",
+                                "$variableName != null ? ${converter.stringParseExpression(variableName)} : null"
+                        )
                     }
-                    val methodArgs = (parameterArgs + requestBodyArg).filterNotNull().joinToString(",\n")
+                    val operationArgs = (parameterArgs + bodyArg).filterNotNull()
+                    val controllerMethodArgs = operationArgs.joinToString(",\n") {
+                        val annotations = listOf(it.nullabilityAnnotation, it.mappingAnnotation).joinToString(" ")
+                        "$annotations ${it.controllerType} ${it.name}"
+                    }
+                    val interfaceMethodArgs = operationArgs.joinToString(",\n") {
+                        "${it.nullabilityAnnotation} ${it.interfaceType} ${it.name}"
+                    }
+                    val interfaceCallArgs = operationArgs.joinToString(",\n") {
+                        it.operationCallExpression
+                    }
 
-                    val methodContent =
-                            """|@Nonnull
-                               |@$mappingAnnotationName(path = "$pathTemplate"$producesPart$consumesPart)
-                               |ResponseEntity<$responseType> ${toMethodName(operation.operationId)}(
-                               |        ${methodArgs.indentWithMargin(2)}
+                    val methodName = toMethodName(operation.operationId)
+                    val controllerMethodContent =
+                            """|@$mappingAnnotationName(path = "$pathTemplate"$producesPart$consumesPart)
+                               |public ResponseEntity<$responseType> $methodName(
+                               |        ${controllerMethodArgs.indentWithMargin(2)}
+                               |) {
+                               |    return this.operations.$methodName(
+                               |            ${interfaceCallArgs.indentWithMargin(3)}
+                               |    );
+                               |}
+                               |
+                            """.trimMargin()
+                    val interfaceMethodContent =
+                            """|ResponseEntity<$responseType> $methodName(
+                               |        ${interfaceMethodArgs.indentWithMargin(2)}
                                |);
                                |
                             """.trimMargin()
                     val dtoSchemas = listOfNotNull(
                             bodySchema,
                             responseSchema
-                    )
-                    OperationOutput(methodContent, dtoSchemas)
+                    ) + operation.parameters().map { it.schema() }
+                    OperationOutput(controllerMethodContent, interfaceMethodContent, dtoSchemas)
                 }
             }
 
-            val methodContentList = methodOutputs.map { it.methodContent }
+            val controllerMethodContentList = methodOutputs.map { it.controllerMethodContent }
+            val interfaceMethodContentList = methodOutputs.map { it.interfaceMethodContent }
             val dtoSchemas = methodOutputs.flatMap { it.dtoSchemas }
 
             val content = """
@@ -122,9 +170,19 @@ class JavaSpringMvcServerWriter(
                |
                |${importDeclarations.indentWithMargin(0)}
                |
-               |public interface ${getSimpleName(routesClassName)} {
+               |@Controller
+               |public class ${getSimpleName(routesClassName)} {
+               |    interface Operations {
+               |        ${interfaceMethodContentList.indentWithMargin(2)}
+               |    }
                |
-               |    ${methodContentList.indentWithMargin(1)}
+               |    public final Operations operations;
+               |
+               |    public SimpleRoutes(Operations operations) {
+               |        this.operations = operations;
+               |    }
+               |
+               |    ${controllerMethodContentList.indentWithMargin(1)}
                |
                |}
                |

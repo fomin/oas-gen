@@ -10,6 +10,8 @@ class NumberConverterMatcher : ConverterMatcher {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.math.BigDecimal"
                 override fun extraAnnotations(): String? = null
+                override fun stringParseExpression(valueExpression: String) = "new java.math.BigDecimal($valueExpression)"
+                override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toPlainString()"
                 override fun output() = ConverterOutput.EMPTY
             }
             else -> null

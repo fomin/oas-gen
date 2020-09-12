@@ -15,6 +15,8 @@ class IntegerConverterMatcher : ConverterMatcher {
             override fun valueType() = "java.math.BigInteger"
             override fun parserCreateExpression() = "io.github.fomin.oasgen.IntegerConverter.createParser()"
             override fun writerCreateExpression() = "io.github.fomin.oasgen.IntegerConverter.WRITER"
+            override fun stringParseExpression(valueExpression: String) = "new java.math.BigInteger($valueExpression)"
+            override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
             override fun generate() = ConverterWriter.Result(null, emptyList())
         }
         else null

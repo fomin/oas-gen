@@ -16,6 +16,8 @@ class NumberConverterMatcher : ConverterMatcher {
                 override fun valueType() = "java.math.BigDecimal"
                 override fun parserCreateExpression() = "io.github.fomin.oasgen.NumberConverter.createParser()"
                 override fun writerCreateExpression() = "io.github.fomin.oasgen.NumberConverter.WRITER"
+                override fun stringParseExpression(valueExpression: String) = "new java.math.BigDecimal($valueExpression)"
+                override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toPlainString()"
                 override fun generate() = ConverterWriter.Result(null, emptyList())
             }
             else -> null

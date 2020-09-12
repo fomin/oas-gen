@@ -15,6 +15,8 @@ class Int32ConverterMatcher : ConverterMatcher {
             override fun valueType() = "java.lang.Integer"
             override fun parserCreateExpression() = "io.github.fomin.oasgen.Int32Converter.createParser()"
             override fun writerCreateExpression() = "io.github.fomin.oasgen.Int32Converter.WRITER"
+            override fun stringParseExpression(valueExpression: String) = "java.lang.Integer.parseInt($valueExpression)"
+            override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
             override fun generate() = ConverterWriter.Result(null, emptyList())
         }
         else null

@@ -16,6 +16,8 @@ class OffsetDateTimeConverterMatcher : ConverterMatcher {
                 override fun valueType() = "java.time.OffsetDateTime"
                 override fun parserCreateExpression() = "io.github.fomin.oasgen.OffsetDateTimeConverter.createParser()"
                 override fun writerCreateExpression() = "io.github.fomin.oasgen.OffsetDateTimeConverter.WRITER"
+                override fun stringParseExpression(valueExpression: String) = "java.time.OffsetDateTime.parse($valueExpression)"
+                override fun stringWriteExpression(valueExpression: String) = "$valueExpression.format(java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME)"
                 override fun generate() = ConverterWriter.Result(null, emptyList())
             }
         else null

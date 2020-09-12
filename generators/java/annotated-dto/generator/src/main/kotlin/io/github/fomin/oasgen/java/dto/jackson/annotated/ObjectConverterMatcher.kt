@@ -10,6 +10,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = toJavaClassName(basePackage, jsonSchema)
                 override fun extraAnnotations(): String? = null
+                override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
+                override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
                 override fun output(): ConverterOutput {
                     val jointProperties = jsonSchema.jointProperties()
                     val simpleName = getSimpleName(valueType())

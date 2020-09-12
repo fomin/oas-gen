@@ -10,6 +10,8 @@ class Int32ConverterMatcher : ConverterMatcher {
                     override val jsonSchema = jsonSchema
                     override fun valueType() = "java.lang.Integer"
                     override fun extraAnnotations(): String? = null
+                    override fun stringParseExpression(valueExpression: String) = "java.lang.Integer.parseInt($valueExpression)"
+                    override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
                     override fun output() = ConverterOutput.EMPTY
                 }
             else null

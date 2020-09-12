@@ -71,7 +71,7 @@ public class SimpleClient {
     @Nonnull
     public ResponseEntity<com.example.Item> find(
             @Nonnull java.lang.String param1,
-            @Nullable java.lang.String param2
+            @Nullable com.example.Param2OfFind param2
     ) {
         return find$0(
                 param1,
@@ -81,13 +81,13 @@ public class SimpleClient {
 
     private ResponseEntity<com.example.Item> find$0(
             java.lang.String param0,
-            java.lang.String param1
+            com.example.Param2OfFind param1
     ) {
         Map<String, Object> uriVariables = Collections.emptyMap();
         URI uri = UriComponentsBuilder
                 .fromUriString(baseUrl + "/find")
-                .queryParam("param1", param0)
-                .queryParam("param2", param1)
+                .queryParam("param1", param0 != null ? param0 : null)
+                .queryParam("param2", param1 != null ? com.example.Param2OfFind.writeString(param1) : null)
                 .build(uriVariables);
         RequestEntity<java.lang.Void> request = RequestEntity
                 .get(uri)
@@ -108,7 +108,7 @@ public class SimpleClient {
             java.lang.String param0
     ) {
         Map<String, Object> uriVariables = new HashMap<>();
-        uriVariables.put("id", param0);
+        uriVariables.put("id", param0 != null ? param0 : null);
         URI uri = UriComponentsBuilder
                 .fromUriString(baseUrl + "/{id}")
 

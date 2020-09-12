@@ -31,6 +31,7 @@ public class SimpleClient {
     private Mono<java.lang.String> create$0(
             Mono<com.example.Item> bodyArg
     ) {
+
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .post()
                 .uri(UrlEncoderUtils.encodeUrl("/"))
@@ -54,6 +55,7 @@ public class SimpleClient {
     private Mono<java.lang.String> postWithoutRequestBody$0(
 
     ) {
+
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .post()
                 .uri(UrlEncoderUtils.encodeUrl("/post-without-request-body"))
@@ -65,7 +67,7 @@ public class SimpleClient {
     @Nonnull
     public Mono<com.example.Item> find(
             @Nonnull java.lang.String param1,
-            @Nullable java.lang.String param2
+            @Nullable com.example.Param2OfFind param2
     ) {
         return find$0(
                 param1,
@@ -75,11 +77,13 @@ public class SimpleClient {
 
     private Mono<com.example.Item> find$0(
             java.lang.String param0,
-            java.lang.String param1
+            com.example.Param2OfFind param1
     ) {
+        String param0Str = param0 != null ? param0 : null;
+        String param1Str = param1 != null ? com.example.Param2OfFind.writeString(param1) : null;
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .get()
-                .uri(UrlEncoderUtils.encodeUrl("/find", "param1", param0, "param2", param1))
+                .uri(UrlEncoderUtils.encodeUrl("/find", "param1", param0Str, "param2", param1Str))
 
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
         return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());
@@ -97,9 +101,10 @@ public class SimpleClient {
     private Mono<com.example.Item> get$0(
             java.lang.String param0
     ) {
+        String param0Str = param0 != null ? param0 : null;
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .get()
-                .uri(UrlEncoderUtils.encodeUrl("/" + UrlEncoderUtils.encode(param0)))
+                .uri(UrlEncoderUtils.encodeUrl("/" + UrlEncoderUtils.encode(param0Str)))
 
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
         return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());

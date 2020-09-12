@@ -44,8 +44,11 @@ class SimpleClientWriter(
                     val bodyArguments = if (bodySchema == null) emptyList()
                     else listOf("body: ${typeConverterRegistry[bodySchema].type()}")
                     val queryString = operation.parameters().mapNotNull { parameter ->
+                        val jsonConverter = typeConverterRegistry[parameter.schema()].jsonConverter
+                        val valueExpression = toVariableName(parameter.name)
+                        val toStrExression = jsonConverter?.toJson(valueExpression) ?: valueExpression
                         when (parameter.parameterIn) {
-                            ParameterIn.QUERY -> "${parameter.name}=${'$'}{encodeURIComponent(${toVariableName(parameter.name)})}"
+                            ParameterIn.QUERY -> "${parameter.name}=${'$'}{encodeURIComponent($toStrExression)}"
                             else -> null
                         }
                     }.joinToString("&")
@@ -90,7 +93,7 @@ class SimpleClientWriter(
                                |    )
                                |}
                                |""".trimMargin(),
-                            listOfNotNull(bodySchema, responseSchema)
+                            listOfNotNull(bodySchema, responseSchema) + operation.parameters().map { it.schema() }
                     )
                 }
             }

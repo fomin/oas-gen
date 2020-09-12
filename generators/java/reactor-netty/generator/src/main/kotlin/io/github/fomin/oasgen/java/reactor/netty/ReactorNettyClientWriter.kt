@@ -84,11 +84,17 @@ class ReactorNettyClientWriter(
 
                 val queryParameterArgs = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
                     if (javaParameter.schemaParameter.parameterIn == ParameterIn.QUERY) {
-                        """, "${javaParameter.name}", param$index"""
+                        """, "${javaParameter.name}", param${index}Str"""
                     } else {
                         null
                     }
                 }.joinToString("")
+
+                val parameterStrDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
+                    val stringWriteExpression =
+                            converterRegistry[javaParameter.schemaParameter.schema()].stringWriteExpression("param$index")
+                    "String param${index}Str = param$index != null ? $stringWriteExpression : null;"
+                }
 
                 """|@Nonnull
                    |public Mono<$responseType> ${javaOperation.methodName}(
@@ -102,6 +108,7 @@ class ReactorNettyClientWriter(
                    |private Mono<$responseType> ${javaOperation.methodName}$0(
                    |        ${methodInternalArgDeclarations.indentWithMargin(2)}
                    |) {
+                   |    ${parameterStrDeclarations.indentWithMargin(1)}
                    |    Flux<ByteBuf> responseByteBufFlux = httpClient
                    |            .${javaOperation.operation.operationType.name.toLowerCase()}()
                    |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate)}$queryParameterArgs))
@@ -135,6 +142,9 @@ class ReactorNettyClientWriter(
             val dtoSchemas = mutableListOf<JsonSchema>()
             dtoSchemas.addAll(javaOperations.mapNotNull { it.responseVariable.schema })
             dtoSchemas.addAll(javaOperations.mapNotNull { it.requestVariable?.schema })
+            dtoSchemas.addAll(javaOperations.flatMap { javaOperation ->
+                javaOperation.parameters.map { it.schemaParameter.schema() }
+            })
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
             outputFiles.add(OutputFile(filePath, content))
@@ -154,7 +164,7 @@ class ReactorNettyClientWriter(
                 expressionParts.quoteAndAdd(pathTemplate.substring(closeBraceIndex + 1, openBraceIndex))
                 closeBraceIndex = pathTemplate.indexOf('}', closeBraceIndex + 1)
                 if (closeBraceIndex > 0) {
-                    expressionParts.add("UrlEncoderUtils.encode(param$parameterIndex)")
+                    expressionParts.add("UrlEncoderUtils.encode(param${parameterIndex}Str)")
                     parameterIndex += 1
                 } else {
                     expressionParts.quoteAndAdd(pathTemplate.substring(openBraceIndex + 1))

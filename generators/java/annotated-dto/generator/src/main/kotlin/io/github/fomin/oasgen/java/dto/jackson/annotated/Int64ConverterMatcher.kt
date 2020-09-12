@@ -10,6 +10,8 @@ class Int64ConverterMatcher : ConverterMatcher {
                     override val jsonSchema = jsonSchema
                     override fun valueType() = "java.lang.Long"
                     override fun extraAnnotations(): String? = null
+                    override fun stringParseExpression(valueExpression: String) = "java.lang.Long.parseLong($valueExpression)"
+                    override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
                     override fun output() = ConverterOutput.EMPTY
                 }
             else null

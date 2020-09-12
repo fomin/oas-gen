@@ -10,6 +10,8 @@ class BooleanConverterMatcher : ConverterMatcher {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.lang.Boolean"
                 override fun extraAnnotations(): String? = null
+                override fun stringParseExpression(valueExpression: String) = "java.lang.Boolean.parseBoolean($valueExpression)"
+                override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
                 override fun output() = ConverterOutput.EMPTY
             }
             else -> null

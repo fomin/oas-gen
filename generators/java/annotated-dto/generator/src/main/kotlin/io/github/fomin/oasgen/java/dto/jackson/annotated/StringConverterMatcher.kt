@@ -10,6 +10,8 @@ class StringConverterMatcher : ConverterMatcher {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.lang.String"
                 override fun extraAnnotations(): String? = null
+                override fun stringParseExpression(valueExpression: String) = valueExpression;
+                override fun stringWriteExpression(valueExpression: String) = valueExpression;
                 override fun output() = ConverterOutput.EMPTY
             }
             else -> null

@@ -15,6 +15,8 @@ class BooleanConverterMatcher : ConverterMatcher {
             override fun valueType() = "java.lang.Boolean"
             override fun parserCreateExpression() = "io.github.fomin.oasgen.BooleanConverter.createParser()"
             override fun writerCreateExpression() = "io.github.fomin.oasgen.BooleanConverter.WRITER"
+            override fun stringParseExpression(valueExpression: String) = "java.lang.Boolean.parseBoolean($valueExpression)"
+            override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
             override fun generate() = ConverterWriter.Result(null, emptyList())
         }
         else null

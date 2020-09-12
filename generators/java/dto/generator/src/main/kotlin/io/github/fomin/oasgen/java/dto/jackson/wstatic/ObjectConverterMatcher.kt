@@ -240,6 +240,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                 override fun valueType() = toJavaClassName(basePackage, jsonSchema)
                 override fun parserCreateExpression() = "new ${valueType()}.Parser()"
                 override fun writerCreateExpression() = "${valueType()}.Writer.INSTANCE"
+                override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
+                override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
                 override fun generate(): ConverterWriter.Result {
                     val filePath = getFilePath(valueType())
 

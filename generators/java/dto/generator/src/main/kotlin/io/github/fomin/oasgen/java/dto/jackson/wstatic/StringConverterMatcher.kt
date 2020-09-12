@@ -16,6 +16,8 @@ class StringConverterMatcher : ConverterMatcher {
                 override fun valueType() = "java.lang.String"
                 override fun parserCreateExpression() = "io.github.fomin.oasgen.StringConverter.createParser()"
                 override fun writerCreateExpression() = "io.github.fomin.oasgen.StringConverter.WRITER"
+                override fun stringParseExpression(valueExpression: String) = valueExpression;
+                override fun stringWriteExpression(valueExpression: String) = valueExpression;
                 override fun generate() = ConverterWriter.Result(null, emptyList())
             }
             else -> null

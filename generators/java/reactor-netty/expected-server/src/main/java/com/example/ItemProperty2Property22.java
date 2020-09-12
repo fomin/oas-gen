@@ -22,21 +22,29 @@ public enum ItemProperty2Property22 {
                 token -> token == com.fasterxml.jackson.core.JsonToken.VALUE_STRING,
                 jsonParser -> {
                     String value = jsonParser.getText();
-                    switch (value) {
-                        case "value1":
-                            return VALUE1;
-                        case "value2":
-                            return VALUE2;
-                        case "value3":
-                            return VALUE3;
-                        default:
-                            throw new UnsupportedOperationException("Unsupported value " + value);
-                    }
+                    return parseString(value);
                 }
         );
     }
 
     public static final io.github.fomin.oasgen.Writer<com.example.ItemProperty2Property22> WRITER =
             (jsonGenerator, value) -> jsonGenerator.writeString(value.strValue);
+
+    public static com.example.ItemProperty2Property22 parseString(String value) {
+        switch (value) {
+            case "value1":
+                return VALUE1;
+            case "value2":
+                return VALUE2;
+            case "value3":
+                return VALUE3;
+            default:
+                throw new UnsupportedOperationException("Unsupported value " + value);
+        }
+    }
+
+    public static String writeString(com.example.ItemProperty2Property22 value) {
+        return value.strValue;
+    }
 
 }
