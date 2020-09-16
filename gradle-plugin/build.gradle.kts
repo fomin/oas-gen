@@ -29,12 +29,3 @@ gradlePlugin {
         }
     }
 }
-
-val versionFileDir = file("$buildDir/generated/versionFileDir")
-val versionFile = file("${rootProject.projectDir}/version.txt")
-
-tasks {
-    processResources {
-        from(versionFile) { into("META-INF/oas-gen/") }
-    }
-}

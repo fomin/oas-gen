@@ -25,19 +25,30 @@ import javax.inject.Inject
 
 class GenerationSpec(
         val generatorId: String,
-        val baseDir: File,
+        val generationSource: GenerationSource,
         val outputDir: File?,
         val schemaPath: String,
         val namespace: String,
         val converterIds: Array<out String>,
         val javaSources: Boolean
-) : Serializable
+)
+
+sealed class GenerationSource
+
+class DirectoryGenerationSource(
+        val baseDir: File
+) : GenerationSource()
+
+class DependencyGenerationSource(
+        val dependency: String,
+        val basePath: String
+) : GenerationSource()
 
 open class OasGenExtension {
-    val generationSpecs: MutableList<GenerationSpec> = mutableListOf()
+    internal val generationSpecs: MutableList<GenerationSpec> = mutableListOf()
 
     @Suppress("Unused")
-    fun generate(
+    fun generateFromDirectory(
             generatorId: String,
             baseDir: File,
             outputDir: File? = null,
@@ -46,25 +57,48 @@ open class OasGenExtension {
             vararg converterIds: String = emptyArray(),
             javaSources: Boolean = false
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, baseDir, outputDir, schemaPath, namespace, converterIds, javaSources))
+        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), outputDir, schemaPath, namespace, converterIds, javaSources))
+    }
+
+    @Suppress("Unused")
+    fun generateFromDependency(
+            generatorId: String,
+            dependency: String,
+            basePath: String = ".",
+            outputDir: File? = null,
+            schemaPath: String,
+            namespace: String,
+            vararg converterIds: String = emptyArray(),
+            javaSources: Boolean = false
+    ) {
+        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), outputDir, schemaPath, namespace, converterIds, javaSources))
     }
 }
 
 interface GenerationWorkParameters : WorkParameters {
+    val items: ListProperty<OasGenActionParameters>
     val buildDir: Property<File>
-    val generationSpecs: ListProperty<GenerationSpec>
 }
+
+class OasGenActionParameters(
+        val generatorId: String,
+        val baseDir: File,
+        val outputDir: File,
+        val schemaPath: String,
+        val namespace: String,
+        val converterIds: Array<out String>
+) : Serializable
 
 abstract class OasGenAction : WorkAction<GenerationWorkParameters> {
     override fun execute() {
-        parameters.generationSpecs.get().forEachIndexed { index, generationSpec ->
+        parameters.items.get().forEach { item ->
             openApiGenerate(
-                    generationSpec.generatorId,
-                    generationSpec.baseDir,
-                    effectiveOutputDir(parameters.buildDir.get(), index, generationSpec),
-                    generationSpec.schemaPath,
-                    generationSpec.namespace,
-                    generationSpec.converterIds.asList()
+                    item.generatorId,
+                    item.baseDir,
+                    item.outputDir,
+                    item.schemaPath,
+                    item.namespace,
+                    item.converterIds.asList()
             )
         }
     }
@@ -88,9 +122,34 @@ open class OasGenTask @Inject constructor(
         val workQueue = workerExecutor.classLoaderIsolation { workerSpec ->
             workerSpec.classpath.from(generatorClasspathProvider)
         }
-        workQueue.submit(OasGenAction::class.java) { t ->
-            t.buildDir.set(project.buildDir)
-            t.generationSpecs.set(oasGenExtension.generationSpecs)
+        workQueue.submit(OasGenAction::class.java) { oasGenActionParametersList ->
+            oasGenActionParametersList.buildDir.set(project.buildDir)
+            oasGenActionParametersList.items.set(oasGenExtension.generationSpecs.mapIndexed { index, generationSpec ->
+                val baseDir = when (val generationSource = generationSpec.generationSource) {
+                    is DirectoryGenerationSource -> {
+                        generationSource.baseDir
+                    }
+                    is DependencyGenerationSource -> {
+                        val configuration = project.configurations.register("oasGen$index") { configuration ->
+                            configuration.isCanBeResolved = true
+                            configuration.isCanBeConsumed = false
+                            configuration.defaultDependencies { dependencySet ->
+                                val dependency = project.dependencies.create(generationSource.dependency)
+                                dependencySet.add(dependency)
+                            }
+                        }
+                        val zipFile = configuration.get().files.single()
+                        val unzipDir = "${project.buildDir}/oas-gen/unzipped$index"
+                        project.copy {
+                            it.from(project.zipTree(zipFile))
+                            it.into(unzipDir)
+                        }
+                        File(unzipDir).resolve(generationSource.basePath).absoluteFile
+                    }
+                }
+                val outputDir = effectiveOutputDir(project.buildDir, index, generationSpec)
+                OasGenActionParameters(generationSpec.generatorId, baseDir, outputDir, generationSpec.schemaPath, generationSpec.namespace, generationSpec.converterIds)
+            })
         }
     }
 }
@@ -104,12 +163,6 @@ class OasGenPlugin : Plugin<Project> {
         val oasGenConfiguration = project.configurations.register("oasGen") { configuration ->
             configuration.isCanBeResolved = true
             configuration.isCanBeConsumed = false
-            configuration.defaultDependencies { dependencySet ->
-                val version = this.javaClass.classLoader.getResource("META-INF/oas-gen/version.txt")!!
-                        .readText().trim()
-                val dependency = project.dependencies.create("io.github.fomin.oas-gen:oas-gen-core:$version")
-                dependencySet.add(dependency)
-            }
         }
 
         project.afterEvaluate {
@@ -129,9 +182,18 @@ class OasGenPlugin : Plugin<Project> {
                 task.inputs.property("schemaPath$index", generationSpec.schemaPath)
                 task.inputs.property("namespace$index", generationSpec.namespace)
                 task.inputs.property("converterIds$index", generationSpec.converterIds.joinToString())
-                task.inputs.dir(generationSpec.baseDir).withPathSensitivity(PathSensitivity.RELATIVE)
+                when (val generationSource = generationSpec.generationSource) {
+                    is DirectoryGenerationSource -> {
+                        task.inputs.dir(generationSource.baseDir).withPathSensitivity(PathSensitivity.RELATIVE)
+                    }
+                    is DependencyGenerationSource -> {
+                        task.inputs.property("dependency$index", generationSource.dependency)
+                        task.inputs.property("basePath$index", generationSource.basePath)
+                    }
+                }
                 task.outputs.dir(effectiveOutputDir(project.buildDir, index, generationSpec))
             }
+            task.dependsOn(oasGenConfiguration)
         }
     }
 }
