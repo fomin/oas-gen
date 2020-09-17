@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.fomin.oas-gen") version "0.0.19-SNAPSHOT"
+    id("io.github.fomin.oas-gen") version "0.0.20-SNAPSHOT"
     java
 }
 
@@ -9,7 +9,9 @@ repositories {
 }
 
 dependencies {
-    oasGen("io.github.fomin.oas-gen", "oas-gen-reactor-netty-generator", "0.0.19-SNAPSHOT")
+    val oasGenVersion = "0.0.20-SNAPSHOT"
+    oasGen("io.github.fomin.oas-gen", "oas-gen-reactor-netty-generator", oasGenVersion)
+    implementation("io.github.fomin.oas-gen", "oas-gen-reactor-netty-runtime", oasGenVersion)
 }
 
 oasGen {

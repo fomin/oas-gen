@@ -165,18 +165,8 @@ class OasGenPlugin : Plugin<Project> {
             configuration.isCanBeConsumed = false
         }
 
-        project.afterEvaluate {
-            oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
-                if (generationSpec.javaSources) {
-                    val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
-                    javaConvention.sourceSets.getAt(SourceSet.MAIN_SOURCE_SET_NAME).java {
-                        it.srcDir(effectiveOutputDir(project.buildDir, index, generationSpec))
-                    }
-                }
-            }
-        }
-
-        project.tasks.register("oasGen", OasGenTask::class.java, oasGenExtension, oasGenConfiguration).configure { task ->
+        val oasGenTask = project.tasks.register("oasGen", OasGenTask::class.java, oasGenExtension, oasGenConfiguration)
+        oasGenTask.configure { task ->
             oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
                 task.inputs.property("generatorId$index", generationSpec.generatorId)
                 task.inputs.property("schemaPath$index", generationSpec.schemaPath)
@@ -194,6 +184,21 @@ class OasGenPlugin : Plugin<Project> {
                 task.outputs.dir(effectiveOutputDir(project.buildDir, index, generationSpec))
             }
             task.dependsOn(oasGenConfiguration)
+        }
+
+        project.afterEvaluate {
+            oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
+                if (generationSpec.javaSources) {
+                    val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
+                    javaConvention.sourceSets.getAt(SourceSet.MAIN_SOURCE_SET_NAME).java {
+                        it.srcDir(effectiveOutputDir(project.buildDir, index, generationSpec))
+                    }
+                }
+            }
+
+            if (oasGenExtension.generationSpecs.any { it.javaSources }) {
+                project.tasks.getAt("compileJava").dependsOn(oasGenTask)
+            }
         }
     }
 }
