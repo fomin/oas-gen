@@ -171,14 +171,15 @@ class JavaSpringMvcServerWriter(
                |${importDeclarations.indentWithMargin(0)}
                |
                |@Controller
+               |@RequestMapping("${'$'}{$routesClassName.path}")
                |public class ${getSimpleName(routesClassName)} {
-               |    interface Operations {
+               |    public interface Operations {
                |        ${interfaceMethodContentList.indentWithMargin(2)}
                |    }
                |
                |    public final Operations operations;
                |
-               |    public SimpleRoutes(Operations operations) {
+               |    public ${getSimpleName(routesClassName)}(Operations operations) {
                |        this.operations = operations;
                |    }
                |
