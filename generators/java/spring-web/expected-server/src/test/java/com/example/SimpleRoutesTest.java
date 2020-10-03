@@ -81,7 +81,6 @@ class SimpleRoutesTest extends BaseServerTest {
         public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer() {
             return factory -> {
                 factory.setPort(PORT);
-                factory.setContextPath(CONTEXT_PATH);
             };
         }
     }

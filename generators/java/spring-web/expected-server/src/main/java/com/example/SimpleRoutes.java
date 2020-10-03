@@ -7,7 +7,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("${com.example.SimpleRoutes.path}")
+@RequestMapping("${com.example.SimpleRoutes.path:}")
 public class SimpleRoutes {
     public interface Operations {
         ResponseEntity<java.lang.String> create(
