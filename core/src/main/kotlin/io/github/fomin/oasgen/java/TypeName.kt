@@ -39,14 +39,30 @@ fun toTypeName(typedFragment: TypedFragment, suffix: String? = null): TypeName {
         }
 
         val parent = currentFragment.parent ?: break
+        val grandParent = parent.parent
         if (parent is Parameter) {
-            val parameterParent = parent.parent
-            if (parameterParent is Operation) {
-                nameParts.add(parameterParent.operationId)
+            if (grandParent is Operation) {
+                nameParts.add(grandParent.operationId)
                 nameParts.add("of")
             }
             nameParts.add(parent.name)
             break
+        } else if (parent is MediaTypeObject) {
+            if (grandParent is RequestBody) {
+                nameParts.add("request")
+                val requestBodyParent = grandParent.parent
+                if (requestBodyParent is Operation) {
+                    nameParts.add(requestBodyParent.operationId)
+                }
+                break
+            } else if (grandParent is Response) {
+                nameParts.add("response")
+                val responseParent = grandParent.parent?.parent
+                if (responseParent is Operation) {
+                    nameParts.add(responseParent.operationId)
+                }
+                break
+            }
         }
 
         if (parent is JsonSchema && parent.type == JsonType.ARRAY) {
