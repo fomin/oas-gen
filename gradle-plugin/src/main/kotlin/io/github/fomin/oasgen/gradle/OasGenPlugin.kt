@@ -148,6 +148,9 @@ open class OasGenTask @Inject constructor(
                     }
                 }
                 val outputDir = effectiveOutputDir(project.buildDir, index, generationSpec)
+                if (outputDir.exists()) {
+                    outputDir.deleteRecursively()
+                }
                 OasGenActionParameters(generationSpec.generatorId, baseDir, outputDir, generationSpec.schemaPath, generationSpec.namespace, generationSpec.converterIds)
             })
         }
