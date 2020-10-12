@@ -54,7 +54,9 @@ class SimpleRoutesTest extends BaseServerTest {
                 @Override
                 public ResponseEntity<String> create(@Nonnull Item item) {
                     assertNotNull(item);
-                    return ResponseEntity.ok("id");
+                    // implementation note: normally framework should add quotes
+                    // in case of response type application/json
+                    return ResponseEntity.ok("\"idValue\"");
                 }
 
                 @Override

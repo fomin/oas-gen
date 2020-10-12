@@ -57,6 +57,6 @@ public abstract class BaseServerTest {
                     return byteBufMono.asString();
                 })
                 .block();
-        assertEquals("id", body);
+        assertEquals("\"idValue\"", body);
     }
 }
