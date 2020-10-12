@@ -14,7 +14,6 @@ export class RestRequest<T> {
     ) {
         this.request = new XMLHttpRequest();
         this.request.open(method, url)
-        this.request.responseType = "json"
         if (timeout) this.request.timeout = timeout
 
         if (onLoadCallback) {

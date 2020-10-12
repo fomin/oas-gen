@@ -1,6 +1,7 @@
 import {create, find, get, Item, ItemProperty2Property22, Param2OfFind} from '../src/simple'
 import * as http from "http";
 import {LocalDate, LocalDateTime, LocalTime, Month} from "@js-joda/core";
+import {IncomingMessage} from "http";
 
 const testItemStr = '{"commonProperty1":"common property 1 value","property1":"property 1 value","property2":{"commonProperty1":"inner common property 1 value","property21":"property 21 value","property22":"value1"},"decimalProperty":1,"localDateTimeProperty":"2020-01-01T01:01:00","stringArrayProperty":["array value 1","array value 2"],"mapProperty":{"key 1":10}}';
 const testItem: Item = {
@@ -17,15 +18,38 @@ const testItem: Item = {
     "mapProperty": {"key 1": 10}
 };
 
+function onContent(req: IncomingMessage, callback: (content: string) => void) {
+    const chunks: Array<any> = []
+    req.on('readable', () => {
+        let chunk
+        while (null !== (chunk = req.read())) {
+            chunks.push(chunk)
+        }
+    });
+    req.on('end', () => {
+        const content = chunks.join('')
+        callback(content)
+    });
+
+}
+
 let server = http.createServer((req, res) => {
         res.setHeader("Access-Control-Allow-Origin", "*")
         if (req.url == "/idValue" && req.method == 'GET') {
-            res.end(testItemStr)
+            onContent(req, content => {
+                expect(content).toEqual("")
+                res.end(testItemStr)
+            })
         } else if (req.url == "/find?param1=param1Value&param2=value2" && req.method == "GET") {
-            res.end(testItemStr)
+            onContent(req, content => {
+                expect(content).toEqual("")
+                res.end(testItemStr)
+            })
         } else if (req.url == "/" && req.method == "POST") {
-            res.statusCode = 404
-            res.end('"idValue"')
+            onContent(req, content => {
+                expect(content).toEqual(testItemStr)
+                res.end('"idValue"')
+            })
         } else {
             res.statusCode = 404
         }
@@ -59,12 +83,12 @@ test('should get item', (done) => {
 test('should create item', (done) => {
     create('http://localhost:8080', testItem, 1000, value => {
         try {
-            expect(value).toEqual("idValue")
+            expect(value).toEqual('"idValue"')
             done()
         } catch (error) {
             done(error)
         }
-    })
+    });
 })
 
 afterAll(() => {

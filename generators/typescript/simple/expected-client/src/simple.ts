@@ -130,8 +130,8 @@ export interface Item {
 }
 
 // @ts-ignore
-function itemFromJson(json: any): Item {
-    return mapObjectProperties(json, (key, value) => {
+function itemFromJson(json: string): Item {
+    return mapObjectProperties(JSON.parse(json), (key, value) => {
         switch (key) {
             case "localDateTimeProperty":
                 return LocalDateTime.parse(value);
@@ -143,14 +143,14 @@ function itemFromJson(json: any): Item {
 
 // @ts-ignore
 function itemToJson(obj: Item): any {
-    return mapObjectProperties(obj, (key, value) => {
+    return JSON.stringify(mapObjectProperties(obj, (key, value) => {
         switch (key) {
             case "localDateTimeProperty":
                 return (value as LocalDateTime).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             default:
                 return value;
         }
-    });
+    }));
 }
 
 /**
