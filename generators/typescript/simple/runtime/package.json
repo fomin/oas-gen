@@ -1,6 +1,6 @@
 {
   "name": "@andrey.n.fomin/oas-gen-typescript-dto-runtime",
-  "version": "0.0.24-SNAPSHOT",
+  "version": "0.0.24",
   "description": "",
   "main": "out/index.js",
   "types": "out/index.d.ts",
