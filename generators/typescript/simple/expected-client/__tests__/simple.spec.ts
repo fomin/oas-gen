@@ -83,7 +83,7 @@ test('should get item', (done) => {
 test('should create item', (done) => {
     create('http://localhost:8080', testItem, 1000, value => {
         try {
-            expect(value).toEqual('"idValue"')
+            expect(value).toEqual('idValue')
             done()
         } catch (error) {
             done(error)

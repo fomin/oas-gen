@@ -21,15 +21,15 @@ class SimpleClientWriter(
             val clientFunctions = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
                 pathItem.operations().map { operation ->
                     val response200 = operation.responses().byCode()[HttpResponseCode.CODE_200]
-                    val responseSchema = response200?.let { response ->
+                    val responseEntry = response200?.let { response ->
                         val entries = response.content().entries
                         if (entries.isEmpty()) {
                             null
                         } else {
-                            val (_, mediaTypeObject) = entries.single()
-                            mediaTypeObject.schema()
+                             entries.single()
                         }
                     }
+                    val responseSchema = responseEntry?.value?.schema()
                     val returnType = if (responseSchema == null) "void"
                     else typeConverterRegistry[responseSchema].type()
 
@@ -37,10 +37,8 @@ class SimpleClientWriter(
                     val parameterArguments = operation.parameters().map { parameter ->
                         "${toLowerCamelCase(parameter.name)}: ${typeConverterRegistry[parameter.schema()].type()}"
                     }
-                    val bodySchema = operation.requestBody()?.let { requestBody ->
-                        val (_, mediaTypeObject) = requestBody.content().entries.single()
-                        mediaTypeObject.schema()
-                    }
+                    val requestEntry = operation.requestBody()?.content()?.entries?.single()
+                    val bodySchema = requestEntry?.value?.schema()
                     val bodyArguments = if (bodySchema == null) emptyList()
                     else listOf("body: ${typeConverterRegistry[bodySchema].type()}")
                     val queryString = operation.parameters().mapNotNull { parameter ->
@@ -60,9 +58,17 @@ class SimpleClientWriter(
                         "undefined"
                     }
 
+                    val responseType = when {
+                        responseEntry != null -> when (responseEntry.key) {
+                            "application/json" -> """"json""""
+                            else -> """"text""""
+                        }
+                        else -> """"text""""
+                    }
+
                     val requestTransformation = if (bodySchema != null) {
                         val jsonConverter = typeConverterRegistry[bodySchema].jsonConverter
-                        jsonConverter?.toJson("body") ?: "body"
+                        "JSON.stringify(${jsonConverter?.toJson("body") ?: "body"})"
                     } else {
                         "undefined"
                     }
@@ -84,6 +90,7 @@ class SimpleClientWriter(
                                |        `${'$'}{baseUrl}$url`,
                                |        "${operation.operationType.name}",
                                |        $responseTransformation,
+                               |        $responseType,
                                |        $requestTransformation,
                                |        timeout,
                                |        onLoadCallback,

@@ -5,7 +5,8 @@ export class RestRequest<T> {
         url: string,
         method: string,
         responseConverter: (response: any) => T,
-        body?: any,
+        responseType: XMLHttpRequestResponseType,
+        body?: Blob | BufferSource | FormData | URLSearchParams | string,
         timeout?: number,
         onLoadCallback?: (value: T) => void,
         onErrorCallback?: (reason: any) => void,
@@ -14,6 +15,7 @@ export class RestRequest<T> {
     ) {
         this.request = new XMLHttpRequest();
         this.request.open(method, url)
+        this.request.responseType = responseType
         if (timeout) this.request.timeout = timeout
 
         if (onLoadCallback) {
@@ -49,10 +51,11 @@ export class RestRequest<T> {
 }
 
 export function mapObjectProperties(source: any, mapper: (key: string, value: any) => any): any {
-    let result: any = {};
+    let result: any = {}
     for (let prop in source) {
-        let mappedValue = mapper(prop, source[prop]);
-        result[prop] = mappedValue;
+        if (source.hasOwnProperty(prop)) {
+            result[prop] = mapper(prop, source[prop])
+        }
     }
-    return result;
+    return result
 }

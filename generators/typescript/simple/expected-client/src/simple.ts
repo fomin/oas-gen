@@ -14,7 +14,8 @@ export function create(
         `${baseUrl}/`,
         "POST",
         value => value,
-        itemToJson(body),
+        "json",
+        JSON.stringify(itemToJson(body)),
         timeout,
         onLoadCallback,
         onErrorCallback,
@@ -35,6 +36,7 @@ export function postWithoutRequestBody(
         `${baseUrl}/post-without-request-body`,
         "POST",
         value => value,
+        "json",
         undefined,
         timeout,
         onLoadCallback,
@@ -58,6 +60,7 @@ export function find(
         `${baseUrl}/find?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
         "GET",
         itemFromJson,
+        "json",
         undefined,
         timeout,
         onLoadCallback,
@@ -80,6 +83,7 @@ export function get(
         `${baseUrl}/${id}`,
         "GET",
         itemFromJson,
+        "json",
         undefined,
         timeout,
         onLoadCallback,
@@ -130,8 +134,8 @@ export interface Item {
 }
 
 // @ts-ignore
-function itemFromJson(json: string): Item {
-    return mapObjectProperties(JSON.parse(json), (key, value) => {
+function itemFromJson(json: any): Item {
+    return mapObjectProperties(json, (key, value) => {
         switch (key) {
             case "localDateTimeProperty":
                 return LocalDateTime.parse(value);
@@ -143,14 +147,14 @@ function itemFromJson(json: string): Item {
 
 // @ts-ignore
 function itemToJson(obj: Item): any {
-    return JSON.stringify(mapObjectProperties(obj, (key, value) => {
+    return mapObjectProperties(obj, (key, value) => {
         switch (key) {
             case "localDateTimeProperty":
                 return (value as LocalDateTime).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
             default:
                 return value;
         }
-    }));
+    });
 }
 
 /**
