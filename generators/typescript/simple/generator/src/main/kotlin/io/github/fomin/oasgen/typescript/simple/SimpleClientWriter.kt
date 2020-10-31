@@ -112,6 +112,7 @@ class SimpleClientWriter(
                     TypeScriptDtoWriter().write(typeConverterRegistry, clientFunctions.flatMap { it.dtoSchemas })
 
             val importDeclarations = dtoImportDeclarations + listOf(
+                    ImportDeclaration("mapObjectProperties", "@andrey.n.fomin/oas-gen-typescript-dto-runtime"),
                     ImportDeclaration("RestRequest", "@andrey.n.fomin/oas-gen-typescript-dto-runtime")
             )
 

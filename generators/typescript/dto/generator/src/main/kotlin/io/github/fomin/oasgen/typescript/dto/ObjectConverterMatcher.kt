@@ -41,10 +41,7 @@ class ObjectConverterMatcher : TypeConverterMatcher {
                                |}""".trimMargin()
                 }
 
-                override fun importDeclarations() =
-                        if (hasMappedToJsonProperties)
-                            listOf(ImportDeclaration("mapObjectProperties", "@andrey.n.fomin/oas-gen-typescript-dto-runtime"))
-                        else emptyList()
+                override fun importDeclarations() = emptyList<ImportDeclaration>()
 
                 override fun innerSchemas() = jsonSchema.jointProperties().values.toList()
 
