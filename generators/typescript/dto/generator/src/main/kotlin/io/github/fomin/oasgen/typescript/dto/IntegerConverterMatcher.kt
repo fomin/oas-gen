@@ -11,7 +11,7 @@ class IntegerConverterMatcher : TypeConverterMatcher {
 
     override fun match(typeConverterRegistry: TypeConverterRegistry, jsonSchema: JsonSchema) = when (jsonSchema.type) {
         JsonType.Scalar.INTEGER -> object : TypeConverter {
-            override fun type() = "bigint"
+            override fun type() = if (jsonSchema.format == "int32") "number" else "bigint"
             override fun content(): String? = null
             override fun importDeclarations() = emptyList<ImportDeclaration>()
             override fun innerSchemas() = emptyList<JsonSchema>()
