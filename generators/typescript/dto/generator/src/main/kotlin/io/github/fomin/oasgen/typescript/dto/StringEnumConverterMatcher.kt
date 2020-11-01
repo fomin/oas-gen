@@ -25,7 +25,7 @@ class StringEnumConverterMatcher : TypeConverterMatcher {
                     return """ |/**
                                | * ${jsonSchema.title}
                                | */
-                               |export const enum ${type()} {
+                               |export enum ${type()} {
                                |    ${valueExpressions.joinToString(",\n").indentWithMargin(1)}
                                |}""".trimMargin()
                 }

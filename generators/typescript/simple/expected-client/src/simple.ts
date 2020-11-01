@@ -160,7 +160,7 @@ function itemToJson(obj: Item): any {
 /**
  * query parameter 2
  */
-export const enum Param2OfFind {
+export enum Param2OfFind {
     Value1 = "value1",
     Value2 = "value2"
 }
@@ -188,7 +188,7 @@ export interface ItemProperty2 {
 /**
  * Property 22
  */
-export const enum ItemProperty2Property22 {
+export enum ItemProperty2Property22 {
     Value1 = "value1",
     Value2 = "value2",
     Value3 = "value3"
