@@ -5,6 +5,7 @@ import io.github.fomin.oasgen.JsonType
 import io.github.fomin.oasgen.TypeName
 import io.github.fomin.oasgen.indentWithMargin
 import io.github.fomin.oasgen.java.toUpperCamelCase
+import io.github.fomin.oasgen.typescript.jsDoc
 
 class StringEnumConverterMatcher(
     private val namingStrategy: NamingStrategy
@@ -24,9 +25,7 @@ class StringEnumConverterMatcher(
 
                 override fun content(): String? {
                     val valueExpressions = enum.map { value -> "${toUpperCamelCase(value)} = \"$value\"" }
-                    return """ |/**
-                               | * ${jsonSchema.title}
-                               | */
+                    return """ |${jsDoc(jsonSchema)}
                                |export enum ${type()} {
                                |    ${valueExpressions.joinToString(",\n").indentWithMargin(1)}
                                |}""".trimMargin()

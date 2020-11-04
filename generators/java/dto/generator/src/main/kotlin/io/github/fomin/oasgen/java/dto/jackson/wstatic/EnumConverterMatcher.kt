@@ -25,12 +25,6 @@ class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
                 val className = valueType()
                 val filePath = getFilePath(className)
 
-                val classJavaDoc = jsonSchema.title?.let { title ->
-                    """|/**
-                           | * $title
-                           | */""".trimMargin()
-                } ?: ""
-
                 val enumValues = jsonSchema.enum() ?: error("enum values should be defined")
                 val valueDeclarations = enumValues.joinToString(",\n") { enumValue ->
                     """${toUpperSnakeCase(enumValue)}("$enumValue")"""
@@ -46,7 +40,7 @@ class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
                        |
                        |import javax.annotation.Nonnull;
                        |
-                       |$classJavaDoc
+                       |${javaDoc(jsonSchema)}
                        |public enum ${getSimpleName(className)} {
                        |    ${valueDeclarations.indentWithMargin(1)};
                        |

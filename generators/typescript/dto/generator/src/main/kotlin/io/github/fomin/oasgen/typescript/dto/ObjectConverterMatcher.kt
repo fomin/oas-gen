@@ -2,6 +2,7 @@ package io.github.fomin.oasgen.typescript.dto
 
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.toUpperCamelCase
+import io.github.fomin.oasgen.typescript.jsDoc
 import io.github.fomin.oasgen.typescript.toVariableName
 
 class ObjectConverterMatcher(
@@ -24,16 +25,12 @@ class ObjectConverterMatcher(
 
                 override fun content(): String? {
                     val fieldDeclarations = jsonSchema.jointProperties().map { (propertyName, propertySchema) ->
-                        """|/**
-                           | * ${propertySchema.title}
-                           | */
+                        """|${jsDoc(propertySchema)}
                            |readonly ${toVariableName(propertyName)}: ${typeConverterRegistry[propertySchema].type()};
                            |""".trimMargin()
                     }
 
-                    return """ |/**
-                               | * ${jsonSchema.title}
-                               | */
+                    return """ |${jsDoc(jsonSchema)}
                                |export interface ${toUpperCamelCase(typeName.name)} {
                                |    ${fieldDeclarations.indentWithMargin(1)}
                                |}""".trimMargin()

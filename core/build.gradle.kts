@@ -12,6 +12,7 @@ dependencies {
     api(kotlin("stdlib-jdk8"))
     implementation("com.fasterxml.jackson.core", "jackson-databind", JACKSON_VERSION)
     implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", JACKSON_VERSION)
+    implementation("com.atlassian.commonmark", "commonmark", COMMONMARK_VERSION)
 }
 
 addPublications("oas-gen-core")

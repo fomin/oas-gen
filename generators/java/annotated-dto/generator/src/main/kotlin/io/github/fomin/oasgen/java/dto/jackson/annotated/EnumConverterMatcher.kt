@@ -30,9 +30,7 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
                            |import com.fasterxml.jackson.annotation.JsonValue;
                            |import javax.annotation.Nonnull;
                            |
-                           |/**
-                           | * ${jsonSchema.title}
-                           | */
+                           |${javaDoc(jsonSchema)}
                            |public enum $simpleName {
                            |
                            |    ${valueDeclarations.indentWithMargin(1)};

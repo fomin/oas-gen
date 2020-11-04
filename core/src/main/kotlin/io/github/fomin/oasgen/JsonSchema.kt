@@ -25,6 +25,7 @@ fun getJsonType(type: String): JsonType {
 
 class JsonSchema(override val fragment: Fragment, override val parent: TypedFragment?) : TypedFragment() {
     val title = fragment.getOptional("title")?.asString()
+    val description = fragment.getOptional("description")?.asString()
     val type = getJsonType(fragment["type"].asString())
     val format = fragment.getOptional("format")?.asString()
 

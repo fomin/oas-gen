@@ -264,12 +264,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     }
 
                     val fieldDeclarations = javaProperties.map { javaProperty ->
-                        val javaDoc = javaProperty.jsonSchema.title?.let { title ->
-                            """|/**
-                               | * $title
-                               | */""".trimMargin()
-                        } ?: ""
-                        """|$javaDoc
+                        """|${javaDoc(javaProperty.jsonSchema)}
                            |${javaProperty.nullAnnotation}
                            |public final ${javaProperty.type} ${javaProperty.variableName};""".trimMargin()
                     }
@@ -312,11 +307,6 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     val (writerContent, writerImports) = jacksonWriterWriter.write(jsonSchema, valueType())
                     val importDeclarations = (parserImports + writerImports + "java.util.Objects")
                             .map { "import $it;" }.toSortedSet()
-                    val classJavaDoc = jsonSchema.title?.let { title ->
-                        """|/**
-                           | * $title
-                           | */""".trimMargin()
-                    } ?: ""
 
                     val simpleName = getSimpleName(valueType())
                     val content = """
@@ -324,7 +314,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                        |
                        |${importDeclarations.indentWithMargin(0)}
                        |
-                       |$classJavaDoc
+                       |${javaDoc(jsonSchema)}
                        |public final class $simpleName {
                        |
                        |    ${fieldDeclarations.indentWithMargin(1)}

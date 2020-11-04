@@ -21,9 +21,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                             true -> "@Nonnull"
                             false -> "@Nullable"
                         }
-                        """|/**
-                           | * ${propertySchema.title}
-                           | */
+                        """|${javaDoc(propertySchema)}
                            |$nullAnnotation
                            |public final ${converterRegistry[propertySchema].valueType()} ${toVariableName(propertyName)};
                            |
@@ -87,9 +85,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                |import javax.annotation.Nullable;
                                |import java.util.Objects;
                                |
-                               |/**
-                               | * ${jsonSchema.title}
-                               | */
+                               |${javaDoc(jsonSchema)}
                                |public final class $simpleName {
                                |
                                |    ${propertyDeclarations.indentWithMargin(1)}

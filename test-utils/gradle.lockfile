@@ -3,6 +3,7 @@
 # This file is expected to be part of source control.
 ch.qos.logback:logback-classic:1.2.3=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
 ch.qos.logback:logback-core:1.2.3=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
+com.atlassian.commonmark:commonmark:0.15.2=default,runtimeClasspath,testRuntimeClasspath
 com.fasterxml.jackson.core:jackson-annotations:2.11.3=default,runtimeClasspath,testRuntimeClasspath
 com.fasterxml.jackson.core:jackson-core:2.11.3=default,runtimeClasspath,testRuntimeClasspath
 com.fasterxml.jackson.core:jackson-databind:2.11.3=default,runtimeClasspath,testRuntimeClasspath

@@ -95,6 +95,12 @@ export function get(
 
 /**
  * Item
+ *
+ * This is a very long *description* of item.
+ * This is a very long *description* of item.
+ *
+ * This is a very long *description* of item.
+ * This is a very long *description* of item.
  */
 export interface Item {
     /**
@@ -104,6 +110,12 @@ export interface Item {
 
     /**
      * Property 1
+     *
+     * This is a very long *description* of property 1
+     * This is a very long *description* of property 1
+     *
+     * This is a very long *description* of property 1
+     * This is a very long *description* of property 1
      */
     readonly property1: string;
 

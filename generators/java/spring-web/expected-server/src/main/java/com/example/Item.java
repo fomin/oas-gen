@@ -8,6 +8,11 @@ import java.util.Objects;
 
 /**
  * Item
+ *
+ * <p>This is a very long <em>description</em> of item.
+ * This is a very long <em>description</em> of item.</p>
+ * <p>This is a very long <em>description</em> of item.
+ * This is a very long <em>description</em> of item.</p>
  */
 public final class Item {
 
@@ -19,6 +24,11 @@ public final class Item {
 
     /**
      * Property 1
+     *
+     * <p>This is a very long <em>description</em> of property 1
+     * This is a very long <em>description</em> of property 1</p>
+     * <p>This is a very long <em>description</em> of property 1
+     * This is a very long <em>description</em> of property 1</p>
      */
     @Nonnull
     public final java.lang.String property1;

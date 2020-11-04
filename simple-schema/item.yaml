@@ -1,10 +1,22 @@
 title: Item
+description: |
+  This is a very long *description* of item.
+  This is a very long *description* of item.
+
+  This is a very long *description* of item.
+  This is a very long *description* of item.
 type: object
 allOf:
   - $ref: '#/components/schemas/commonProperties'
 properties:
   property1:
     title: Property 1
+    description: |
+      This is a very long *description* of property 1
+      This is a very long *description* of property 1
+
+      This is a very long *description* of property 1
+      This is a very long *description* of property 1
     type: string
   property2:
     title: Property 2
