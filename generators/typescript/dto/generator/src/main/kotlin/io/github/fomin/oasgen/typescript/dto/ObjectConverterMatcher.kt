@@ -1,12 +1,8 @@
 package io.github.fomin.oasgen.typescript.dto
 
-import io.github.fomin.oasgen.JsonSchema
-import io.github.fomin.oasgen.JsonType
-import io.github.fomin.oasgen.indentWithMargin
-import io.github.fomin.oasgen.java.toTypeName
+import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.toUpperCamelCase
 import io.github.fomin.oasgen.typescript.toVariableName
-import io.github.fomin.oasgen.jointProperties
 
 class ObjectConverterMatcher : TypeConverterMatcher {
     class Provider : TypeConverterMatcherProvider {
@@ -17,7 +13,7 @@ class ObjectConverterMatcher : TypeConverterMatcher {
     override fun match(typeConverterRegistry: TypeConverterRegistry, jsonSchema: JsonSchema): TypeConverter? {
         return if (jsonSchema.type == JsonType.OBJECT) {
             object : TypeConverter {
-                val typeName = toTypeName(jsonSchema)
+                val typeName = TypeName.toTypeName(jsonSchema)
                 val hasMappedToJsonProperties = jsonSchema.jointProperties().any {
                     typeConverterRegistry[it.value].jsonConverter != null
                 }

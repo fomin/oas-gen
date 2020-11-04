@@ -2,8 +2,8 @@ package io.github.fomin.oasgen.typescript.dto
 
 import io.github.fomin.oasgen.JsonSchema
 import io.github.fomin.oasgen.JsonType
+import io.github.fomin.oasgen.TypeName
 import io.github.fomin.oasgen.indentWithMargin
-import io.github.fomin.oasgen.java.toTypeName
 import io.github.fomin.oasgen.java.toUpperCamelCase
 
 class StringEnumConverterMatcher : TypeConverterMatcher {
@@ -16,7 +16,7 @@ class StringEnumConverterMatcher : TypeConverterMatcher {
         val enum = jsonSchema.enum()
         return when {
             jsonSchema.type == JsonType.Scalar.STRING && enum != null -> object : TypeConverter {
-                val typeName = toTypeName(jsonSchema)
+                val typeName = TypeName.toTypeName(jsonSchema)
 
                 override fun type() = toUpperCamelCase(typeName.name)
 
