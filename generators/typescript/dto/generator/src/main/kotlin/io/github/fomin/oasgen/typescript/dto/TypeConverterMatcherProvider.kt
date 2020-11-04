@@ -14,14 +14,14 @@ interface TypeConverterMatcherProvider {
                         OffsetDateTimeConverterMatcher(),
                         LocalDateConverterMatcher(),
                         LocalDateTimeConverterMatcher(),
-                        StringEnumConverterMatcher(),
+                        StringEnumConverterMatcher(DefaultNamingStrategy()),
                         MapConverterMatcher(),
                         ArrayConverterMatcher(),
                         BooleanConverterMatcher(),
                         NumberConverterMatcher(),
                         IntegerConverterMatcher(),
                         StringConverterMatcher(),
-                        ObjectConverterMatcher()
+                        ObjectConverterMatcher(DefaultNamingStrategy())
                 )
         )
     }

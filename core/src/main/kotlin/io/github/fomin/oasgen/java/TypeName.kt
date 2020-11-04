@@ -4,7 +4,7 @@ package io.github.fomin.oasgen.java
 import io.github.fomin.oasgen.*
 
 fun toJavaClassName(basePackage: String, typedFragment: TypedFragment, suffix: String? = null): String {
-    val typeName = TypeName.toTypeName(typedFragment, suffix)
+    val typeName = TypeName.toTypeName(typedFragment, suffix = suffix)
     val package_ = typeName.namespace.joinToString("") {
         when {
             reservedWords.contains(it) -> "${it.toLowerCase()}$."

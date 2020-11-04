@@ -4,16 +4,18 @@ import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.toUpperCamelCase
 import io.github.fomin.oasgen.typescript.toVariableName
 
-class ObjectConverterMatcher : TypeConverterMatcher {
+class ObjectConverterMatcher(
+    private val namingStrategy: NamingStrategy
+) : TypeConverterMatcher {
     class Provider : TypeConverterMatcherProvider {
         override val id = "object"
-        override fun provide() = ObjectConverterMatcher()
+        override fun provide() = ObjectConverterMatcher(DefaultNamingStrategy())
     }
 
     override fun match(typeConverterRegistry: TypeConverterRegistry, jsonSchema: JsonSchema): TypeConverter? {
         return if (jsonSchema.type == JsonType.OBJECT) {
             object : TypeConverter {
-                val typeName = TypeName.toTypeName(jsonSchema)
+                val typeName = namingStrategy.typeName(jsonSchema)
                 val hasMappedToJsonProperties = jsonSchema.jointProperties().any {
                     typeConverterRegistry[it.value].jsonConverter != null
                 }

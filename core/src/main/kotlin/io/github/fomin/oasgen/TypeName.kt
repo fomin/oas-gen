@@ -7,7 +7,7 @@ data class TypeName(
         val name: String
 ) {
     companion object {
-        fun toTypeName(typedFragment: TypedFragment, suffix: String? = null): TypeName {
+        fun toTypeName(typedFragment: TypedFragment, prefix: String? = null, suffix: String? = null): TypeName {
             val nameParts = mutableListOf<String?>()
 
             var currentFragment = typedFragment
@@ -61,8 +61,10 @@ data class TypeName(
                 currentFragment = parent
             } while (true)
 
+            nameParts.add(prefix)
             nameParts.reverse()
-            val simpleName = toUpperCamelCase(*(nameParts + suffix).filterNotNull().toTypedArray())
+            nameParts.add(suffix)
+            val simpleName = toUpperCamelCase(*nameParts.filterNotNull().toTypedArray())
             val pathComponents = typedFragment.fragment.reference.filePath.split('/')
             val namespace = toNamespace(pathComponents)
             return TypeName(namespace, simpleName)

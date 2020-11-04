@@ -6,17 +6,19 @@ import io.github.fomin.oasgen.TypeName
 import io.github.fomin.oasgen.indentWithMargin
 import io.github.fomin.oasgen.java.toUpperCamelCase
 
-class StringEnumConverterMatcher : TypeConverterMatcher {
+class StringEnumConverterMatcher(
+    private val namingStrategy: NamingStrategy
+) : TypeConverterMatcher {
     class Provider : TypeConverterMatcherProvider {
         override val id = "enum"
-        override fun provide() = StringEnumConverterMatcher()
+        override fun provide() = StringEnumConverterMatcher(DefaultNamingStrategy())
     }
 
     override fun match(typeConverterRegistry: TypeConverterRegistry, jsonSchema: JsonSchema): TypeConverter? {
         val enum = jsonSchema.enum()
         return when {
             jsonSchema.type == JsonType.Scalar.STRING && enum != null -> object : TypeConverter {
-                val typeName = TypeName.toTypeName(jsonSchema)
+                val typeName = namingStrategy.typeName(jsonSchema)
 
                 override fun type() = toUpperCamelCase(typeName.name)
 
