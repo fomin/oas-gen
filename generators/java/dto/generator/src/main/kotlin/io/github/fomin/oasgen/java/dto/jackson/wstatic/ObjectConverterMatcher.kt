@@ -287,10 +287,12 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                         "this.${javaProperty.variableName} = ${javaProperty.variableName};"
                     }
 
-                    val equalsComparisons = jointProperties.map { (propertyName, _) ->
-                        val variableName = toVariableName(propertyName)
-                        "Objects.equals($variableName, other.$variableName)"
-                    }.joinToString(" &&\n")
+                    val equalsComparisons = if (jointProperties.isNotEmpty())
+                        jointProperties.map { (propertyName, _) ->
+                            val variableName = toVariableName(propertyName)
+                            "Objects.equals($variableName, other.$variableName)"
+                        }.joinToString(" &&\n")
+                    else "true"
 
                     val hashArgs = jointProperties.map { (propertyName, _) ->
                         toVariableName(propertyName)

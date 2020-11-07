@@ -15,18 +15,21 @@ public final class ItemProperty2 {
      * Common property 1
      */
     @Nullable
+    @JsonProperty("commonProperty1")
     public final java.lang.String commonProperty1;
 
     /**
      * Property 21
      */
     @Nullable
+    @JsonProperty("property21")
     public final java.lang.String property21;
 
     /**
      * Property 22
      */
     @Nullable
+    @JsonProperty("property22")
     public final com.example.ItemProperty2Property22 property22;
 
     @JsonCreator

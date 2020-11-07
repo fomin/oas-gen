@@ -1,6 +1,8 @@
 package io.github.fomin.oasgen
 
 import io.github.fomin.oasgen.java.toUpperCamelCase
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 
 data class TypeName(
         val namespace: List<String>,
@@ -15,10 +17,14 @@ data class TypeName(
             do {
                 val fragmentReference = currentFragment.fragment.reference
                 if (fragmentReference.fragmentPath.isEmpty()) {
-                    val lastName = fragmentReference.filePath.split("/").last()
+                    val lastName = URLDecoder.decode(fragmentReference.filePath, StandardCharsets.UTF_8)
+                        .split("/").last()
                     val dotIndex = lastName.indexOf('.')
                     val namePart = if (dotIndex == -1) lastName else lastName.substring(0, dotIndex)
                     nameParts.add(namePart)
+                    if (!namePart[0].isLetter()) {
+                        nameParts.add("$")
+                    }
                     break
                 }
 

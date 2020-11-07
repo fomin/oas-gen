@@ -152,7 +152,7 @@ class FragmentRegistry(private val baseDir: File) {
                 "yml" -> yamlMapper
                 else -> error("Unsupported extension $extension")
             }
-            val file = File(baseDir, path)
+            val file = File(baseDir, URLDecoder.decode(path, Charsets.UTF_8))
             val map = mapper.readValue(file, mapTypeReference)
             rootIndex[path] = map
             map

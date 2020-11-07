@@ -26,7 +26,7 @@ class ObjectConverterMatcher(
                 override fun content(): String? {
                     val fieldDeclarations = jsonSchema.jointProperties().map { (propertyName, propertySchema) ->
                         """|${jsDoc(propertySchema)}
-                           |readonly ${toVariableName(propertyName)}: ${typeConverterRegistry[propertySchema].type()};
+                           |readonly "$propertyName": ${typeConverterRegistry[propertySchema].type()};
                            |""".trimMargin()
                     }
 

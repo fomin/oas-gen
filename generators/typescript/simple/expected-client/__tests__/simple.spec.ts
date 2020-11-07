@@ -3,7 +3,7 @@ import * as http from "http";
 import {LocalDate, LocalDateTime, LocalTime, Month} from "@js-joda/core";
 import {IncomingMessage} from "http";
 
-const testItemStr = '{"commonProperty1":"common property 1 value","property1":"property 1 value","property2":{"commonProperty1":"inner common property 1 value","property21":"property 21 value","property22":"value1"},"decimalProperty":1,"localDateTimeProperty":"2020-01-01T01:01:00","stringArrayProperty":["array value 1","array value 2"],"mapProperty":{"key 1":10}}';
+const testItemStr = '{"commonProperty1":"common property 1 value","property1":"property 1 value","property2":{"commonProperty1":"inner common property 1 value","property21":"property 21 value","property22":"value1"},"decimalProperty":1,"localDateTimeProperty":"2020-01-01T01:01:00","stringArrayProperty":["array value 1","array value 2"],"mapProperty":{"key 1":10},"true":{"property1":"property 1 value"},"1 with space-and+other_çhars":{"property1":"property 1 value"}}';
 const testItem: Item = {
     "commonProperty1": "common property 1 value",
     "property1": "property 1 value",
@@ -15,7 +15,9 @@ const testItem: Item = {
     "decimalProperty": 1,
     "localDateTimeProperty": LocalDateTime.of(LocalDate.of(2020, Month.JANUARY, 1), LocalTime.of(1, 1)),
     "stringArrayProperty": ["array value 1", "array value 2"],
-    "mapProperty": {"key 1": 10}
+    "mapProperty": {"key 1": 10},
+    "true": {property1: "property 1 value"},
+    "1 with space-and+other_çhars": {property1: "property 1 value"},
 };
 
 function onContent(req: IncomingMessage, callback: (content: string) => void) {

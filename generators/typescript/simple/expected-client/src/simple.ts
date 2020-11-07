@@ -106,7 +106,7 @@ export interface Item {
     /**
      * Common property 1
      */
-    readonly commonProperty1: string;
+    readonly "commonProperty1": string;
 
     /**
      * Property 1
@@ -117,32 +117,42 @@ export interface Item {
      * This is a very long *description* of property 1
      * This is a very long *description* of property 1
      */
-    readonly property1: string;
+    readonly "property1": string;
 
     /**
      * Property 2
      */
-    readonly property2: ItemProperty2;
+    readonly "property2": ItemProperty2;
 
     /**
      * Decimal property
      */
-    readonly decimalProperty: number;
+    readonly "decimalProperty": number;
 
     /**
      * Local date time property
      */
-    readonly localDateTimeProperty: LocalDateTime;
+    readonly "localDateTimeProperty": LocalDateTime;
 
     /**
      * String array property
      */
-    readonly stringArrayProperty: readonly string[];
+    readonly "stringArrayProperty": readonly string[];
 
     /**
      * Map property
      */
-    readonly mapProperty: Record<string, number>;
+    readonly "mapProperty": Record<string, number>;
+
+    /**
+     * Schema with reserved word in name
+     */
+    readonly "true": True;
+
+    /**
+     * Property with space and other chars in name
+     */
+    readonly "1 with space-and+other_çhars": $1WithSpaceAndOtherÇhars;
 }
 
 // @ts-ignore
@@ -184,17 +194,37 @@ export interface ItemProperty2 {
     /**
      * Common property 1
      */
-    readonly commonProperty1: string;
+    readonly "commonProperty1": string;
 
     /**
      * Property 21
      */
-    readonly property21: string;
+    readonly "property21": string;
 
     /**
      * Property 22
      */
-    readonly property22: ItemProperty2Property22;
+    readonly "property22": ItemProperty2Property22;
+}
+
+/**
+ * Schema with reserved word in name
+ */
+export interface True {
+    /**
+     * Property 1
+     */
+    readonly "property1": string;
+}
+
+/**
+ * Property with space and other chars in name
+ */
+export interface $1WithSpaceAndOtherÇhars {
+    /**
+     * Property 1
+     */
+    readonly "property1": string;
 }
 
 /**

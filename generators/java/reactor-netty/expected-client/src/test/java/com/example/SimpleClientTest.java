@@ -37,6 +37,7 @@ class SimpleClientTest implements ClientTest {
         referenceServer.disposeNow();
     }
 
+    @Test
     @Override
     public void testFind() {
         Mono<Item> itemMono = simpleClient.find("param1Value", Param2OfFind.VALUE2);
@@ -68,7 +69,9 @@ class SimpleClientTest implements ClientTest {
                                 BigDecimal.ONE,
                                 LocalDateTime.of(2020, 1, 1, 1, 1),
                                 Arrays.asList("array value 1", "array value 2"),
-                                Collections.singletonMap("key 1", BigDecimal.TEN)
+                                Collections.singletonMap("key 1", BigDecimal.TEN),
+                                new True("property 1 value"),
+                                new $1WithSpaceAndOtherÇhars("property 1 value")
                         )
                 )
         );

@@ -90,7 +90,7 @@ fun toVariableName(vararg parts: String): String {
         }
     }
 
-    return when (filteredParts.size) {
+    val camelCaseName = when (filteredParts.size) {
         1 -> {
             val singlePart = filteredParts[0]
             when {
@@ -99,6 +99,11 @@ fun toVariableName(vararg parts: String): String {
             }
         }
         else -> toLowerCamelCase(*filteredParts.toTypedArray())
+    }
+    return if (!camelCaseName[0].isLetter()) {
+        "$${camelCaseName}"
+    } else {
+        camelCaseName;
     }
 }
 
@@ -137,7 +142,7 @@ fun toCamelCase(firstUpper: Boolean, vararg parts: String): String {
     parts.forEachIndexed { partIndex, part ->
         if (partIndex > 0) nextInUpper = true
         part.forEachIndexed { charIndex, char ->
-            nextInUpper = if (char in listOf('-', '.')) {
+            nextInUpper = if (!(char.isLetterOrDigit() || char == '$')) {
                 true
             } else {
                 if (nextInUpper) {

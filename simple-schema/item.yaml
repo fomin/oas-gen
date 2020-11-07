@@ -51,9 +51,15 @@ properties:
     type: object
     additionalProperties:
       type: number
+  true:
+    $ref: true.yaml
+  1 with space-and+other_çhars:
+    $ref: "1%20with%20space-and*other_çhars.yaml"
 required:
   - property1
   - property2
+  - "true"
+  - 1 with space-and+other_çhars
 
 components:
   schemas:
