@@ -45,8 +45,8 @@ class ObjectConverterMatcher(
                         override fun toJson(valueExpression: String) =
                                 "${toVariableName(typeName.name, "to", "json")}($valueExpression)"
 
-                        override fun fromJson() =
-                                toVariableName(typeName.name, "from", "json")
+                        override fun fromJson(valueExpression: String) =
+                                "${toVariableName(typeName.name, "from", "json")}($valueExpression)"
 
                         private fun switchCases(converterExpression: (JsonConverter) -> String) = jsonSchema.jointProperties().mapNotNull { (propertyName, propertySchema) ->
                             val propertyJsonConverter = typeConverterRegistry[propertySchema].jsonConverter
@@ -64,7 +64,7 @@ class ObjectConverterMatcher(
                                    |function ${toVariableName(typeName.name, "from", "json")}(json: any): ${type()} {
                                    |    return mapObjectProperties(json, (key, value) => {
                                    |        switch (key) {
-                                   |            ${switchCases { "${it.fromJson()}(value)" }.indentWithMargin(3)}
+                                   |            ${switchCases { it.fromJson("value") }.indentWithMargin(3)}
                                    |            default:
                                    |                return value;
                                    |        }

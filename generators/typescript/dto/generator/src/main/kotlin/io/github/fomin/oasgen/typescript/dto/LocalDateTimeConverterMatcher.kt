@@ -20,7 +20,7 @@ class LocalDateTimeConverterMatcher : TypeConverterMatcher {
             override fun innerSchemas() = listOf<JsonSchema>()
             override val jsonConverter = object : JsonConverter {
                 override fun toJson(valueExpression: String) = "($valueExpression as LocalDateTime).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)"
-                override fun fromJson() = "LocalDateTime.parse"
+                override fun fromJson(valueExpression: String) = "LocalDateTime.parse($valueExpression)"
                 override fun content(): String? = null
             }
 

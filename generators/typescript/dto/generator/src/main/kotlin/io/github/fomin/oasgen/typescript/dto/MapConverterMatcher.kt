@@ -31,7 +31,7 @@ class MapConverterMatcher : TypeConverterMatcher {
                             TODO("Not yet implemented")
                         }
 
-                        override fun fromJson(): String {
+                        override fun fromJson(valueExpression: String): String {
                             TODO("Not yet implemented")
                         }
 

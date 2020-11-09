@@ -26,11 +26,13 @@ class ArrayConverterMatcher : TypeConverterMatcher {
 
                 override val jsonConverter = if (itemsJsonConverter != null) {
                     object : JsonConverter {
-                        override fun toJson(valueExpression: String) = "TODO"
+                        override fun toJson(valueExpression: String) =
+                            "$valueExpression.map((it: any) => ${itemsJsonConverter.toJson("it")})"
 
-                        override fun fromJson() = "TODO"
+                        override fun fromJson(valueExpression: String) =
+                            "$valueExpression.map((it: any) => ${itemsJsonConverter.fromJson("it")})"
 
-                        override fun content() = "TODO"
+                        override fun content(): String? = null
                     }
                 } else {
                     null

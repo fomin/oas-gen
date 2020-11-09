@@ -20,7 +20,7 @@ class OffsetDateTimeConverterMatcher : TypeConverterMatcher {
             override fun innerSchemas() = listOf<JsonSchema>()
             override val jsonConverter = object : JsonConverter {
                 override fun toJson(valueExpression: String) = "($valueExpression as OffsetDateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME)"
-                override fun fromJson() = "OffsetDateTime.parse"
+                override fun fromJson(valueExpression: String) = "OffsetDateTime.parse($valueExpression)"
                 override fun content(): String? = null
             }
 

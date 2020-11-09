@@ -1,4 +1,4 @@
-import {DateTimeFormatter, LocalDateTime} from "@js-joda/core";
+import {DateTimeFormatter, LocalDateTime, OffsetDateTime} from "@js-joda/core";
 import {RestRequest, mapObjectProperties} from "@andrey.n.fomin/oas-gen-typescript-dto-runtime";
 
 export function create(
@@ -59,7 +59,7 @@ export function find(
     return new RestRequest<Item>(
         `${baseUrl}/find?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
         "GET",
-        itemFromJson,
+        value => itemFromJson(value),
         "json",
         undefined,
         timeout,
@@ -82,7 +82,7 @@ export function get(
     return new RestRequest<Item>(
         `${baseUrl}/${id}`,
         "GET",
-        itemFromJson,
+        value => itemFromJson(value),
         "json",
         undefined,
         timeout,
@@ -140,6 +140,11 @@ export interface Item {
     readonly "stringArrayProperty": readonly string[];
 
     /**
+     * Date-time array property
+     */
+    readonly "dateTimeArrayProperty": readonly OffsetDateTime[];
+
+    /**
      * Map property
      */
     readonly "mapProperty": Record<string, number>;
@@ -161,6 +166,9 @@ function itemFromJson(json: any): Item {
         switch (key) {
             case "localDateTimeProperty":
                 return LocalDateTime.parse(value);
+
+            case "dateTimeArrayProperty":
+                return value.map((it: any) => OffsetDateTime.parse(it));
             default:
                 return value;
         }
@@ -173,6 +181,9 @@ function itemToJson(obj: Item): any {
         switch (key) {
             case "localDateTimeProperty":
                 return (value as LocalDateTime).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+
+            case "dateTimeArrayProperty":
+                return value.map((it: any) => (it as OffsetDateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
             default:
                 return value;
         }

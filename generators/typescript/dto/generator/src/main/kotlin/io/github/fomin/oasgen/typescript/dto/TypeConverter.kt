@@ -4,7 +4,7 @@ import io.github.fomin.oasgen.*
 
 interface JsonConverter {
     fun toJson(valueExpression: String): String
-    fun fromJson(): String
+    fun fromJson(valueExpression: String): String
     fun content(): String?
 }
 

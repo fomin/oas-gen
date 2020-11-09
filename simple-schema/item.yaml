@@ -46,6 +46,13 @@ properties:
     type: array
     items:
       type: string
+  dateTimeArrayProperty:
+    title: Date-time array property
+    type: array
+    items:
+      title: Array item
+      type: string
+      format: date-time
   mapProperty:
     title: Map property
     type: object
