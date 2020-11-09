@@ -13,7 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@andrey.n.fomin/oas-gen-typescript-dto-runtime": "file:../runtime",
-    "@js-joda/core": "^2.0.0",
+    "@js-joda/core": "^3.2.0",
     "tslib": "^1.13.0"
   },
   "devDependencies": {
