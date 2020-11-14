@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.github.fomin.oasgen.test.BaseServerTest;
 import org.junit.jupiter.api.AfterAll;
@@ -49,6 +50,7 @@ class SimpleRoutesTest extends BaseServerTest {
             new True("property 1 value"),
             new $1WithSpaceAndOtherÇhars("property 1 value")
     );
+    private static final ComponentItem TEST_COMPONENT_ITEM = new ComponentItem();
 
     public SimpleRoutesTest() {
         super(PORT);
@@ -80,9 +82,9 @@ class SimpleRoutesTest extends BaseServerTest {
                 }
 
                 @Override
-                public ResponseEntity<Item> get(@Nonnull String id) {
+                public ResponseEntity<ComponentItem> get(@Nonnull String id) {
                     assertEquals("idValue", id);
-                    return ResponseEntity.ok(TEST_ITEM);
+                    return ResponseEntity.ok(TEST_COMPONENT_ITEM);
                 }
             };
         }
@@ -91,6 +93,8 @@ class SimpleRoutesTest extends BaseServerTest {
         public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
             Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
             builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            builder.featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            builder.featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
             converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
         }
     }

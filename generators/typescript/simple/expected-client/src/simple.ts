@@ -74,15 +74,15 @@ export function get(
     baseUrl: string,
     id: string,
     timeout?: number,
-    onLoadCallback?: (value: Item) => void,
+    onLoadCallback?: (value: ComponentItem) => void,
     onErrorCallback?: (reason: any) => void,
     onTimeoutCallback?: () => void,
     onAbortCallback?: () => void
-): RestRequest<Item> {
-    return new RestRequest<Item>(
+): RestRequest<ComponentItem> {
+    return new RestRequest<ComponentItem>(
         `${baseUrl}/${id}`,
         "GET",
-        value => itemFromJson(value),
+        value => value,
         "json",
         undefined,
         timeout,
@@ -207,6 +207,13 @@ function itemToJson(obj: Item): any {
 export enum Param2OfFind {
     Value1 = "value1",
     Value2 = "value2"
+}
+
+/**
+ * Component item
+ */
+export interface ComponentItem {
+
 }
 
 /**

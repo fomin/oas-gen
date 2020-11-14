@@ -23,7 +23,7 @@ public class SimpleRoutes {
                 @Nullable com.example.Param2OfFind param2
         );
 
-        ResponseEntity<com.example.Item> get(
+        ResponseEntity<com.example.ComponentItem> get(
                 @Nonnull java.lang.String id
         );
     }
@@ -64,7 +64,7 @@ public class SimpleRoutes {
     }
 
     @GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<com.example.Item> get(
+    public ResponseEntity<com.example.ComponentItem> get(
             @Nonnull @PathVariable("id") java.lang.String id
     ) {
         return this.operations.get(

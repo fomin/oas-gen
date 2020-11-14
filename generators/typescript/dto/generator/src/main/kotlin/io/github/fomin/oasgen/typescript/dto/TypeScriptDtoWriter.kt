@@ -2,6 +2,7 @@ package io.github.fomin.oasgen.typescript.dto
 
 import io.github.fomin.oasgen.Fragment
 import io.github.fomin.oasgen.JsonSchema
+import io.github.fomin.oasgen.indentWithMargin
 
 class TypeScriptDtoWriter {
     data class Result(
@@ -35,6 +36,6 @@ class TypeScriptDtoWriter {
             processedFragments.add(jsonSchema.fragment)
             index += 1
         }
-        return Result(contentList.joinToString("\n\n"), importDeclarations)
+        return Result(contentList.joinToString("\n\n").indentWithMargin(0), importDeclarations)
     }
 }

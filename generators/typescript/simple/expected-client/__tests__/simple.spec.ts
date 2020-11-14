@@ -1,9 +1,10 @@
-import {create, find, get, Item, ItemProperty2Property22, Param2OfFind} from '../src/simple'
+import {ComponentItem, create, find, get, Item, ItemProperty2Property22, Param2OfFind} from '../src/simple'
 import * as http from "http";
 import {LocalDate, LocalDateTime, LocalTime, Month, OffsetDateTime, ZoneOffset} from "@js-joda/core";
 import {IncomingMessage} from "http";
 
 const testItemStr = '{"commonProperty1":"common property 1 value","property1":"property 1 value","property2":{"commonProperty1":"inner common property 1 value","property21":"property 21 value","property22":"value1"},"decimalProperty":1,"localDateTimeProperty":"2020-01-01T01:01:00","stringArrayProperty":["array value 1","array value 2"],"dateTimeArrayProperty":["2020-11-10T01:01:01+01:00"],"mapProperty":{"key 1":10},"dateTimeMapProperty":{"key 1":"2020-11-10T01:01:01+01:00"},"true":{"property1":"property 1 value"},"1 with space-and+other_çhars":{"property1":"property 1 value"}}';
+const testComponentItemStr = '{}';
 const testItem: Item = {
     "commonProperty1": "common property 1 value",
     "property1": "property 1 value",
@@ -23,6 +24,7 @@ const testItem: Item = {
     "true": {property1: "property 1 value"},
     "1 with space-and+other_çhars": {property1: "property 1 value"},
 };
+const testComponentItem: ComponentItem = {}
 
 function onContent(req: IncomingMessage, callback: (content: string) => void) {
     const chunks: Array<any> = []
@@ -44,7 +46,7 @@ let server = http.createServer((req, res) => {
         if (req.url == "/idValue" && req.method == 'GET') {
             onContent(req, content => {
                 expect(content).toEqual("")
-                res.end(testItemStr)
+                res.end(testComponentItemStr)
             })
         } else if (req.url == "/find?param1=param1Value&param2=value2" && req.method == "GET") {
             onContent(req, content => {
@@ -78,7 +80,7 @@ test('should find item', (done) => {
 test('should get item', (done) => {
     get('http://localhost:8080', 'idValue', 1000, value => {
         try {
-            expect(value).toEqual(testItem)
+            expect(value).toEqual(testComponentItem)
             done()
         } catch (error) {
             done(error)

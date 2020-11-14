@@ -29,7 +29,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     public abstract Mono<com.example.Item> find(@Nonnull java.lang.String param1, @Nullable com.example.Param2OfFind param2);
 
     @Nonnull
-    public abstract Mono<com.example.Item> get(@Nonnull java.lang.String id);
+    public abstract Mono<com.example.ComponentItem> get(@Nonnull java.lang.String id);
 
     @Override
     public final void accept(HttpServerRoutes httpServerRoutes) {
@@ -69,10 +69,10 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 String param0Str = request.param("id");
                 java.lang.String param0 = param0Str != null ? param0Str : null;
 
-                Mono<com.example.Item> responseMono = get(param0);
+                Mono<com.example.ComponentItem> responseMono = get(param0);
                 return response
                         .header("Content-Type", "application/json")
-                        .send(byteBufConverter.write(response, responseMono, com.example.Item.Writer.INSTANCE));
+                        .send(byteBufConverter.write(response, responseMono, com.example.ComponentItem.Writer.INSTANCE));
             })
         ;
     }

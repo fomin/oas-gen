@@ -96,7 +96,7 @@ public class SimpleClient {
     }
 
     @Nonnull
-    public ResponseEntity<com.example.Item> get(
+    public ResponseEntity<com.example.ComponentItem> get(
             @Nonnull java.lang.String id
     ) {
         return get$0(
@@ -104,7 +104,7 @@ public class SimpleClient {
         );
     }
 
-    private ResponseEntity<com.example.Item> get$0(
+    private ResponseEntity<com.example.ComponentItem> get$0(
             java.lang.String param0
     ) {
         Map<String, Object> uriVariables = new HashMap<>();
@@ -116,7 +116,7 @@ public class SimpleClient {
         RequestEntity<java.lang.Void> request = RequestEntity
                 .get(uri)
                 .build();
-        return restOperations.exchange(request, com.example.Item.class);
+        return restOperations.exchange(request, com.example.ComponentItem.class);
     }
 
 }

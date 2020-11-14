@@ -90,7 +90,7 @@ public class SimpleClient {
     }
 
     @Nonnull
-    public Mono<com.example.Item> get(
+    public Mono<com.example.ComponentItem> get(
             @Nonnull java.lang.String id
     ) {
         return get$0(
@@ -98,7 +98,7 @@ public class SimpleClient {
         );
     }
 
-    private Mono<com.example.Item> get$0(
+    private Mono<com.example.ComponentItem> get$0(
             java.lang.String param0
     ) {
         String param0Str = param0 != null ? param0 : null;
@@ -107,7 +107,7 @@ public class SimpleClient {
                 .uri(UrlEncoderUtils.encodeUrl("/" + UrlEncoderUtils.encode(param0Str)))
 
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());
+        return byteBufConverter.parse(responseByteBufFlux, new com.example.ComponentItem.Parser());
     }
 
 }

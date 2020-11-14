@@ -71,4 +71,10 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'item.yaml'
+                $ref: '#/components/schemas/componentItem'
+
+components:
+  schemas:
+    componentItem:
+      title: Component item
+      type: object

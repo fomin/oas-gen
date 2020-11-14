@@ -1,5 +1,6 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import io.github.fomin.oasgen.test.ClientTest;
 import io.github.fomin.oasgen.test.ReferenceServer;
@@ -28,7 +29,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SimpleClientTest implements ClientTest {
 
@@ -50,6 +50,7 @@ class SimpleClientTest implements ClientTest {
             new True("property 1 value"),
             new $1WithSpaceAndOtherÇhars("property 1 value")
     );
+    public static final ComponentItem TEST_COMPONENT_ITEM = new ComponentItem();
 
     @SpringBootApplication
     public static class TestApplication {
@@ -58,6 +59,8 @@ class SimpleClientTest implements ClientTest {
         public SimpleClient simpleClient() {
             Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
             builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            builder.featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            builder.featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
             List<HttpMessageConverter<?>> converters = Collections.singletonList(
                     new MappingJackson2HttpMessageConverter(builder.build())
             );
@@ -88,15 +91,15 @@ class SimpleClientTest implements ClientTest {
     public void testFind() {
         ResponseEntity<Item> responseEntity = simpleClient.find("param1Value", Param2OfFind.VALUE2);
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertNotNull(responseEntity.getBody());
+        assertEquals(TEST_ITEM, responseEntity.getBody());
     }
 
     @Override
     @Test
     public void testGet() {
-        ResponseEntity<Item> responseEntity = simpleClient.get("idValue");
+        ResponseEntity<ComponentItem> responseEntity = simpleClient.get("idValue");
         assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertNotNull(responseEntity.getBody());
+        assertEquals(TEST_COMPONENT_ITEM, responseEntity.getBody());
     }
 
     @Override
