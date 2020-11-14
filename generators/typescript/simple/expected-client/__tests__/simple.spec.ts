@@ -3,7 +3,7 @@ import * as http from "http";
 import {LocalDate, LocalDateTime, LocalTime, Month, OffsetDateTime, ZoneOffset} from "@js-joda/core";
 import {IncomingMessage} from "http";
 
-const testItemStr = '{"commonProperty1":"common property 1 value","property1":"property 1 value","property2":{"commonProperty1":"inner common property 1 value","property21":"property 21 value","property22":"value1"},"decimalProperty":1,"localDateTimeProperty":"2020-01-01T01:01:00","stringArrayProperty":["array value 1","array value 2"],"dateTimeArrayProperty":["2020-11-10T01:01:01+01:00"],"mapProperty":{"key 1":10},"true":{"property1":"property 1 value"},"1 with space-and+other_çhars":{"property1":"property 1 value"}}';
+const testItemStr = '{"commonProperty1":"common property 1 value","property1":"property 1 value","property2":{"commonProperty1":"inner common property 1 value","property21":"property 21 value","property22":"value1"},"decimalProperty":1,"localDateTimeProperty":"2020-01-01T01:01:00","stringArrayProperty":["array value 1","array value 2"],"dateTimeArrayProperty":["2020-11-10T01:01:01+01:00"],"mapProperty":{"key 1":10},"dateTimeMapProperty":{"key 1":"2020-11-10T01:01:01+01:00"},"true":{"property1":"property 1 value"},"1 with space-and+other_çhars":{"property1":"property 1 value"}}';
 const testItem: Item = {
     "commonProperty1": "common property 1 value",
     "property1": "property 1 value",
@@ -17,6 +17,9 @@ const testItem: Item = {
     "stringArrayProperty": ["array value 1", "array value 2"],
     "dateTimeArrayProperty": [OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))],
     "mapProperty": {"key 1": 10},
+    "dateTimeMapProperty": {
+        "key 1": OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))
+    },
     "true": {property1: "property 1 value"},
     "1 with space-and+other_çhars": {property1: "property 1 value"},
 };

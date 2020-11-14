@@ -150,6 +150,11 @@ export interface Item {
     readonly "mapProperty": Record<string, number>;
 
     /**
+     * Date-time map property
+     */
+    readonly "dateTimeMapProperty": Record<string, OffsetDateTime>;
+
+    /**
      * Schema with reserved word in name
      */
     readonly "true": True;
@@ -169,6 +174,9 @@ function itemFromJson(json: any): Item {
 
             case "dateTimeArrayProperty":
                 return value.map((it: any) => OffsetDateTime.parse(it));
+
+            case "dateTimeMapProperty":
+                return mapObjectProperties(value, (_, v) => OffsetDateTime.parse(v));
             default:
                 return value;
         }
@@ -184,6 +192,9 @@ function itemToJson(obj: Item): any {
 
             case "dateTimeArrayProperty":
                 return value.map((it: any) => (it as OffsetDateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+
+            case "dateTimeMapProperty":
+                return mapObjectProperties(value, (_, v) => (v as OffsetDateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
             default:
                 return value;
         }

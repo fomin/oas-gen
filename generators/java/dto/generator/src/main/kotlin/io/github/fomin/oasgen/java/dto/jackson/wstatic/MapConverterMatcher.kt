@@ -28,7 +28,7 @@ class MapConverterMatcher : ConverterMatcher {
             override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
 
             override fun generate(): ConverterWriter.Result {
-                return ConverterWriter.Result(null, listOf())
+                return ConverterWriter.Result(null, listOf(additionalProperties))
             }
         }
         else null

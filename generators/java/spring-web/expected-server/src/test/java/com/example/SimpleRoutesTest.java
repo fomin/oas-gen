@@ -1,24 +1,30 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import io.github.fomin.oasgen.test.BaseServerTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.web.server.WebServerFactoryCustomizer;
-import org.springframework.boot.web.servlet.server.ConfigurableServletWebServerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -37,7 +43,9 @@ class SimpleRoutesTest extends BaseServerTest {
             BigDecimal.ONE,
             LocalDateTime.of(2020, 1, 1, 1, 1),
             Arrays.asList("array value 1", "array value 2"),
+            Collections.singletonList(OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
             Collections.singletonMap("key 1", BigDecimal.TEN),
+            Collections.singletonMap("key 1", OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
             new True("property 1 value"),
             new $1WithSpaceAndOtherÇhars("property 1 value")
     );
@@ -48,7 +56,7 @@ class SimpleRoutesTest extends BaseServerTest {
 
     @SpringBootApplication
     @EnableWebMvc
-    public static class TestApplication {
+    public static class TestApplication implements WebMvcConfigurer {
 
         @Bean
         public SimpleRoutes.Operations simpleRoutesActions() {
@@ -56,9 +64,7 @@ class SimpleRoutesTest extends BaseServerTest {
                 @Override
                 public ResponseEntity<String> create(@Nonnull Item item) {
                     assertNotNull(item);
-                    // implementation note: normally framework should add quotes
-                    // in case of response type application/json
-                    return ResponseEntity.ok("\"idValue\"");
+                    return ResponseEntity.ok("idValue");
                 }
 
                 @Override
@@ -81,11 +87,11 @@ class SimpleRoutesTest extends BaseServerTest {
             };
         }
 
-        @Bean
-        public WebServerFactoryCustomizer<ConfigurableServletWebServerFactory> webServerFactoryCustomizer() {
-            return factory -> {
-                factory.setPort(PORT);
-            };
+        @Override
+        public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+            Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+            builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
         }
     }
 

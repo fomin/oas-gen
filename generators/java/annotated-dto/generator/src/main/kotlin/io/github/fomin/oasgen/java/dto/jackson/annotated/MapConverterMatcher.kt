@@ -18,7 +18,7 @@ class MapConverterMatcher : ConverterMatcher {
 
             override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
 
-            override fun output() = ConverterOutput.EMPTY
+            override fun output() = ConverterOutput(null, listOf(additionalProperties))
         }
         else null
     }

@@ -57,10 +57,20 @@ public final class Item {
     @Nullable
     public final java.util.List<java.lang.String> stringArrayProperty;
     /**
+     * Date-time array property
+     */
+    @Nullable
+    public final java.util.List<java.time.OffsetDateTime> dateTimeArrayProperty;
+    /**
      * Map property
      */
     @Nullable
     public final java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty;
+    /**
+     * Date-time map property
+     */
+    @Nullable
+    public final java.util.Map<java.lang.String, java.time.OffsetDateTime> dateTimeMapProperty;
     /**
      * Schema with reserved word in name
      */
@@ -79,7 +89,9 @@ public final class Item {
             @Nullable java.math.BigDecimal decimalProperty,
             @Nullable java.time.LocalDateTime localDateTimeProperty,
             @Nullable java.util.List<java.lang.String> stringArrayProperty,
+            @Nullable java.util.List<java.time.OffsetDateTime> dateTimeArrayProperty,
             @Nullable java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty,
+            @Nullable java.util.Map<java.lang.String, java.time.OffsetDateTime> dateTimeMapProperty,
             @Nonnull com.example.True true$,
             @Nonnull com.example.$1WithSpaceAndOtherÇhars $1WithSpaceAndOtherÇhars
     ) {
@@ -101,7 +113,9 @@ public final class Item {
         this.decimalProperty = decimalProperty;
         this.localDateTimeProperty = localDateTimeProperty;
         this.stringArrayProperty = stringArrayProperty;
+        this.dateTimeArrayProperty = dateTimeArrayProperty;
         this.mapProperty = mapProperty;
+        this.dateTimeMapProperty = dateTimeMapProperty;
         this.true$ = true$;
         this.$1WithSpaceAndOtherÇhars = $1WithSpaceAndOtherÇhars;
     }
@@ -117,7 +131,9 @@ public final class Item {
                 Objects.equals(decimalProperty, other.decimalProperty) &&
                 Objects.equals(localDateTimeProperty, other.localDateTimeProperty) &&
                 Objects.equals(stringArrayProperty, other.stringArrayProperty) &&
+                Objects.equals(dateTimeArrayProperty, other.dateTimeArrayProperty) &&
                 Objects.equals(mapProperty, other.mapProperty) &&
+                Objects.equals(dateTimeMapProperty, other.dateTimeMapProperty) &&
                 Objects.equals(true$, other.true$) &&
                 Objects.equals($1WithSpaceAndOtherÇhars, other.$1WithSpaceAndOtherÇhars);
     }
@@ -131,7 +147,9 @@ public final class Item {
                 decimalProperty,
                 localDateTimeProperty,
                 stringArrayProperty,
+                dateTimeArrayProperty,
                 mapProperty,
+                dateTimeMapProperty,
                 true$,
                 $1WithSpaceAndOtherÇhars
         );
@@ -146,7 +164,9 @@ public final class Item {
                 ", decimalProperty='" + decimalProperty + '\'' +
                 ", localDateTimeProperty='" + localDateTimeProperty + '\'' +
                 ", stringArrayProperty='" + stringArrayProperty + '\'' +
+                ", dateTimeArrayProperty='" + dateTimeArrayProperty + '\'' +
                 ", mapProperty='" + mapProperty + '\'' +
+                ", dateTimeMapProperty='" + dateTimeMapProperty + '\'' +
                 ", true$='" + true$ + '\'' +
                 ", $1WithSpaceAndOtherÇhars='" + $1WithSpaceAndOtherÇhars + '\'' +
                 '}';
@@ -162,17 +182,21 @@ public final class Item {
         private java.math.BigDecimal p3; // decimalProperty
         private java.time.LocalDateTime p4; // localDateTimeProperty
         private java.util.List<java.lang.String> p5; // stringArrayProperty
-        private java.util.Map<java.lang.String, java.math.BigDecimal> p6; // mapProperty
-        private com.example.True p7; // true
-        private com.example.$1WithSpaceAndOtherÇhars p8; // 1 with space-and+other_çhars
+        private java.util.List<java.time.OffsetDateTime> p6; // dateTimeArrayProperty
+        private java.util.Map<java.lang.String, java.math.BigDecimal> p7; // mapProperty
+        private java.util.Map<java.lang.String, java.time.OffsetDateTime> p8; // dateTimeMapProperty
+        private com.example.True p9; // true
+        private com.example.$1WithSpaceAndOtherÇhars p10; // 1 with space-and+other_çhars
         private final io.github.fomin.oasgen.NonBlockingParser<java.time.LocalDateTime> parser0 = io.github.fomin.oasgen.LocalDateTimeConverter.createParser();
         private final io.github.fomin.oasgen.NonBlockingParser<java.math.BigDecimal> parser1 = io.github.fomin.oasgen.NumberConverter.createParser();
         private final io.github.fomin.oasgen.NonBlockingParser<java.lang.String> parser2 = io.github.fomin.oasgen.StringConverter.createParser();
         private final io.github.fomin.oasgen.NonBlockingParser<com.example.$1WithSpaceAndOtherÇhars> parser3 = new com.example.$1WithSpaceAndOtherÇhars.Parser();
         private final io.github.fomin.oasgen.NonBlockingParser<com.example.ItemProperty2> parser4 = new com.example.ItemProperty2.Parser();
         private final io.github.fomin.oasgen.NonBlockingParser<com.example.True> parser5 = new com.example.True.Parser();
-        private final io.github.fomin.oasgen.NonBlockingParser<java.util.List<java.lang.String>> parser6 = new io.github.fomin.oasgen.ArrayParser<>(io.github.fomin.oasgen.StringConverter.createParser());
-        private final io.github.fomin.oasgen.NonBlockingParser<java.util.Map<java.lang.String, java.math.BigDecimal>> parser7 = new io.github.fomin.oasgen.MapParser<>(io.github.fomin.oasgen.NumberConverter.createParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.List<java.time.OffsetDateTime>> parser6 = new io.github.fomin.oasgen.ArrayParser<>(io.github.fomin.oasgen.OffsetDateTimeConverter.createParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.List<java.lang.String>> parser7 = new io.github.fomin.oasgen.ArrayParser<>(io.github.fomin.oasgen.StringConverter.createParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.Map<java.lang.String, java.math.BigDecimal>> parser8 = new io.github.fomin.oasgen.MapParser<>(io.github.fomin.oasgen.NumberConverter.createParser());
+        private final io.github.fomin.oasgen.NonBlockingParser<java.util.Map<java.lang.String, java.time.OffsetDateTime>> parser9 = new io.github.fomin.oasgen.MapParser<>(io.github.fomin.oasgen.OffsetDateTimeConverter.createParser());
 
         @Override
         public boolean parseNext(NonBlockingJsonParser jsonParser) throws IOException {
@@ -192,6 +216,8 @@ public final class Item {
                                     this.p6 = null;
                                     this.p7 = null;
                                     this.p8 = null;
+                                    this.p9 = null;
+                                    this.p10 = null;
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                                     break;
                                 case END_ARRAY:
@@ -272,18 +298,36 @@ public final class Item {
                                 }
                                 break;
                             case "stringArrayProperty":
-                                if (parser6.parseNext(jsonParser)) {
-                                    ParseResult<java.util.List<java.lang.String>> parseResult = parser6.build();
+                                if (parser7.parseNext(jsonParser)) {
+                                    ParseResult<java.util.List<java.lang.String>> parseResult = parser7.build();
                                     this.p5 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                                 } else {
                                     return false;
                                 }
                                 break;
-                            case "mapProperty":
-                                if (parser7.parseNext(jsonParser)) {
-                                    ParseResult<java.util.Map<java.lang.String, java.math.BigDecimal>> parseResult = parser7.build();
+                            case "dateTimeArrayProperty":
+                                if (parser6.parseNext(jsonParser)) {
+                                    ParseResult<java.util.List<java.time.OffsetDateTime>> parseResult = parser6.build();
                                     this.p6 = parseResult.getValue();
+                                    objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
+                                }
+                                break;
+                            case "mapProperty":
+                                if (parser8.parseNext(jsonParser)) {
+                                    ParseResult<java.util.Map<java.lang.String, java.math.BigDecimal>> parseResult = parser8.build();
+                                    this.p7 = parseResult.getValue();
+                                    objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                                } else {
+                                    return false;
+                                }
+                                break;
+                            case "dateTimeMapProperty":
+                                if (parser9.parseNext(jsonParser)) {
+                                    ParseResult<java.util.Map<java.lang.String, java.time.OffsetDateTime>> parseResult = parser9.build();
+                                    this.p8 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                                 } else {
                                     return false;
@@ -292,7 +336,7 @@ public final class Item {
                             case "true":
                                 if (parser5.parseNext(jsonParser)) {
                                     ParseResult<com.example.True> parseResult = parser5.build();
-                                    this.p7 = parseResult.getValue();
+                                    this.p9 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                                 } else {
                                     return false;
@@ -301,7 +345,7 @@ public final class Item {
                             case "1 with space-and+other_çhars":
                                 if (parser3.parseNext(jsonParser)) {
                                     ParseResult<com.example.$1WithSpaceAndOtherÇhars> parseResult = parser3.build();
-                                    this.p8 = parseResult.getValue();
+                                    this.p10 = parseResult.getValue();
                                     objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
                                 } else {
                                     return false;
@@ -322,7 +366,7 @@ public final class Item {
             switch (objectParserState) {
                 case FINISHED_VALUE:
                     objectParserState = ObjectParserState.PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL;
-                    return new ParseResult.Value<>(new com.example.Item(this.p0, this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8));
+                    return new ParseResult.Value<>(new com.example.Item(this.p0, this.p1, this.p2, this.p3, this.p4, this.p5, this.p6, this.p7, this.p8, this.p9, this.p10));
                 case FINISHED_ARRAY:
                     objectParserState = ObjectParserState.PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL;
                     return ParseResult.endArray();
@@ -344,8 +388,10 @@ public final class Item {
         private static final io.github.fomin.oasgen.Writer<java.time.LocalDateTime> WRITER_3 = io.github.fomin.oasgen.LocalDateTimeConverter.WRITER;
         private static final io.github.fomin.oasgen.Writer<java.math.BigDecimal> WRITER_4 = io.github.fomin.oasgen.NumberConverter.WRITER;
         private static final io.github.fomin.oasgen.Writer<java.lang.String> WRITER_5 = io.github.fomin.oasgen.StringConverter.WRITER;
-        private static final io.github.fomin.oasgen.Writer<java.util.List<java.lang.String>> WRITER_6 = new io.github.fomin.oasgen.ArrayWriter<>(io.github.fomin.oasgen.StringConverter.WRITER);
-        private static final io.github.fomin.oasgen.Writer<java.util.Map<java.lang.String, java.math.BigDecimal>> WRITER_7 = new io.github.fomin.oasgen.MapWriter<>(io.github.fomin.oasgen.NumberConverter.WRITER);
+        private static final io.github.fomin.oasgen.Writer<java.util.List<java.time.OffsetDateTime>> WRITER_6 = new io.github.fomin.oasgen.ArrayWriter<>(io.github.fomin.oasgen.OffsetDateTimeConverter.WRITER);
+        private static final io.github.fomin.oasgen.Writer<java.util.List<java.lang.String>> WRITER_7 = new io.github.fomin.oasgen.ArrayWriter<>(io.github.fomin.oasgen.StringConverter.WRITER);
+        private static final io.github.fomin.oasgen.Writer<java.util.Map<java.lang.String, java.math.BigDecimal>> WRITER_8 = new io.github.fomin.oasgen.MapWriter<>(io.github.fomin.oasgen.NumberConverter.WRITER);
+        private static final io.github.fomin.oasgen.Writer<java.util.Map<java.lang.String, java.time.OffsetDateTime>> WRITER_9 = new io.github.fomin.oasgen.MapWriter<>(io.github.fomin.oasgen.OffsetDateTimeConverter.WRITER);
 
         @Override
         public void write(JsonGenerator jsonGenerator, com.example.Item value) throws IOException {
@@ -372,11 +418,19 @@ public final class Item {
             }
             if (value.stringArrayProperty != null) {
                 jsonGenerator.writeFieldName("stringArrayProperty");
-                WRITER_6.write(jsonGenerator, value.stringArrayProperty);
+                WRITER_7.write(jsonGenerator, value.stringArrayProperty);
+            }
+            if (value.dateTimeArrayProperty != null) {
+                jsonGenerator.writeFieldName("dateTimeArrayProperty");
+                WRITER_6.write(jsonGenerator, value.dateTimeArrayProperty);
             }
             if (value.mapProperty != null) {
                 jsonGenerator.writeFieldName("mapProperty");
-                WRITER_7.write(jsonGenerator, value.mapProperty);
+                WRITER_8.write(jsonGenerator, value.mapProperty);
+            }
+            if (value.dateTimeMapProperty != null) {
+                jsonGenerator.writeFieldName("dateTimeMapProperty");
+                WRITER_9.write(jsonGenerator, value.dateTimeMapProperty);
             }
             if (value.true$ != null) {
                 jsonGenerator.writeFieldName("true");

@@ -12,6 +12,8 @@ import reactor.netty.http.client.HttpClient;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -69,7 +71,9 @@ class SimpleClientTest implements ClientTest {
                                 BigDecimal.ONE,
                                 LocalDateTime.of(2020, 1, 1, 1, 1),
                                 Arrays.asList("array value 1", "array value 2"),
+                                Collections.singletonList(OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
                                 Collections.singletonMap("key 1", BigDecimal.TEN),
+                                Collections.singletonMap("key 1", OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
                                 new True("property 1 value"),
                                 new $1WithSpaceAndOtherÇhars("property 1 value")
                         )

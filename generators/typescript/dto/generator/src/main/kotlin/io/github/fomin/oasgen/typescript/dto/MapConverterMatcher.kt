@@ -17,7 +17,7 @@ class MapConverterMatcher : TypeConverterMatcher {
                 val valueTypeConverter = typeConverterRegistry[valueSchema]
                 val valueJsonConverter = valueTypeConverter.jsonConverter
 
-                override fun type() = "Record<string, ${toLowerCamelCase(valueTypeConverter.type())}>"
+                override fun type() = "Record<string, ${valueTypeConverter.type()}>"
 
                 override fun content(): String? = null
 
@@ -27,15 +27,13 @@ class MapConverterMatcher : TypeConverterMatcher {
 
                 override val jsonConverter = if (valueJsonConverter != null) {
                     object : JsonConverter {
-                        override fun toJson(valueExpression: String): String {
-                            TODO("Not yet implemented")
-                        }
+                        override fun toJson(valueExpression: String) =
+                            "mapObjectProperties(value, (_, v) => ${valueJsonConverter.toJson("v")})"
 
-                        override fun fromJson(valueExpression: String): String {
-                            TODO("Not yet implemented")
-                        }
+                        override fun fromJson(valueExpression: String) =
+                            "mapObjectProperties(value, (_, v) => ${valueJsonConverter.fromJson("v")})"
 
-                        override fun content(): String = ""
+                        override fun content(): String? = null
 
                     }
                 } else {

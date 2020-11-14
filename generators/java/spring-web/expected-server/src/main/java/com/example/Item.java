@@ -64,11 +64,25 @@ public final class Item {
     public final java.util.List<java.lang.String> stringArrayProperty;
 
     /**
+     * Date-time array property
+     */
+    @Nullable
+    @JsonProperty("dateTimeArrayProperty")
+    public final java.util.List<java.time.OffsetDateTime> dateTimeArrayProperty;
+
+    /**
      * Map property
      */
     @Nullable
     @JsonProperty("mapProperty")
     public final java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty;
+
+    /**
+     * Date-time map property
+     */
+    @Nullable
+    @JsonProperty("dateTimeMapProperty")
+    public final java.util.Map<java.lang.String, java.time.OffsetDateTime> dateTimeMapProperty;
 
     /**
      * Schema with reserved word in name
@@ -92,7 +106,9 @@ public final class Item {
             @Nullable @JsonProperty("decimalProperty") java.math.BigDecimal decimalProperty,
             @Nullable @JsonProperty("localDateTimeProperty") @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING) java.time.LocalDateTime localDateTimeProperty,
             @Nullable @JsonProperty("stringArrayProperty") java.util.List<java.lang.String> stringArrayProperty,
+            @Nullable @JsonProperty("dateTimeArrayProperty") java.util.List<java.time.OffsetDateTime> dateTimeArrayProperty,
             @Nullable @JsonProperty("mapProperty") java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty,
+            @Nullable @JsonProperty("dateTimeMapProperty") java.util.Map<java.lang.String, java.time.OffsetDateTime> dateTimeMapProperty,
             @Nonnull @JsonProperty("true") com.example.True true$,
             @Nonnull @JsonProperty("1 with space-and+other_çhars") com.example.$1WithSpaceAndOtherÇhars $1WithSpaceAndOtherÇhars
     ) {
@@ -114,7 +130,9 @@ public final class Item {
         this.decimalProperty = decimalProperty;
         this.localDateTimeProperty = localDateTimeProperty;
         this.stringArrayProperty = stringArrayProperty;
+        this.dateTimeArrayProperty = dateTimeArrayProperty;
         this.mapProperty = mapProperty;
+        this.dateTimeMapProperty = dateTimeMapProperty;
         this.true$ = true$;
         this.$1WithSpaceAndOtherÇhars = $1WithSpaceAndOtherÇhars;
     }
@@ -130,7 +148,9 @@ public final class Item {
                 Objects.equals(decimalProperty, other.decimalProperty) &&
                 Objects.equals(localDateTimeProperty, other.localDateTimeProperty) &&
                 Objects.equals(stringArrayProperty, other.stringArrayProperty) &&
+                Objects.equals(dateTimeArrayProperty, other.dateTimeArrayProperty) &&
                 Objects.equals(mapProperty, other.mapProperty) &&
+                Objects.equals(dateTimeMapProperty, other.dateTimeMapProperty) &&
                 Objects.equals(true$, other.true$) &&
                 Objects.equals($1WithSpaceAndOtherÇhars, other.$1WithSpaceAndOtherÇhars);
     }
@@ -144,7 +164,9 @@ public final class Item {
                 decimalProperty,
                 localDateTimeProperty,
                 stringArrayProperty,
+                dateTimeArrayProperty,
                 mapProperty,
+                dateTimeMapProperty,
                 true$,
                 $1WithSpaceAndOtherÇhars
         );
@@ -159,7 +181,9 @@ public final class Item {
                 ", decimalProperty='" + decimalProperty + '\'' +
                 ", localDateTimeProperty='" + localDateTimeProperty + '\'' +
                 ", stringArrayProperty='" + stringArrayProperty + '\'' +
+                ", dateTimeArrayProperty='" + dateTimeArrayProperty + '\'' +
                 ", mapProperty='" + mapProperty + '\'' +
+                ", dateTimeMapProperty='" + dateTimeMapProperty + '\'' +
                 ", true$='" + true$ + '\'' +
                 ", $1WithSpaceAndOtherÇhars='" + $1WithSpaceAndOtherÇhars + '\'' +
                 '}';
