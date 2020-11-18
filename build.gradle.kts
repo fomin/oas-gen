@@ -76,4 +76,11 @@ allprojects {
         useJUnitPlatform()
     }
 
+    tasks.withType<PublishToMavenRepository> {
+        doFirst {
+            require(!gradle.startParameter.isParallelProjectExecutionEnabled) {
+                "Parallel build should be disabled"
+            }
+        }
+    }
 }
