@@ -51,6 +51,11 @@ public class ReferenceServer {
                             return response
                                     .header("Content-Type", "application/json")
                                     .sendString(Mono.just(TEST_COMPONENT_STR));
+                        })
+                        .delete(BASE_PATH + "/{id}", (request, response) -> {
+                            String param0 = request.param("id");
+                            assertEquals("idValue", param0);
+                            return response.send();
                         }));
         return httpServer.bindNow();
     }
