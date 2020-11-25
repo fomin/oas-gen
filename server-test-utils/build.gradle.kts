@@ -1,11 +1,7 @@
-import io.github.fomin.oasgen.gradle.*
-
 description = "oas-gen - server test utils"
 
 plugins {
-    `java-library`
-    `maven-publish`
-    signing
+    id("java-library-publishing-conventions")
 }
 
 dependencies {
@@ -14,5 +10,3 @@ dependencies {
     api("org.junit.jupiter","junit-jupiter-engine", JUNIT_VERSION)
     api(project(":generators:java:url-utils"))
 }
-
-addPublications("oas-gen-server-test-utils")

@@ -1,5 +1,3 @@
-package io.github.fomin.oasgen.gradle
-
 const val JACKSON_VERSION = "[2.10,)"
 const val REACTOR_NETTY_VERSION = "[0.9,)"
 const val JUNIT_VERSION = "[5.6,)"

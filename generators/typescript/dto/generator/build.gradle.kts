@@ -1,15 +1,9 @@
-import io.github.fomin.oasgen.gradle.addPublications
-
 description = "oas-gen - typescript dto generator"
 
 plugins {
-    kotlin("jvm")
-    `maven-publish`
-    signing
+    id("kotlin-publishing-conventions")
 }
 
 dependencies {
     api(project(":core"))
 }
-
-addPublications("oas-gen-typescript-dto-generator")

@@ -1,11 +1,7 @@
-import io.github.fomin.oasgen.gradle.addPublications
-
 description = "oas-gen - java spring-web generator"
 
 plugins {
-    kotlin("jvm")
-    `maven-publish`
-    signing
+    id("kotlin-publishing-conventions")
 }
 
 dependencies {
@@ -17,5 +13,3 @@ tasks.test {
     inputs.dir("../expected-client/src/main")
     inputs.dir("../expected-server/src/main")
 }
-
-addPublications("oas-gen-spring-web-generator")

@@ -1,7 +1,5 @@
-import io.github.fomin.oasgen.gradle.*
-
 plugins {
-    java
+    id("java-conventions")
 }
 
 dependencies {

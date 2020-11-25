@@ -1,11 +1,7 @@
-import io.github.fomin.oasgen.gradle.*
-
 description = "oas-gen - core classes"
 
 plugins {
-    kotlin("jvm")
-    `maven-publish`
-    signing
+    id("kotlin-publishing-conventions")
 }
 
 dependencies {
@@ -14,5 +10,3 @@ dependencies {
     implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml", JACKSON_VERSION)
     implementation("com.atlassian.commonmark", "commonmark", COMMONMARK_VERSION)
 }
-
-addPublications("oas-gen-core")

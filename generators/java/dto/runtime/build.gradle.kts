@@ -1,16 +1,7 @@
-import io.github.fomin.oasgen.gradle.*
-
 description = "oas-gen - java dto runtime support classes"
 
 plugins {
-    `java-library`
-    `maven-publish`
-    signing
-}
-
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
+    id("java-library-publishing-conventions")
 }
 
 dependencies {
@@ -19,5 +10,3 @@ dependencies {
     testImplementation("org.junit.jupiter","junit-jupiter-api", JUNIT_VERSION)
     testImplementation("org.junit.jupiter","junit-jupiter-engine", JUNIT_VERSION)
 }
-
-addPublications("oas-gen-java-dto-runtime")

@@ -1,6 +1,7 @@
 description = "oas-gen - gradle plugin"
 
 plugins {
+    id("base-conventions")
     kotlin("jvm")
     `maven-publish`
     signing

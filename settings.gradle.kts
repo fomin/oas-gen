@@ -2,7 +2,6 @@ rootProject.name = "oas-gen"
 
 pluginManagement {
     plugins {
-        kotlin("jvm") version "1.3.71"
         id("com.github.node-gradle.node") version "2.2.4"
         id("com.gradle.plugin-publish") version "0.12.0"
     }
