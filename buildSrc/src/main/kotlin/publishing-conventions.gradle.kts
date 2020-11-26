@@ -36,7 +36,9 @@ publishing {
             }
             pom {
                 name.set(project.name)
-                description.set(project.description)
+                description.set(project.provider {
+                    project.description
+                })
                 url.set("https://github.com/fomin/oas-gen")
                 licenses {
                     license {
