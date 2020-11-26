@@ -35,7 +35,7 @@ class SimpleClientTest implements ClientTest {
             LocalDateTime.of(2020, 1, 1, 1, 1),
             Arrays.asList("array value 1", "array value 2"),
             Collections.singletonList(OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
-            Collections.singletonMap("key 1", BigDecimal.TEN),
+            Collections.singletonMap("key 1", 10.0),
             Collections.singletonMap("key 1", OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
             new True("property 1 value"),
             new $1WithSpaceAndOtherÇhars("property 1 value")

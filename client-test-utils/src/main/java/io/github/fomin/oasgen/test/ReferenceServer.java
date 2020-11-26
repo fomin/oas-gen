@@ -11,7 +11,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class ReferenceServer {
     public static final String BASE_PATH = "/base";
-    private static final String TEST_ITEM_STR = "{\"commonProperty1\":\"common property 1 value\",\"property1\":\"property 1 value\",\"property2\":{\"commonProperty1\":\"inner common property 1 value\",\"property21\":\"property 21 value\",\"property22\":\"value1\"},\"decimalProperty\":1,\"localDateTimeProperty\":\"2020-01-01T01:01:00\",\"stringArrayProperty\":[\"array value 1\",\"array value 2\"],\"dateTimeArrayProperty\":[\"2020-11-10T01:01:01+01:00\"],\"mapProperty\":{\"key 1\":10},\"dateTimeMapProperty\":{\"key 1\":\"2020-11-10T01:01:01+01:00\"},\"true\":{\"property1\":\"property 1 value\"},\"1 with space-and+other_çhars\":{\"property1\":\"property 1 value\"}}";
+    private static final String TEST_ITEM_STR = "{\"commonProperty1\":\"common property 1 value\",\"property1\":\"property 1 value\",\"property2\":{\"commonProperty1\":\"inner common property 1 value\",\"property21\":\"property 21 value\",\"property22\":\"value1\"},\"decimalProperty\":\"1\",\"localDateTimeProperty\":\"2020-01-01T01:01:00\",\"stringArrayProperty\":[\"array value 1\",\"array value 2\"],\"dateTimeArrayProperty\":[\"2020-11-10T01:01:01+01:00\"],\"mapProperty\":{\"key 1\":10.0},\"dateTimeMapProperty\":{\"key 1\":\"2020-11-10T01:01:01+01:00\"},\"true\":{\"property1\":\"property 1 value\"},\"1 with space-and+other_çhars\":{\"property1\":\"property 1 value\"}}";
     public static final String TEST_COMPONENT_STR = "{}";
 
     public static DisposableServer create(int port) {

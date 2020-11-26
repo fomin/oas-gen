@@ -36,7 +36,8 @@ properties:
           - value3
   decimalProperty:
     title: Decimal property
-    type: number
+    type: string
+    format: decimal
   localDateTimeProperty:
     title: Local date time property
     type: string
@@ -58,6 +59,7 @@ properties:
     type: object
     additionalProperties:
       type: number
+      format: double
   dateTimeMapProperty:
     title: Date-time map property
     type: object

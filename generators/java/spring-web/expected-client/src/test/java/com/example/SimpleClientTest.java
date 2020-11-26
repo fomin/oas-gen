@@ -1,7 +1,14 @@
 package com.example;
 
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
+import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import io.github.fomin.oasgen.test.ClientTest;
 import io.github.fomin.oasgen.test.ReferenceServer;
 import org.junit.jupiter.api.AfterAll;
@@ -20,6 +27,7 @@ import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import reactor.netty.DisposableServer;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -45,7 +53,7 @@ class SimpleClientTest implements ClientTest {
             LocalDateTime.of(2020, 1, 1, 1, 1),
             Arrays.asList("array value 1", "array value 2"),
             Collections.singletonList(OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
-            Collections.singletonMap("key 1", BigDecimal.TEN),
+            Collections.singletonMap("key 1", 10.0),
             Collections.singletonMap("key 1", OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
             new True("property 1 value"),
             new $1WithSpaceAndOtherÇhars("property 1 value")
@@ -61,6 +69,18 @@ class SimpleClientTest implements ClientTest {
             builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
             builder.featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
             builder.featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+            builder.serializers(new StdScalarSerializer<BigDecimal>(BigDecimal.class) {
+                @Override
+                public void serialize(BigDecimal value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+                    gen.writeString(value.toPlainString());
+                }
+            });
+            builder.deserializers(new StdScalarDeserializer<BigDecimal>(BigDecimal.class) {
+                @Override
+                public BigDecimal deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                    return new BigDecimal(p.getText());
+                }
+            });
             List<HttpMessageConverter<?>> converters = Collections.singletonList(
                     new MappingJackson2HttpMessageConverter(builder.build())
             );

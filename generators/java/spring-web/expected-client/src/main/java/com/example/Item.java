@@ -75,7 +75,7 @@ public final class Item {
      */
     @Nullable
     @JsonProperty("mapProperty")
-    public final java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty;
+    public final java.util.Map<java.lang.String, java.lang.Double> mapProperty;
 
     /**
      * Date-time map property
@@ -107,7 +107,7 @@ public final class Item {
             @Nullable @JsonProperty("localDateTimeProperty") @com.fasterxml.jackson.annotation.JsonFormat(shape = com.fasterxml.jackson.annotation.JsonFormat.Shape.STRING) java.time.LocalDateTime localDateTimeProperty,
             @Nullable @JsonProperty("stringArrayProperty") java.util.List<java.lang.String> stringArrayProperty,
             @Nullable @JsonProperty("dateTimeArrayProperty") java.util.List<java.time.OffsetDateTime> dateTimeArrayProperty,
-            @Nullable @JsonProperty("mapProperty") java.util.Map<java.lang.String, java.math.BigDecimal> mapProperty,
+            @Nullable @JsonProperty("mapProperty") java.util.Map<java.lang.String, java.lang.Double> mapProperty,
             @Nullable @JsonProperty("dateTimeMapProperty") java.util.Map<java.lang.String, java.time.OffsetDateTime> dateTimeMapProperty,
             @Nonnull @JsonProperty("true") com.example.True true$,
             @Nonnull @JsonProperty("1 with space-and+other_çhars") com.example.$1WithSpaceAndOtherÇhars $1WithSpaceAndOtherÇhars

@@ -127,7 +127,7 @@ export interface Item {
     /**
      * Decimal property
      */
-    readonly "decimalProperty": number;
+    readonly "decimalProperty": string;
 
     /**
      * Local date time property

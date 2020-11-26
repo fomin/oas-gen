@@ -22,9 +22,11 @@ interface ConverterMatcherProvider {
                             Int32ConverterMatcher(),
                             Int64ConverterMatcher(),
                             IntegerConverterMatcher(),
+                            DoubleConverterMatcher(),
                             NumberConverterMatcher(),
                             BooleanConverterMatcher(),
                             EnumConverterMatcher(basePackage),
+                            DecimalConverterMatcher(),
                             StringConverterMatcher()
                     )
             )
