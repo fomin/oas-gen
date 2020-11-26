@@ -106,7 +106,7 @@ export interface Item {
     /**
      * Common property 1
      */
-    readonly "commonProperty1": string;
+    readonly "commonProperty1"?: string;
 
     /**
      * Property 1
@@ -127,32 +127,32 @@ export interface Item {
     /**
      * Decimal property
      */
-    readonly "decimalProperty": string;
+    readonly "decimalProperty"?: string;
 
     /**
      * Local date time property
      */
-    readonly "localDateTimeProperty": LocalDateTime;
+    readonly "localDateTimeProperty"?: LocalDateTime;
 
     /**
      * String array property
      */
-    readonly "stringArrayProperty": readonly string[];
+    readonly "stringArrayProperty"?: readonly string[];
 
     /**
      * Date-time array property
      */
-    readonly "dateTimeArrayProperty": readonly OffsetDateTime[];
+    readonly "dateTimeArrayProperty"?: readonly OffsetDateTime[];
 
     /**
      * Map property
      */
-    readonly "mapProperty": Record<string, number>;
+    readonly "mapProperty"?: Record<string, number>;
 
     /**
      * Date-time map property
      */
-    readonly "dateTimeMapProperty": Record<string, OffsetDateTime>;
+    readonly "dateTimeMapProperty"?: Record<string, OffsetDateTime>;
 
     /**
      * Schema with reserved word in name
@@ -223,17 +223,17 @@ export interface ItemProperty2 {
     /**
      * Common property 1
      */
-    readonly "commonProperty1": string;
+    readonly "commonProperty1"?: string;
 
     /**
      * Property 21
      */
-    readonly "property21": string;
+    readonly "property21"?: string;
 
     /**
      * Property 22
      */
-    readonly "property22": ItemProperty2Property22;
+    readonly "property22"?: ItemProperty2Property22;
 }
 
 /**
@@ -243,7 +243,7 @@ export interface True {
     /**
      * Property 1
      */
-    readonly "property1": string;
+    readonly "property1"?: string;
 }
 
 /**
@@ -253,7 +253,7 @@ export interface $1WithSpaceAndOtherÇhars {
     /**
      * Property 1
      */
-    readonly "property1": string;
+    readonly "property1"?: string;
 }
 
 /**

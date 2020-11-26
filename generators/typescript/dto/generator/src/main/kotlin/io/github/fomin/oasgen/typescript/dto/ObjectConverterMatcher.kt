@@ -25,8 +25,10 @@ class ObjectConverterMatcher(
 
                 override fun content(): String? {
                     val fieldDeclarations = jsonSchema.jointProperties().map { (propertyName, propertySchema) ->
+                        val optionalFlag = if (!jsonSchema.required().contains(propertyName)) "?" else ""
+
                         """|${jsDoc(propertySchema)}
-                           |readonly "$propertyName": ${typeConverterRegistry[propertySchema].type()};
+                           |readonly "$propertyName"$optionalFlag: ${typeConverterRegistry[propertySchema].type()};
                            |""".trimMargin()
                     }
 
