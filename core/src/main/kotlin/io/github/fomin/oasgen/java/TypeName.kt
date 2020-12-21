@@ -117,15 +117,27 @@ fun toVariableName(vararg parts: String): String {
 //    return sb.toString()
 //}
 
+fun isUpperSnakeCase(part: String) =
+    part.asSequence().all { it.isUpperCase() || isOtherSnakeCaseChar(it) }
+
+fun isLowerSnakeCase(part: String) =
+    part.asSequence().all { it.isUpperCase() || isOtherSnakeCaseChar(it) }
+
+fun isOtherSnakeCaseChar(c: Char) = c.isDigit() || c == '_' || c == '$'
+
 fun toUpperSnakeCase(vararg parts: String): String {
     val sb = StringBuilder()
     parts.forEachIndexed { index, part ->
         if (index > 0) sb.append("_")
-        part.forEach { char ->
-            when {
-                char == '-' -> sb.append('_')
-                char.isUpperCase() -> sb.append("_").append(char)
-                else -> sb.append(char.toUpperCase())
+        when {
+            isUpperSnakeCase(part) -> sb.append(part)
+            isLowerSnakeCase(part) -> sb.append(part.toUpperCase())
+            else -> part.forEach { char ->
+                when {
+                    char == '-' -> sb.append('_')
+                    char.isUpperCase() -> sb.append("_").append(char)
+                    else -> sb.append(char.toUpperCase())
+                }
             }
         }
     }
@@ -141,7 +153,12 @@ fun toCamelCase(firstUpper: Boolean, vararg parts: String): String {
     var nextInUpper = firstUpper
     parts.forEachIndexed { partIndex, part ->
         if (partIndex > 0) nextInUpper = true
-        part.forEachIndexed { charIndex, char ->
+        val preparedPart = when {
+            isUpperSnakeCase(part) -> part.toLowerCase()
+            else -> part
+        }
+
+        preparedPart.forEachIndexed { charIndex, char ->
             nextInUpper = if (!(char.isLetterOrDigit() || char == '$')) {
                 true
             } else {
