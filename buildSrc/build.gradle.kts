@@ -2,26 +2,8 @@ plugins {
     `kotlin-dsl`
 }
 
-repositories {
-    mavenCentral()
-}
+apply(from = "src/main/kotlin/dependency-locking-conventions.gradle.kts")
 
 dependencies {
-    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:latest.release")
-}
-
-dependencyLocking {
-    lockAllConfigurations()
-}
-
-tasks.register("resolveAndLockAll") {
-    doFirst {
-        require(gradle.startParameter.isWriteDependencyLocks)
-    }
-    doLast {
-        configurations.filter {
-            // Add any custom filtering on the configurations to be resolved
-            it.isCanBeResolved
-        }.forEach { it.resolve() }
-    }
+    implementation("org.jetbrains.kotlin:kotlin-gradle-plugin:+")
 }
