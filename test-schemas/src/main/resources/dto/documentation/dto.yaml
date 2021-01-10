@@ -1,0 +1,11 @@
+title: Dto title
+description: Dto description
+type: object
+properties:
+  property1:
+    title: Property 1 title
+    description: Property 1 description
+    type: string
+  property2:
+    title: Property 2 title
+    type: string

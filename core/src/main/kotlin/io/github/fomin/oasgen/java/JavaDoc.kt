@@ -12,12 +12,17 @@ fun javaDoc(jsonSchema: JsonSchema): String {
         val document = parser.parse(description)
         renderer.render(document).trim()
     }
-    val javaDocContent = listOfNotNull(jsonSchema.title?.trim(), renderedDescription)
-        .joinToString("\n\n")
-        .lines()
-        .joinToString("\n") { " * $it".trimEnd() }
+    val titleAndDescription = listOfNotNull(jsonSchema.title?.trim(), renderedDescription)
+    if (titleAndDescription.isNotEmpty()) {
+        val javaDocContent = titleAndDescription
+            .joinToString("\n\n")
+            .lines()
+            .joinToString("\n") { " * $it".trimEnd() }
 
-    return """|/**
+        return """|/**
               |$javaDocContent
               | */""".trimMargin()
+    } else {
+        return ""
+    }
 }

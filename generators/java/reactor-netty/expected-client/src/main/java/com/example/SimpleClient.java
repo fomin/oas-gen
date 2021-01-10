@@ -20,23 +20,23 @@ public class SimpleClient {
     }
 
     @Nonnull
-    public Mono<java.lang.String> create(
-            @Nonnull Mono<com.example.Item> item
+    public Mono<java.lang.String> simplePost(
+            @Nonnull Mono<com.example.Dto> dto
     ) {
-        return create$0(
-                item
+        return simplePost$0(
+                dto
         );
     }
 
-    private Mono<java.lang.String> create$0(
-            Mono<com.example.Item> bodyArg
+    private Mono<java.lang.String> simplePost$0(
+            Mono<com.example.Dto> bodyArg
     ) {
 
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .post()
-                .uri(UrlEncoderUtils.encodeUrl("/"))
+                .uri(UrlEncoderUtils.encodeUrl("/path1"))
                 .send((httpClientRequest, nettyOutbound) -> {
-                    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, com.example.Item.Writer.INSTANCE);
+                    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, com.example.Dto.Writer.INSTANCE);
                     return nettyOutbound.send(byteBufMono);
                 })
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
@@ -44,70 +44,32 @@ public class SimpleClient {
     }
 
     @Nonnull
-    public Mono<java.lang.String> postWithoutRequestBody(
-
-    ) {
-        return postWithoutRequestBody$0(
-
-        );
-    }
-
-    private Mono<java.lang.String> postWithoutRequestBody$0(
-
-    ) {
-
-        Flux<ByteBuf> responseByteBufFlux = httpClient
-                .post()
-                .uri(UrlEncoderUtils.encodeUrl("/post-without-request-body"))
-
-                .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.StringConverter.createParser());
-    }
-
-    @Nonnull
-    public Mono<com.example.Item> find(
+    public Mono<com.example.Dto> simpleGet(
+            @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
-            @Nullable com.example.Param2OfFind param2
+            @Nullable com.example.Param2OfSimpleGet param2
     ) {
-        return find$0(
+        return simpleGet$0(
+                id,
                 param1,
                 param2
         );
     }
 
-    private Mono<com.example.Item> find$0(
+    private Mono<com.example.Dto> simpleGet$0(
             java.lang.String param0,
-            com.example.Param2OfFind param1
+            java.lang.String param1,
+            com.example.Param2OfSimpleGet param2
     ) {
         String param0Str = param0 != null ? param0 : null;
-        String param1Str = param1 != null ? com.example.Param2OfFind.writeString(param1) : null;
+        String param1Str = param1 != null ? param1 : null;
+        String param2Str = param2 != null ? com.example.Param2OfSimpleGet.writeString(param2) : null;
         Flux<ByteBuf> responseByteBufFlux = httpClient
                 .get()
-                .uri(UrlEncoderUtils.encodeUrl("/find", "param1", param0Str, "param2", param1Str))
+                .uri(UrlEncoderUtils.encodeUrl("/path2/" + UrlEncoderUtils.encode(param0Str), "param1", param1Str, "param2", param2Str))
 
                 .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, new com.example.Item.Parser());
-    }
-
-    @Nonnull
-    public Mono<com.example.ComponentItem> get(
-            @Nonnull java.lang.String id
-    ) {
-        return get$0(
-                id
-        );
-    }
-
-    private Mono<com.example.ComponentItem> get$0(
-            java.lang.String param0
-    ) {
-        String param0Str = param0 != null ? param0 : null;
-        Flux<ByteBuf> responseByteBufFlux = httpClient
-                .get()
-                .uri(UrlEncoderUtils.encodeUrl("/" + UrlEncoderUtils.encode(param0Str)))
-
-                .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, new com.example.ComponentItem.Parser());
+        return byteBufConverter.parse(responseByteBufFlux, new com.example.Dto.Parser());
     }
 
 }

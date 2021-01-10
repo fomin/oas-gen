@@ -10,21 +10,14 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("${com.example.SimpleRoutes.path:}")
 public class SimpleRoutes {
     public interface Operations {
-        ResponseEntity<java.lang.String> create(
-                @Nonnull com.example.Item item
+        ResponseEntity<java.lang.String> simplePost(
+                @Nonnull com.example.Dto dto
         );
 
-        ResponseEntity<java.lang.String> postWithoutRequestBody(
-
-        );
-
-        ResponseEntity<com.example.Item> find(
+        ResponseEntity<com.example.Dto> simpleGet(
+                @Nonnull java.lang.String id,
                 @Nonnull java.lang.String param1,
-                @Nullable com.example.Param2OfFind param2
-        );
-
-        ResponseEntity<com.example.ComponentItem> get(
-                @Nonnull java.lang.String id
+                @Nullable com.example.Param2OfSimpleGet param2
         );
     }
 
@@ -34,41 +27,25 @@ public class SimpleRoutes {
         this.operations = operations;
     }
 
-    @PostMapping(path = "/", produces = "application/json", consumes = "application/json")
-    public ResponseEntity<java.lang.String> create(
-            @Nonnull @RequestBody com.example.Item item
+    @PostMapping(path = "/path1", produces = "application/json", consumes = "application/json")
+    public ResponseEntity<java.lang.String> simplePost(
+            @Nonnull @RequestBody com.example.Dto dto
     ) {
-        return this.operations.create(
-                item
+        return this.operations.simplePost(
+                dto
         );
     }
 
-    @PostMapping(path = "/post-without-request-body", produces = "application/json")
-    public ResponseEntity<java.lang.String> postWithoutRequestBody(
-
-    ) {
-        return this.operations.postWithoutRequestBody(
-
-        );
-    }
-
-    @GetMapping(path = "/find", produces = "application/json")
-    public ResponseEntity<com.example.Item> find(
+    @GetMapping(path = "/path2/{id}", produces = "application/json")
+    public ResponseEntity<com.example.Dto> simpleGet(
+            @Nonnull @PathVariable("id") java.lang.String id,
             @Nonnull @RequestParam("param1") java.lang.String param1,
             @Nullable @RequestParam("param2") java.lang.String param2
     ) {
-        return this.operations.find(
+        return this.operations.simpleGet(
+                id != null ? id : null,
                 param1 != null ? param1 : null,
-                param2 != null ? com.example.Param2OfFind.parseString(param2) : null
-        );
-    }
-
-    @GetMapping(path = "/{id}", produces = "application/json")
-    public ResponseEntity<com.example.ComponentItem> get(
-            @Nonnull @PathVariable("id") java.lang.String id
-    ) {
-        return this.operations.get(
-                id != null ? id : null
+                param2 != null ? com.example.Param2OfSimpleGet.parseString(param2) : null
         );
     }
 

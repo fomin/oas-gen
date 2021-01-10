@@ -5,15 +5,15 @@ info:
 servers:
   - url: http://localhost/
 paths:
-  /:
+  /path1:
     post:
-      operationId: create
+      operationId: simple post
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: 'item.yaml'
+              $ref: '#/components/schemas/dto'
       responses:
         '200':
           description: description
@@ -21,20 +21,15 @@ paths:
             application/json:
               schema:
                 type: string
-  /post-without-request-body:
-    post:
-      operationId: post-without-request-body
-      responses:
-        '200':
-          description: description
-          content:
-            application/json:
-              schema:
-                type: string
-  /find:
+  /path2/{id}:
     get:
-      operationId: find
+      operationId: simple get
       parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
         - name: param1
           in: query
           required: true
@@ -44,7 +39,6 @@ paths:
           in: query
           required: false
           schema:
-            title: query parameter 2
             type: string
             enum:
               - value1
@@ -55,26 +49,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: 'item.yaml'
-  /{id}:
-    get:
-      operationId: get
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: description
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/componentItem'
+                $ref: '#/components/schemas/dto'
 
 components:
   schemas:
-    componentItem:
-      title: Component item
+    dto:
       type: object
+      properties:
+        property1:
+          type: string

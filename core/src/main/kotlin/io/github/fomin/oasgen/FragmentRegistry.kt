@@ -138,22 +138,44 @@ data class RootFragment(
         val fragment: Map<*, *>
 )
 
-class FragmentRegistry(private val baseDir: File) {
+interface ContentLoader {
+    fun loadMap(path: String): Map<*, *>
+}
+
+private val yamlMapper = ObjectMapper(YAMLFactory())
+private val jsonMapper = ObjectMapper()
+private val mapTypeReference = object : TypeReference<Map<*, *>>() {}
+
+private fun getMapper(path: String) =
+    when (val extension = path.substring(path.lastIndexOf(".") + 1)) {
+        "json" -> jsonMapper
+        "yaml" -> yamlMapper
+        "yml" -> yamlMapper
+        else -> error("Unsupported extension $extension")
+    }
+
+class FileContentLoader(private val baseDir: File) : ContentLoader {
+    override fun loadMap(path: String): Map<*, *> {
+        val mapper = getMapper(path)
+        val file = File(baseDir, URLDecoder.decode(path, "UTF-8"))
+        return mapper.readValue(file, mapTypeReference)
+    }
+}
+
+class InMemoryContentLoader(private val fileContentMap: Map<String, String>) : ContentLoader {
+    override fun loadMap(path: String): Map<*, *> {
+        val mapper = getMapper(path)
+        val content = fileContentMap[path]
+        return mapper.readValue(content, mapTypeReference)
+    }
+}
+
+class FragmentRegistry(private val contentLoader: ContentLoader) {
     private val rootIndex = mutableMapOf<String, Map<*,*>>()
-    private val yamlMapper = ObjectMapper(YAMLFactory())
-    private val jsonMapper = ObjectMapper()
-    private val mapTypeReference = object : TypeReference<Map<*, *>>() {}
 
     private fun loadMap(path: String) = when (val indexedMap = rootIndex[path]) {
         null -> {
-            val mapper = when (val extension = path.substring(path.lastIndexOf(".") + 1)) {
-                "json" -> jsonMapper
-                "yaml" -> yamlMapper
-                "yml" -> yamlMapper
-                else -> error("Unsupported extension $extension")
-            }
-            val file = File(baseDir, URLDecoder.decode(path, "UTF-8"))
-            val map = mapper.readValue(file, mapTypeReference)
+            val map = contentLoader.loadMap(path)
             rootIndex[path] = map
             map
         }

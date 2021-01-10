@@ -22,101 +22,58 @@ public class SimpleClient {
     }
 
     @Nonnull
-    public ResponseEntity<java.lang.String> create(
-            @Nonnull com.example.Item item
+    public ResponseEntity<java.lang.String> simplePost(
+            @Nonnull com.example.Dto dto
     ) {
-        return create$0(
-                item
+        return simplePost$0(
+                dto
         );
     }
 
-    private ResponseEntity<java.lang.String> create$0(
-            com.example.Item bodyArg
+    private ResponseEntity<java.lang.String> simplePost$0(
+            com.example.Dto bodyArg
     ) {
         Map<String, Object> uriVariables = Collections.emptyMap();
         URI uri = UriComponentsBuilder
-                .fromUriString(baseUrl + "/")
+                .fromUriString(baseUrl + "/path1")
 
                 .build(uriVariables);
-        RequestEntity<com.example.Item> request = RequestEntity
+        RequestEntity<com.example.Dto> request = RequestEntity
                 .post(uri)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(bodyArg, com.example.Item.class);
+                .body(bodyArg, com.example.Dto.class);
         return restOperations.exchange(request, java.lang.String.class);
     }
 
     @Nonnull
-    public ResponseEntity<java.lang.String> postWithoutRequestBody(
-
-    ) {
-        return postWithoutRequestBody$0(
-
-        );
-    }
-
-    private ResponseEntity<java.lang.String> postWithoutRequestBody$0(
-
-    ) {
-        Map<String, Object> uriVariables = Collections.emptyMap();
-        URI uri = UriComponentsBuilder
-                .fromUriString(baseUrl + "/post-without-request-body")
-
-                .build(uriVariables);
-        RequestEntity<java.lang.Void> request = RequestEntity
-                .post(uri)
-                .build();
-        return restOperations.exchange(request, java.lang.String.class);
-    }
-
-    @Nonnull
-    public ResponseEntity<com.example.Item> find(
+    public ResponseEntity<com.example.Dto> simpleGet(
+            @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
-            @Nullable com.example.Param2OfFind param2
+            @Nullable com.example.Param2OfSimpleGet param2
     ) {
-        return find$0(
-                param1,
+        return simpleGet$0(
+                id,
+            param1,
             param2
         );
     }
 
-    private ResponseEntity<com.example.Item> find$0(
+    private ResponseEntity<com.example.Dto> simpleGet$0(
             java.lang.String param0,
-            com.example.Param2OfFind param1
-    ) {
-        Map<String, Object> uriVariables = Collections.emptyMap();
-        URI uri = UriComponentsBuilder
-                .fromUriString(baseUrl + "/find")
-                .queryParam("param1", param0 != null ? param0 : null)
-                .queryParam("param2", param1 != null ? com.example.Param2OfFind.writeString(param1) : null)
-                .build(uriVariables);
-        RequestEntity<java.lang.Void> request = RequestEntity
-                .get(uri)
-                .build();
-        return restOperations.exchange(request, com.example.Item.class);
-    }
-
-    @Nonnull
-    public ResponseEntity<com.example.ComponentItem> get(
-            @Nonnull java.lang.String id
-    ) {
-        return get$0(
-                id
-        );
-    }
-
-    private ResponseEntity<com.example.ComponentItem> get$0(
-            java.lang.String param0
+            java.lang.String param1,
+            com.example.Param2OfSimpleGet param2
     ) {
         Map<String, Object> uriVariables = new HashMap<>();
         uriVariables.put("id", param0 != null ? param0 : null);
         URI uri = UriComponentsBuilder
-                .fromUriString(baseUrl + "/{id}")
-
+                .fromUriString(baseUrl + "/path2/{id}")
+                .queryParam("param1", param1 != null ? param1 : null)
+                .queryParam("param2", param2 != null ? com.example.Param2OfSimpleGet.writeString(param2) : null)
                 .build(uriVariables);
         RequestEntity<java.lang.Void> request = RequestEntity
                 .get(uri)
                 .build();
-        return restOperations.exchange(request, com.example.ComponentItem.class);
+        return restOperations.exchange(request, com.example.Dto.class);
     }
 
 }

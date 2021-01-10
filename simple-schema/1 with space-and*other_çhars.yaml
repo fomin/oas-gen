@@ -1,6 +1,0 @@
-title: Property with space and other chars in name
-type: object
-properties:
-  property1:
-    title: Property 1
-    type: string

@@ -21,7 +21,7 @@ fun openApiGenerate(
             }
     val openApiWriterProvider = providerMap[generatorId] ?: error("Can't find generator $generatorId")
 
-    val fragmentRegistry = FragmentRegistry(baseDir)
+    val fragmentRegistry = FragmentRegistry(FileContentLoader(baseDir))
     val openApiSchema = OpenApiSchema(fragmentRegistry.get(Reference.root(schemaPath)), null)
 
     val writer = openApiWriterProvider.provide(namespace, converterIds)

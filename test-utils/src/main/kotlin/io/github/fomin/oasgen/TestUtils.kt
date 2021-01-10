@@ -98,16 +98,47 @@ class TestUtils {
     }
 }
 
-fun testCase(
+fun openApiTestCase(
         writer: Writer<OpenApiSchema>,
         baseDir: File,
         schemaPath: String,
         outputDir: File
 ) {
-    val fragmentRegistry = FragmentRegistry(baseDir)
+    testCase<OpenApiSchema>(
+        baseDir,
+        schemaPath,
+        outputDir
+    ) { rootFragment: Fragment ->
+        val schema = OpenApiSchema(rootFragment, null)
+        writer.write(listOf(schema))
+    }
+}
+
+fun jsonSchemaTestCase(
+        writer: Writer<JsonSchema>,
+        baseDir: File,
+        schemaPath: String,
+        outputDir: File
+) {
+    testCase<JsonSchema>(
+        baseDir,
+        schemaPath,
+        outputDir
+    ) { rootFragment: Fragment ->
+        val schema = JsonSchema(rootFragment, null)
+        writer.write(listOf(schema))
+    }
+}
+
+private fun <T> testCase(
+        baseDir: File,
+        schemaPath: String,
+        outputDir: File,
+        f: (Fragment) -> List<OutputFile>
+) {
+    val fragmentRegistry = FragmentRegistry(FileContentLoader(baseDir))
     val rootFragment = fragmentRegistry.get(Reference.root(schemaPath))
-    val openApiSchema = OpenApiSchema(rootFragment, null)
-    val actualOutputFiles = writer.write(listOf(openApiSchema))
+    val actualOutputFiles = f(rootFragment)
 
     val outputDirUri = outputDir.toURI()
     val expectedOutputFiles = outputDir.walk().filter { it.isFile }.map {

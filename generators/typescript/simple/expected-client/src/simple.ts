@@ -1,9 +1,8 @@
-import {DateTimeFormatter, LocalDateTime, OffsetDateTime} from "@js-joda/core";
 import {RestRequest, mapObjectProperties} from "@andrey.n.fomin/oas-gen-typescript-dto-runtime";
 
-export function create(
+export function simplePost(
     baseUrl: string,
-    body: Item,
+    body: Dto,
     timeout?: number,
     onLoadCallback?: (value: string) => void,
     onErrorCallback?: (reason: any) => void,
@@ -11,11 +10,11 @@ export function create(
     onAbortCallback?: () => void
 ): RestRequest<string> {
     return new RestRequest<string>(
-        `${baseUrl}/`,
+        `${baseUrl}/path1`,
         "POST",
         value => value,
         "json",
-        JSON.stringify(itemToJson(body)),
+        JSON.stringify(body),
         timeout,
         onLoadCallback,
         onErrorCallback,
@@ -24,63 +23,19 @@ export function create(
     )
 }
 
-export function postWithoutRequestBody(
-    baseUrl: string,
-    timeout?: number,
-    onLoadCallback?: (value: string) => void,
-    onErrorCallback?: (reason: any) => void,
-    onTimeoutCallback?: () => void,
-    onAbortCallback?: () => void
-): RestRequest<string> {
-    return new RestRequest<string>(
-        `${baseUrl}/post-without-request-body`,
-        "POST",
-        value => value,
-        "json",
-        undefined,
-        timeout,
-        onLoadCallback,
-        onErrorCallback,
-        onTimeoutCallback,
-        onAbortCallback
-    )
-}
-
-export function find(
-    baseUrl: string,
-    param1: string,
-    param2: Param2OfFind,
-    timeout?: number,
-    onLoadCallback?: (value: Item) => void,
-    onErrorCallback?: (reason: any) => void,
-    onTimeoutCallback?: () => void,
-    onAbortCallback?: () => void
-): RestRequest<Item> {
-    return new RestRequest<Item>(
-        `${baseUrl}/find?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
-        "GET",
-        value => itemFromJson(value),
-        "json",
-        undefined,
-        timeout,
-        onLoadCallback,
-        onErrorCallback,
-        onTimeoutCallback,
-        onAbortCallback
-    )
-}
-
-export function get(
+export function simpleGet(
     baseUrl: string,
     id: string,
+    param1: string,
+    param2: Param2OfSimpleGet,
     timeout?: number,
-    onLoadCallback?: (value: ComponentItem) => void,
+    onLoadCallback?: (value: Dto) => void,
     onErrorCallback?: (reason: any) => void,
     onTimeoutCallback?: () => void,
     onAbortCallback?: () => void
-): RestRequest<ComponentItem> {
-    return new RestRequest<ComponentItem>(
-        `${baseUrl}/${id}`,
+): RestRequest<Dto> {
+    return new RestRequest<Dto>(
+        `${baseUrl}/path2/${id}?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
         "GET",
         value => value,
         "json",
@@ -94,173 +49,19 @@ export function get(
 }
 
 /**
- * Item
  *
- * This is a very long *description* of item.
- * This is a very long *description* of item.
- *
- * This is a very long *description* of item.
- * This is a very long *description* of item.
  */
-export interface Item {
+export interface Dto {
     /**
-     * Common property 1
-     */
-    readonly "commonProperty1"?: string;
-
-    /**
-     * Property 1
      *
-     * This is a very long *description* of property 1
-     * This is a very long *description* of property 1
-     *
-     * This is a very long *description* of property 1
-     * This is a very long *description* of property 1
      */
-    readonly "property1": string;
-
-    /**
-     * Property 2
-     */
-    readonly "property2": ItemProperty2;
-
-    /**
-     * Decimal property
-     */
-    readonly "decimalProperty"?: string;
-
-    /**
-     * Local date time property
-     */
-    readonly "localDateTimeProperty"?: LocalDateTime;
-
-    /**
-     * String array property
-     */
-    readonly "stringArrayProperty"?: readonly string[];
-
-    /**
-     * Date-time array property
-     */
-    readonly "dateTimeArrayProperty"?: readonly OffsetDateTime[];
-
-    /**
-     * Map property
-     */
-    readonly "mapProperty"?: Record<string, number>;
-
-    /**
-     * Date-time map property
-     */
-    readonly "dateTimeMapProperty"?: Record<string, OffsetDateTime>;
-
-    /**
-     * Schema with reserved word in name
-     */
-    readonly "true": True;
-
-    /**
-     * Property with space and other chars in name
-     */
-    readonly "1 with space-and+other_çhars": $1WithSpaceAndOtherÇhars;
-}
-
-// @ts-ignore
-function itemFromJson(json: any): Item {
-    return mapObjectProperties(json, (key, value) => {
-        switch (key) {
-            case "localDateTimeProperty":
-                return LocalDateTime.parse(value);
-
-            case "dateTimeArrayProperty":
-                return value.map((it: any) => OffsetDateTime.parse(it));
-
-            case "dateTimeMapProperty":
-                return mapObjectProperties(value, (_, v) => OffsetDateTime.parse(v));
-            default:
-                return value;
-        }
-    });
-}
-
-// @ts-ignore
-function itemToJson(obj: Item): any {
-    return mapObjectProperties(obj, (key, value) => {
-        switch (key) {
-            case "localDateTimeProperty":
-                return (value as LocalDateTime).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
-
-            case "dateTimeArrayProperty":
-                return value.map((it: any) => (it as OffsetDateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-
-            case "dateTimeMapProperty":
-                return mapObjectProperties(value, (_, v) => (v as OffsetDateTime).format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
-            default:
-                return value;
-        }
-    });
+    readonly "property1"?: string;
 }
 
 /**
- * query parameter 2
+ *
  */
-export enum Param2OfFind {
+export enum Param2OfSimpleGet {
     Value1 = "value1",
     Value2 = "value2"
-}
-
-/**
- * Component item
- */
-export interface ComponentItem {
-
-}
-
-/**
- * Property 2
- */
-export interface ItemProperty2 {
-    /**
-     * Common property 1
-     */
-    readonly "commonProperty1"?: string;
-
-    /**
-     * Property 21
-     */
-    readonly "property21"?: string;
-
-    /**
-     * Property 22
-     */
-    readonly "property22"?: ItemProperty2Property22;
-}
-
-/**
- * Schema with reserved word in name
- */
-export interface True {
-    /**
-     * Property 1
-     */
-    readonly "property1"?: string;
-}
-
-/**
- * Property with space and other chars in name
- */
-export interface $1WithSpaceAndOtherÇhars {
-    /**
-     * Property 1
-     */
-    readonly "property1"?: string;
-}
-
-/**
- * Property 22
- */
-export enum ItemProperty2Property22 {
-    Value1 = "value1",
-    Value2 = "value2",
-    Value3 = "value3"
 }

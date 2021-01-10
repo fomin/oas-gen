@@ -2,7 +2,6 @@ package com.example;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -16,7 +15,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
@@ -28,37 +26,14 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SimpleRoutesTest extends BaseServerTest {
 
     private static final int PORT = 8081;
-    private static final Item TEST_ITEM = new Item(
-            "common property 1 value",
-            "property 1 value",
-            new ItemProperty2(
-                    "inner common property 1 value",
-                    "property 21 value",
-                    ItemProperty2Property22.VALUE1
-            ),
-            BigDecimal.ONE,
-            LocalDateTime.of(2020, 1, 1, 1, 1),
-            Arrays.asList("array value 1", "array value 2"),
-            Collections.singletonList(OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
-            Collections.singletonMap("key 1", 10.0),
-            Collections.singletonMap("key 1", OffsetDateTime.of(2020, 11, 10, 1, 1, 1, 0, ZoneOffset.ofHours(1))),
-            new True("property 1 value"),
-            new $1WithSpaceAndOtherÇhars("property 1 value")
-    );
-    private static final ComponentItem TEST_COMPONENT_ITEM = new ComponentItem();
+    public static final Dto REFERENCE_DTO = new Dto("value1");
 
     public SimpleRoutesTest() {
         super(PORT);
@@ -72,27 +47,21 @@ class SimpleRoutesTest extends BaseServerTest {
         public SimpleRoutes.Operations simpleRoutesActions() {
             return new SimpleRoutes.Operations() {
                 @Override
-                public ResponseEntity<String> create(@Nonnull Item item) {
-                    assertNotNull(item);
-                    return ResponseEntity.ok("idValue");
+                public ResponseEntity<String> simplePost(@Nonnull Dto dto) {
+                    assertEquals(REFERENCE_DTO, dto);
+                    return ResponseEntity.ok("postResponseValue");
                 }
 
                 @Override
-                public ResponseEntity<String> postWithoutRequestBody() {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-                }
-
-                @Override
-                public ResponseEntity<Item> find(@Nonnull String param1, @Nullable Param2OfFind param2) {
-                    assertEquals("param1Value", param1);
-                    assertEquals(Param2OfFind.VALUE2, param2);
-                    return ResponseEntity.ok(TEST_ITEM);
-                }
-
-                @Override
-                public ResponseEntity<ComponentItem> get(@Nonnull String id) {
+                public ResponseEntity<Dto> simpleGet(
+                        @Nonnull String id,
+                        @Nonnull String param1,
+                        @Nullable Param2OfSimpleGet param2
+                ) {
                     assertEquals("idValue", id);
-                    return ResponseEntity.ok(TEST_COMPONENT_ITEM);
+                    assertEquals("param1Value", param1);
+                    assertEquals(Param2OfSimpleGet.VALUE1, param2);
+                    return ResponseEntity.ok(REFERENCE_DTO);
                 }
             };
         }
@@ -111,7 +80,7 @@ class SimpleRoutesTest extends BaseServerTest {
             });
             builder.deserializers(new StdScalarDeserializer<BigDecimal>(BigDecimal.class) {
                 @Override
-                public BigDecimal deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
+                public BigDecimal deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
                     return new BigDecimal(p.getText());
                 }
             });

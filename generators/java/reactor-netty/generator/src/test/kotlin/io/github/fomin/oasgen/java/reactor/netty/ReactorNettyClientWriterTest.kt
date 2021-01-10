@@ -7,7 +7,7 @@ import java.io.File
 internal class ReactorNettyClientWriterTest {
     @Test
     fun `generator should create expected output`() {
-        testCase(
+        openApiTestCase(
                 ReactorNettyClientWriter("com.example", emptyList()),
                 File("../../../../simple-schema"),
                 "simple.yaml",

@@ -41,6 +41,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     "io.github.fomin.oasgen.NonBlockingParser",
                     "io.github.fomin.oasgen.ObjectParserState",
                     "io.github.fomin.oasgen.ParseResult",
+                    "io.github.fomin.oasgen.SkipValueParser",
                     "javax.annotation.Nonnull",
                     "javax.annotation.Nullable"
             )
@@ -87,7 +88,11 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                        |    switch (currentField) {
                        |        ${parseValueCases.indentWithMargin(2)}
                        |        default:
-                       |            throw new UnsupportedOperationException("Unexpected field " + currentField);
+                       |            if (skipValueParser.parseNext(jsonParser)) {
+                       |                objectParserState = ObjectParserState.PARSE_FIELD_NAME_OR_END_OBJECT;
+                       |            } else {
+                       |                return false;
+                       |            }
                        |    }
                        |    break;
                        |
@@ -101,6 +106,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                |    private ObjectParserState objectParserState = ObjectParserState.PARSE_START_OBJECT_OR_END_ARRAY_OR_NULL;
                |    private java.lang.String currentField;
                |    ${builderPropertyDeclarations.indentWithMargin(1)}
+               |    private final io.github.fomin.oasgen.SkipValueParser skipValueParser = new io.github.fomin.oasgen.SkipValueParser();
                |    ${propertyParserDeclarations.indentWithMargin(1)}
                |
                |    @Override
