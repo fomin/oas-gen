@@ -49,7 +49,7 @@ interface ConverterMatcherProvider {
 
                 val converterMatchers = converterIds.map { converterId ->
                     val converterMatcherProvider = converterMatcherProviders[converterId]
-                            ?: error("Can't find converter with id $converterId")
+                            ?: error("Can't find converter with id=$converterId")
                     converterMatcherProvider.provide(basePackage)
                 }
                 return CompositeConverterMatcher(converterMatchers)
