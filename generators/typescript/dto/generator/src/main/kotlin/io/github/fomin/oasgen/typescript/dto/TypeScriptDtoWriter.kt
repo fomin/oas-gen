@@ -15,15 +15,15 @@ class TypeScriptDtoWriter {
             jsonSchemas: List<JsonSchema>
     ): Result {
         val schemaQueue = jsonSchemas.toMutableList()
-        val processedFragments = mutableSetOf<Fragment>()
+        val processedTypes = mutableSetOf<String>()
         val contentList = mutableListOf<String>()
         val importDeclarations = mutableListOf<ImportDeclaration>()
         var index = 0
 
         while (index < schemaQueue.size) {
             val jsonSchema = schemaQueue[index]
-            if (!processedFragments.contains(jsonSchema.fragment)) {
-                val typeConverter = typeConverterRegistry[jsonSchema]
+            val typeConverter = typeConverterRegistry[jsonSchema]
+            if (!processedTypes.contains(typeConverter.type())) {
                 typeConverter.content()?.let { contentList.add(it) }
                 importDeclarations.addAll(typeConverter.importDeclarations())
                 schemaQueue.addAll(typeConverter.innerSchemas())
@@ -33,7 +33,7 @@ class TypeScriptDtoWriter {
                     if (content != null) contentList.add(content)
                 }
             }
-            processedFragments.add(jsonSchema.fragment)
+            processedTypes.add(typeConverter.type())
             index += 1
         }
         return Result(contentList.joinToString("\n\n").indentWithMargin(0), importDeclarations)
