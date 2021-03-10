@@ -27,9 +27,17 @@ data class TypeName(
                     break
                 }
 
-                if (fragmentReference.fragmentPath.size == 3
-                    && fragmentReference.fragmentPath[0] == "components"
-                    && fragmentReference.fragmentPath[1] == "schemas") {
+                if ((fragmentReference.fragmentPath.size == 3
+                                && fragmentReference.fragmentPath[0] == "components"
+                                && fragmentReference.fragmentPath[1] == "schemas")
+                        || (fragmentReference.fragmentPath.size == 6
+                                && fragmentReference.fragmentPath[0] == "components"
+                                && fragmentReference.fragmentPath[1] == "responses")
+                ) {
+
+                    if (fragmentReference.fragmentPath[1] == "responses") {
+                        nameParts.add("response")
+                    }
 
                     val componentName = fragmentReference.fragmentPath[2]
                     nameParts.add(componentName)
