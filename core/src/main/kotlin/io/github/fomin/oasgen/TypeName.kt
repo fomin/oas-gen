@@ -35,6 +35,10 @@ data class TypeName(
                                 && fragmentReference.fragmentPath[1] == "responses")
                 ) {
 
+                    if (fragmentReference.fragmentPath[1] == "responses") {
+                        nameParts.add("response")
+                    }
+
                     val componentName = fragmentReference.fragmentPath[2]
                     nameParts.add(componentName)
                     if (!componentName[0].isLetter()) {
