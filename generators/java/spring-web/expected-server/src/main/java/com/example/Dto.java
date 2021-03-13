@@ -14,12 +14,26 @@ public final class Dto {
     @JsonProperty("property1")
     public final java.lang.String property1;
 
+
+    @Nullable
+    @JsonProperty("property2")
+    public final com.example.DtoProperty2 property2;
+
+
+    @Nullable
+    @JsonProperty("property3")
+    public final com.example.DtoProperty3 property3;
+
     @JsonCreator
     public Dto(
-            @Nullable @JsonProperty("property1") java.lang.String property1
+            @Nullable @JsonProperty("property1") java.lang.String property1,
+            @Nullable @JsonProperty("property2") com.example.DtoProperty2 property2,
+            @Nullable @JsonProperty("property3") com.example.DtoProperty3 property3
     ) {
 
         this.property1 = property1;
+        this.property2 = property2;
+        this.property3 = property3;
     }
 
     @Override
@@ -27,13 +41,17 @@ public final class Dto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         com.example.Dto other = (com.example.Dto) o;
-        return Objects.equals(property1, other.property1);
+        return Objects.equals(property1, other.property1) &&
+                Objects.equals(property2, other.property2) &&
+                Objects.equals(property3, other.property3);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(
-                property1
+                property1,
+                property2,
+                property3
         );
     }
 
@@ -41,6 +59,8 @@ public final class Dto {
     public String toString() {
         return "Dto{" +
                 "property1='" + property1 + '\'' +
+                ", property2='" + property2 + '\'' +
+                ", property3='" + property3 + '\'' +
                 '}';
     }
 }

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public abstract class BaseServerTest {
     protected static final String CONTEXT_PATH = "/base";
-    public static final String DTO_JSON = "{\"property1\":\"value1\"}";
+    public static final String DTO_JSON = "{\"property1\":\"value1\",\"property2\":null,\"property3\":null}";
     public static final String POST_RESPONSE_VALUE_JSON = "\"postResponseValue\"";
 
     private final HttpClient httpClient;

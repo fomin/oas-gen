@@ -58,3 +58,17 @@ components:
       properties:
         property1:
           type: string
+        property2:
+          type: string
+          enum:
+            - ACCEPT
+            - DEFAULT
+        property3:
+          type: string
+          format: number
+          enum:
+            - 1
+            - 2
+          enumLabel:
+            - ONE
+            - TWO

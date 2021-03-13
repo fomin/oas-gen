@@ -14,14 +14,15 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
             override fun stringWriteExpression(valueExpression: String) = "${valueType()}.writeString($valueExpression)"
             override fun output(): ConverterOutput {
                 val simpleName = getSimpleName(valueType())
-
-                val valueDeclarations = enumValues.joinToString(",\n") { enumValue ->
-                    """${toUpperSnakeCase(enumValue)}("$enumValue")"""
+                val enumLabels = jsonSchema.enumLabel() ?: enumValues
+                val enumValueType = getJavaTypeName(jsonSchema.format)
+                val valueDeclarations = enumLabels.withIndex().joinToString(",\n") { (index, enumLabel) ->
+                    """${toUpperSnakeCase(enumLabel.toString())}(${toVariableType(jsonSchema.format, enumValues[index])})"""
                 }
 
-                val parserCases = enumValues.map { enumValue ->
-                    """|case "$enumValue":
-                       |    return ${toUpperSnakeCase(enumValue)};""".trimMargin()
+                val parserCases = enumLabels.withIndex().map { (index, enumLabel) ->
+                    """|case ${toVariableType(jsonSchema.format, enumValues[index])}:
+                       |    return ${toUpperSnakeCase(enumLabel.toString())};""".trimMargin()
                 }
 
                 val content =
@@ -37,13 +38,13 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
                            |
                            |    @Nonnull
                            |    @JsonValue
-                           |    public final String strValue;
+                           |    public final ${enumValueType.first} ${enumValueType.second}Value; 
                            |
-                           |    $simpleName(@Nonnull String strValue) {
-                           |        this.strValue = strValue;
+                           |    $simpleName(@Nonnull ${enumValueType.first} ${enumValueType.second}Value) {
+                           |        this.${enumValueType.second}Value = ${enumValueType.second}Value;
                            |    }
                            |
-                           |    public static $simpleName parseString(String value) {
+                           |    public static $simpleName parse${enumValueType.first}(${enumValueType.first} value) {
                            |        switch (value) {
                            |            ${parserCases.indentWithMargin(3)}
                            |            default:
@@ -51,8 +52,8 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
                            |        }
                            |    }
                            |
-                           |    public static String writeString($simpleName value) {
-                           |        return value.strValue;
+                           |    public static ${enumValueType.first} writeString($simpleName value) {
+                           |        return value.${enumValueType.second}Value;
                            |    }
                            |
                            |}
@@ -63,5 +64,19 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
             }
         }
         else null
+    }
+
+    private fun toVariableType(format: String?, any: Any): Any {
+        if (format == null || format == "string") {
+            return "\"$any\""
+        }
+        return any
+    }
+
+    private fun getJavaTypeName(format: String?): Pair<String, String> {
+        if (format == "number") {
+            return Pair("Integer", "int")
+        }
+        return Pair("String", "str")
     }
 }

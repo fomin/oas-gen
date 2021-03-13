@@ -42,7 +42,9 @@ class JsonSchema(override val fragment: Fragment, override val parent: TypedFrag
         }
     }
 
-    fun enum() = fragment.getOptional("enum")?.map { enumValue -> enumValue.asString() }
+    fun enum() = fragment.getOptional("enum")?.map { enumValue -> enumValue.value }
+
+    fun enumLabel() = fragment.getOptional("enumLabel")?.map { enumLabel -> enumLabel.asString() }
 
     fun additionalProperties(): JsonSchema? {
         val additionalPropertiesFragment = fragment.getOptional("additionalProperties")

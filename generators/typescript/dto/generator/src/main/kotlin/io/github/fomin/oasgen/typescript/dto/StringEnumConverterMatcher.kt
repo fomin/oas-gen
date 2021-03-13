@@ -24,7 +24,7 @@ class StringEnumConverterMatcher(
                 override fun type() = toUpperCamelCase(typeName.name)
 
                 override fun content(): String? {
-                    val valueExpressions = enum.map { value -> "${toUpperCamelCase(value)} = \"$value\"" }
+                    val valueExpressions = enum.map { value -> "${toUpperCamelCase(value.toString())} = \"$value\"" }
                     return """ |${jsDoc(jsonSchema)}
                                |export enum ${type()} {
                                |    ${valueExpressions.joinToString(",\n").indentWithMargin(1)}
