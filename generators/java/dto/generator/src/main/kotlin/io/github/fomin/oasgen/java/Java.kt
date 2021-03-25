@@ -53,7 +53,7 @@ fun toJavaOperations(converterRegistry: ConverterRegistry, paths: Paths): List<J
                 )
             }
 
-            val response = operation.responses().byCode()[HttpResponseCode.CODE_200]
+            val response = operation.responses().singleOrNull2xx()
                     ?: error("response 200 is required")
             val responseMediaTypeObject = response.content()["application/json"]
             val responseSchema = responseMediaTypeObject?.schema()

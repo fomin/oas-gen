@@ -20,7 +20,7 @@ class SimpleClientWriter(
         return items.map { openApiSchema ->
             val clientFunctions = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
                 pathItem.operations().map { operation ->
-                    val response200 = operation.responses().byCode()[HttpResponseCode.CODE_200]
+                    val response200 = operation.responses().singleOrNull2xx()
                     val responseEntry = response200?.let { response ->
                         val entries = response.content().entries
                         if (entries.isEmpty()) {

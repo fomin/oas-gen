@@ -6,12 +6,6 @@ enum class OperationType {
     fun key() = name.toLowerCase()
 }
 
-enum class HttpResponseCode {
-    CODE_200, CODE_500;
-
-    fun key() = name.substring(5)
-}
-
 class OpenApiSchema(override val fragment: Fragment, override val parent: TypedFragment?) : TypedFragment() {
     fun paths() = Paths(fragment["paths"], this)
 }
@@ -69,11 +63,14 @@ class Parameter(override val fragment: Fragment, override val parent: TypedFragm
 }
 
 class Responses(override val fragment: Fragment, override val parent: TypedFragment?) : TypedFragment() {
-    fun default() = fragment.getOptional("default")?.let { Response(it, this) }
+    fun byCode() =
+        fragment.map { key, responseFragment ->
+            Pair(key, Response(responseFragment, this))
+        }.toMap()
 
-    fun byCode() = HttpResponseCode.values().mapNotNull { httpResponseCode ->
-        fragment.getOptional(httpResponseCode.key())?.let { Pair(httpResponseCode, Response(it, this)) }
-    }.toMap()
+    fun default() = byCode()["default"]
+
+    fun singleOrNull2xx() = byCode().entries.singleOrNull { it.key.startsWith("2") }?.value
 }
 
 class Response(override val fragment: Fragment, override val parent: TypedFragment?) : TypedFragment() {
