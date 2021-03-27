@@ -48,6 +48,7 @@ class RequestBody(override val fragment: Fragment, override val parent: TypedFra
     fun content() = fragment["content"].map { mediaType, mediaTypeFragment ->
         Pair(mediaType, MediaTypeObject(mediaTypeFragment, this))
     }.toMap()
+
 }
 
 enum class ParameterIn {

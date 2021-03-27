@@ -50,7 +50,80 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/dto'
-
+  /download:
+    post:
+      operationId: downloadfile
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                name:
+                  type: string
+      responses:
+        '200':
+          description: description
+          content:
+            multipart/form-data:
+              schema:
+                type: string
+                format: binary
+  /downloadWithModel:
+    post:
+      operationId: downloadWithModel
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                params:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    id:
+                      type: integer
+      responses:
+        '200':
+          description: description
+          content:
+            multipart/form-data:
+              schema:
+                type: string
+                format: binary
+  /downloadWithType:
+    post:
+      operationId: downloadWithType
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: string
+              format: binary
+      responses:
+        '200':
+          description: description
+          content:
+            multipart/form-data:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  file:
+                    type: string
+                    format: binary
 components:
   schemas:
     dto:

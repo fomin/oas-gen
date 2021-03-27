@@ -27,6 +27,7 @@ interface ConverterMatcherProvider {
                             BooleanConverterMatcher(),
                             EnumConverterMatcher(basePackage),
                             DecimalConverterMatcher(),
+                            BinaryConverterMatcher(),
                             StringConverterMatcher()
                     )
             )

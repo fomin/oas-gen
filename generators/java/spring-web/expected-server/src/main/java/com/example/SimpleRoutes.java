@@ -4,6 +4,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
@@ -18,6 +19,20 @@ public class SimpleRoutes {
                 @Nonnull java.lang.String id,
                 @Nonnull java.lang.String param1,
                 @Nullable com.example.Param2OfSimpleGet param2
+        );
+
+        ResponseEntity<org.springframework.core.io.Resource> downloadfile(
+                @Nonnull org.springframework.web.multipart.MultipartFile file,
+                @Nonnull java.lang.String name
+        );
+
+        ResponseEntity<org.springframework.core.io.Resource> downloadWithModel(
+                @Nonnull org.springframework.web.multipart.MultipartFile file,
+                @Nonnull com.example.DownloadWithModelRequestParams params
+        );
+
+        ResponseEntity<MultiValueMap<String, Object>> downloadWithType(
+                @Nonnull org.springframework.web.multipart.MultipartFile multipartFile
         );
     }
 
@@ -46,6 +61,37 @@ public class SimpleRoutes {
                 id != null ? id : null,
                 param1 != null ? param1 : null,
                 param2 != null ? com.example.Param2OfSimpleGet.parseString(param2) : null
+        );
+    }
+
+    @PostMapping(path = "/download", produces = "multipart/form-data", consumes = "multipart/form-data")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadfile(
+            @Nonnull @RequestPart("file") org.springframework.web.multipart.MultipartFile file,
+            @Nonnull @RequestPart("name") java.lang.String name
+    ) {
+        return this.operations.downloadfile(
+                file,
+                name
+        );
+    }
+
+    @PostMapping(path = "/downloadWithModel", produces = "multipart/form-data", consumes = "multipart/form-data")
+    public ResponseEntity<org.springframework.core.io.Resource> downloadWithModel(
+            @Nonnull @RequestPart("file") org.springframework.web.multipart.MultipartFile file,
+            @Nonnull @RequestPart("params") com.example.DownloadWithModelRequestParams params
+    ) {
+        return this.operations.downloadWithModel(
+                file,
+                params
+        );
+    }
+
+    @PostMapping(path = "/downloadWithType", produces = "multipart/form-data", consumes = "multipart/form-data")
+    public ResponseEntity<MultiValueMap<String, Object>> downloadWithType(
+            @Nonnull @RequestBody org.springframework.web.multipart.MultipartFile multipartFile
+    ) {
+        return this.operations.downloadWithType(
+                multipartFile
         );
     }
 

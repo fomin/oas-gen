@@ -15,10 +15,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -63,6 +68,28 @@ class SimpleRoutesTest extends BaseServerTest {
                     assertEquals(Param2OfSimpleGet.VALUE1, param2);
                     return ResponseEntity.ok(REFERENCE_DTO);
                 }
+
+                @Override
+                public ResponseEntity<Resource> downloadfile(@Nonnull MultipartFile file, @Nonnull String name) {
+                    try {
+                        final Resource resource = new ByteArrayResource(file.getBytes());
+                        return ResponseEntity.ok(resource);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+
+                @Override
+                public ResponseEntity<Resource> downloadWithModel(@Nonnull MultipartFile file, @Nonnull DownloadWithModelRequestParams params) {
+                    return null;
+                }
+
+                @Override
+                public ResponseEntity<MultiValueMap<String, Object>> downloadWithType(@Nonnull MultipartFile multipartFile) {
+                    return null;
+                }
+
+
             };
         }
 
