@@ -6,6 +6,7 @@ import io.github.fomin.oasgen.java.dto.jackson.annotated.ConverterMatcherProvide
 import io.github.fomin.oasgen.java.dto.jackson.annotated.ConverterRegistry
 import io.github.fomin.oasgen.java.dto.jackson.annotated.JavaDtoWriter
 import java.util.*
+import kotlin.collections.ArrayList
 
 class JavaSpringMvcServerWriter(
         private val basePackage: String,
@@ -25,6 +26,10 @@ class JavaSpringMvcServerWriter(
             val controllerType: String,
             val operationCallExpression: String
     )
+
+    private fun isMultipart(value: String): Boolean {
+        return value.startsWith("multipart")
+    }
 
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
@@ -58,12 +63,18 @@ class JavaSpringMvcServerWriter(
                         }
                     }
                     val producesPart: String
-                    val responseSchema: JsonSchema?
+                    var responseSchema: JsonSchema?
                     val responseType: String
                     if (responseEntry != null) {
                         producesPart = """, produces = "${responseEntry.key}""""
                         responseSchema = responseEntry.value.schema()
-                        responseType = converterRegistry[responseSchema].valueType()
+                        if (isMultipart(responseEntry.key) && responseSchema.type  == JsonType.OBJECT) {
+                            responseSchema = null
+                            responseType = "MultiValueMap<String, Object>"
+                            importDeclarations.add("import org.springframework.util.MultiValueMap;")
+                        } else {
+                            responseType = converterRegistry[responseSchema].valueType()
+                        }
                     } else {
                         producesPart = ""
                         responseSchema = null
@@ -78,24 +89,48 @@ class JavaSpringMvcServerWriter(
                     }
 
                     val requestBody = operation.requestBody()
-                    val bodySchema: JsonSchema?
-                    val bodyArg: OperationArg?
+                    val bodySchema: List<JsonSchema>?
+                    val bodyArg: List<OperationArg>?
                     val consumesPart: String
 
                     if (requestBody != null) {
                         val entry = requestBody.content().entries.single()
-                        bodySchema = entry.value.schema()
                         consumesPart = """, consumes = "${entry.key}""""
-                        val bodyType = converterRegistry[bodySchema].valueType()
-                        val name = toVariableName(getSimpleName(bodyType))
-                        bodyArg = OperationArg(
-                                name,
-                                "@RequestBody",
-                                "@Nonnull",
-                                bodyType,
-                                bodyType,
-                                name
-                        )
+                        val jsonSchema = entry.value.schema()
+                        if (isMultipart(entry.key) && jsonSchema.type == JsonType.OBJECT) {
+                            if (jsonSchema.type != JsonType.OBJECT) {
+                                throw UnsupportedOperationException("Response ${entry.key} must have only an object type")
+                            } else {
+                                val partEntries = jsonSchema.properties()
+                                bodySchema = partEntries.map { it.value }
+                                bodyArg = partEntries.map {
+                                    val valueType = converterRegistry[it.value].valueType()
+                                    OperationArg(
+                                            it.key,
+                                            """@RequestPart("${it.key}")""",
+                                            "@Nonnull",
+                                            valueType,
+                                            valueType,
+                                            it.key
+                                    )
+                                }
+                            }
+
+                        } else {
+                            bodySchema = listOf(jsonSchema)
+                            val bodyType = converterRegistry[bodySchema.single()].valueType()
+                            val name = toVariableName(getSimpleName(bodyType))
+                            bodyArg = listOf(
+                                    OperationArg(
+                                            name,
+                                            "@RequestBody",
+                                            "@Nonnull",
+                                            bodyType,
+                                            bodyType,
+                                            name
+                                    )
+                            )
+                        }
                     } else {
                         bodySchema = null
                         consumesPart = ""
@@ -123,7 +158,10 @@ class JavaSpringMvcServerWriter(
                                 "$variableName != null ? ${converter.stringParseExpression(variableName)} : null"
                         )
                     }
-                    val operationArgs = (parameterArgs + bodyArg).filterNotNull()
+                    var operationArgs = ArrayList<OperationArg>()
+                    parameterArgs?.let { operationArgs.addAll(parameterArgs) }
+                    bodyArg?.let { operationArgs.addAll(bodyArg) }
+
                     val controllerMethodArgs = operationArgs.joinToString(",\n") {
                         val annotations = listOf(it.nullabilityAnnotation, it.mappingAnnotation).joinToString(" ")
                         "$annotations ${it.controllerType} ${it.name}"
@@ -153,10 +191,10 @@ class JavaSpringMvcServerWriter(
                                |);
                                |
                             """.trimMargin()
-                    val dtoSchemas = listOfNotNull(
-                            bodySchema,
-                            responseSchema
-                    ) + operation.parameters().map { it.schema() }
+                    val schemas = ArrayList<JsonSchema>()
+                    bodySchema?.let { schemas.addAll(bodySchema) }
+                    responseSchema?.let { schemas.add(responseSchema) }
+                    val dtoSchemas = schemas + operation.parameters().map { it.schema() }
                     OperationOutput(controllerMethodContent, interfaceMethodContent, dtoSchemas)
                 }
             }
