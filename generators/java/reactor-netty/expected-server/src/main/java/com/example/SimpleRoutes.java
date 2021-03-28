@@ -34,6 +34,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 Mono<com.example.Dto> requestMono = byteBufConverter.parse(request.receive(), new com.example.Dto.Parser());
                 Mono<java.lang.String> responseMono = simplePost(requestMono);
                 return response
+                        .status(200)
                         .header("Content-Type", "application/json")
                         .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.StringConverter.WRITER));
             })
@@ -48,6 +49,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
 
                 Mono<com.example.Dto> responseMono = simpleGet(param0, param1, param2);
                 return response
+                        .status(200)
                         .header("Content-Type", "application/json")
                         .send(byteBufConverter.write(response, responseMono, com.example.Dto.Writer.INSTANCE));
             })

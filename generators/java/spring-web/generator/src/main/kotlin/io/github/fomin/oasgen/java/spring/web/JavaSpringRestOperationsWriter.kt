@@ -45,7 +45,7 @@ class JavaSpringRestOperationsWriter(
             val methodOutputs = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
                 pathItem.operations().map { operation ->
                     val response200 = operation.responses().singleOrNull2xx()
-                    val responseEntry = response200?.let { response ->
+                    val responseEntry = response200?.value?.let { response ->
                         val entries = response.content().entries
                         if (entries.isEmpty()) {
                             null

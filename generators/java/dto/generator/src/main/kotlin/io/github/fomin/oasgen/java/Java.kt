@@ -33,6 +33,7 @@ data class JavaOperation(
         val pathTemplate: String,
         val requestVariable: RequestVariable?,
         val responseVariable: ResponseVariable,
+        val responseCode: String?,
         val methodName: String,
         val parameters: List<JavaParameter>
 )
@@ -54,8 +55,8 @@ fun toJavaOperations(converterRegistry: ConverterRegistry, paths: Paths): List<J
             }
 
             val response = operation.responses().singleOrNull2xx()
-                    ?: error("response 200 is required")
-            val responseMediaTypeObject = response.content()["application/json"]
+                    ?: error("response 2xx is required")
+            val responseMediaTypeObject = response.value.content()["application/json"]
             val responseSchema = responseMediaTypeObject?.schema()
             val responseType = if (responseSchema != null)
                 converterRegistry[responseSchema].valueType()
@@ -71,6 +72,7 @@ fun toJavaOperations(converterRegistry: ConverterRegistry, paths: Paths): List<J
                     pathTemplate,
                     requestVariable,
                     ResponseVariable(responseType, responseSchema, "application/json"),
+                    response.key,
                     methodName,
                     javaParameters
             )
