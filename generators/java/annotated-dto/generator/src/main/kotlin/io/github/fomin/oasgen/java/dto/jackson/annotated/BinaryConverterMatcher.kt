@@ -10,7 +10,7 @@ class BinaryConverterMatcher : ConverterMatcher {
                     override val jsonSchema = jsonSchema
                     override fun valueType() = "org.springframework.core.io.Resource"
                     override fun extraAnnotations(): String? = null
-                    override fun stringParseExpression(valueExpression: String) = ""
+                    override fun stringParseExpression(valueExpression: String) = error("Not implemented")
                     override fun stringWriteExpression(valueExpression: String) = ""
                     override fun output() = ConverterOutput.EMPTY
                 }

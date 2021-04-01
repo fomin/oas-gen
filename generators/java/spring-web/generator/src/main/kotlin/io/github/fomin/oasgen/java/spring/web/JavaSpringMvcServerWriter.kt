@@ -63,17 +63,18 @@ class JavaSpringMvcServerWriter(
                         }
                     }
                     val producesPart: String
-                    var responseSchema: JsonSchema?
+                    val responseSchema: JsonSchema?
                     val responseType: String
                     if (responseEntry != null) {
                         producesPart = """, produces = "${responseEntry.key}""""
-                        responseSchema = responseEntry.value.schema()
-                        if (isMultipart(responseEntry.key) && responseSchema.type  == JsonType.OBJECT) {
+                        val schema = responseEntry.value.schema()
+                        if (isMultipart(responseEntry.key) && schema.type  == JsonType.OBJECT) {
                             responseSchema = null
                             responseType = "MultiValueMap<String, Object>"
                             importDeclarations.add("import org.springframework.util.MultiValueMap;")
                         } else {
-                            responseType = converterRegistry[responseSchema].valueType()
+                            responseType = converterRegistry[schema].valueType()
+                            responseSchema = schema
                         }
                     } else {
                         producesPart = ""
