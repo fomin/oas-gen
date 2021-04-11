@@ -9,7 +9,7 @@ internal class JavaSpringRestOperationsWriterTest {
     fun `generator should create expected output`() {
         openApiTestCase(
                 JavaSpringRestOperationsWriter("com.example", emptyList()),
-                File("../../../../simple-schema"),
+                File("../../../../simple-schema/resttemplate"),
                 "simple.yaml",
                 File("../expected-client/src/main/java")
         )
