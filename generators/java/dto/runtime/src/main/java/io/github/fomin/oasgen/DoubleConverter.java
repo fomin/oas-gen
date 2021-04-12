@@ -1,17 +1,29 @@
 package io.github.fomin.oasgen;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
-public class DoubleConverter {
-    public static ScalarParser<Double> createParser() {
-        return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_NUMBER_FLOAT || token == JsonToken.VALUE_NUMBER_INT,
-                JsonParser::getDoubleValue
-        );
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+
+public final class DoubleConverter {
+
+    private DoubleConverter() {
     }
 
-    public static final Writer<Double> WRITER = JsonGenerator::writeNumber;
+    public static double parse(JsonNode jsonNode) {
+        ConverterUtils.checkNodeType(JsonNodeType.NUMBER, jsonNode);
+        return jsonNode.doubleValue();
+    }
+
+    public static List<? extends ValidationError.ValueError> write(
+            JsonGenerator jsonGenerator,
+            double value
+    ) throws IOException {
+        jsonGenerator.writeNumber(value);
+        return Collections.emptyList();
+    }
 
 }

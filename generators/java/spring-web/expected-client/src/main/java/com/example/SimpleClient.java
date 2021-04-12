@@ -1,30 +1,26 @@
 package com.example;
 
+import io.github.fomin.oasgen.SpringMvcClient;
 import java.net.URI;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import org.springframework.http.MediaType;
-import org.springframework.http.RequestEntity;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.MultipartBodyBuilder;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestOperations;
+import org.springframework.http.HttpMethod;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class SimpleClient {
-    private final RestOperations restOperations;
+    private final SpringMvcClient springMvcClient;
     private final String baseUrl;
 
-    public SimpleClient(@Nonnull RestOperations restOperations, @Nonnull String baseUrl) {
-        this.restOperations = restOperations;
+    public SimpleClient(@Nonnull SpringMvcClient springMvcClient, @Nonnull String baseUrl) {
+        this.springMvcClient = springMvcClient;
         this.baseUrl = baseUrl;
     }
 
     @Nonnull
-    public ResponseEntity<java.lang.String> simplePost(
+    public java.lang.String simplePost(
             @Nonnull com.example.Dto dto
     ) {
         return simplePost$0(
@@ -32,7 +28,7 @@ public class SimpleClient {
         );
     }
 
-    private ResponseEntity<java.lang.String> simplePost$0(
+    private java.lang.String simplePost$0(
             com.example.Dto bodyArg
     ) {
         Map<String, Object> uriVariables = Collections.emptyMap();
@@ -40,27 +36,29 @@ public class SimpleClient {
                 .fromUriString(baseUrl + "/path1")
 
                 .build(uriVariables);
-        RequestEntity<com.example.Dto> request = RequestEntity
-                .post(uri)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(bodyArg, com.example.Dto.class);
-        return restOperations.exchange(request, java.lang.String.class);
+        return springMvcClient.doRequest(
+                uri,
+                HttpMethod.POST,
+                bodyArg,
+                (jsonGenerator, value) -> com.example.DtoConverter.write(jsonGenerator, value),
+                jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode)
+        );
     }
 
     @Nonnull
-    public ResponseEntity<com.example.Dto> simpleGet(
+    public com.example.Dto simpleGet(
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
             @Nullable com.example.Param2OfSimpleGet param2
     ) {
         return simpleGet$0(
                 id,
-            param1,
-            param2
+                param1,
+                param2
         );
     }
 
-    private ResponseEntity<com.example.Dto> simpleGet$0(
+    private com.example.Dto simpleGet$0(
             java.lang.String param0,
             java.lang.String param1,
             com.example.Param2OfSimpleGet param2
@@ -70,39 +68,15 @@ public class SimpleClient {
         URI uri = UriComponentsBuilder
                 .fromUriString(baseUrl + "/path2/{id}")
                 .queryParam("param1", param1 != null ? param1 : null)
-                .queryParam("param2", param2 != null ? com.example.Param2OfSimpleGet.writeString(param2) : null)
+                .queryParam("param2", param2 != null ? com.example.Param2OfSimpleGetConverter.writeString(param2) : null)
                 .build(uriVariables);
-        RequestEntity<java.lang.Void> request = RequestEntity
-                .get(uri)
-                .build();
-        return restOperations.exchange(request, com.example.Dto.class);
-    }
-
-    @Nonnull
-    public ResponseEntity<org.springframework.core.io.Resource> downloadWithModel(
-            @Nonnull com.example.DownloadWithModelRequest downloadWithModelRequest
-    ) {
-        final MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part("file", downloadWithModelRequest.file, MediaType.APPLICATION_PDF);
-        multipartBodyBuilder.part("params", downloadWithModelRequest.params);
-        return downloadWithModel$0(
-                multipartBodyBuilder.build()
+        return springMvcClient.doRequest(
+                uri,
+                HttpMethod.GET,
+                null,
+                null,
+                jsonNode -> com.example.DtoConverter.parse(jsonNode)
         );
-    }
-
-    private ResponseEntity<org.springframework.core.io.Resource> downloadWithModel$0(
-            MultiValueMap<String, ?> bodyArg
-    ) {
-        Map<String, Object> uriVariables = Collections.emptyMap();
-        URI uri = UriComponentsBuilder
-                .fromUriString(baseUrl + "/downloadWithModel")
-
-                .build(uriVariables);
-        RequestEntity<MultiValueMap<String, ?>> request = RequestEntity
-                .post(uri)
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(bodyArg);
-        return restOperations.exchange(request, org.springframework.core.io.Resource.class);
     }
 
 }

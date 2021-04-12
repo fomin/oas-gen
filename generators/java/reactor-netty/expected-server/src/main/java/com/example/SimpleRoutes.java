@@ -1,6 +1,6 @@
 package com.example;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.fomin.oasgen.ByteBufConverter;
 import io.github.fomin.oasgen.UrlEncoderUtils;
 import java.util.Map;
@@ -14,8 +14,8 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     private final ByteBufConverter byteBufConverter;
     private final String baseUrl;
 
-    protected SimpleRoutes(JsonFactory jsonFactory, String baseUrl) {
-        this.byteBufConverter = new ByteBufConverter(jsonFactory);
+    protected SimpleRoutes(ObjectMapper objectMapper, String baseUrl) {
+        this.byteBufConverter = new ByteBufConverter(objectMapper);
         this.baseUrl = baseUrl;
     }
 
@@ -31,12 +31,12 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
             .post(baseUrl + "/path1", (request, response) -> {
 
 
-                Mono<com.example.Dto> requestMono = byteBufConverter.parse(request.receive(), new com.example.Dto.Parser());
+                Mono<com.example.Dto> requestMono = byteBufConverter.parse(request.receive().aggregate(), jsonNode -> com.example.DtoConverter.parse(jsonNode));
                 Mono<java.lang.String> responseMono = simplePost(requestMono);
                 return response
                         .status(200)
                         .header("Content-Type", "application/json")
-                        .send(byteBufConverter.write(response, responseMono, io.github.fomin.oasgen.StringConverter.WRITER));
+                        .send(byteBufConverter.write(response, responseMono, (jsonGenerator, value) -> io.github.fomin.oasgen.StringConverter.write(jsonGenerator, value)));
             })
             .get(baseUrl + "/path2/{id}", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
@@ -45,13 +45,13 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 String param1Str = queryParams.get("param1");
                 java.lang.String param1 = param1Str != null ? param1Str : null;
                 String param2Str = queryParams.get("param2");
-                com.example.Param2OfSimpleGet param2 = param2Str != null ? com.example.Param2OfSimpleGet.parseString(param2Str) : null;
+                com.example.Param2OfSimpleGet param2 = param2Str != null ? com.example.Param2OfSimpleGetConverter.parseString(param2Str) : null;
 
                 Mono<com.example.Dto> responseMono = simpleGet(param0, param1, param2);
                 return response
                         .status(200)
                         .header("Content-Type", "application/json")
-                        .send(byteBufConverter.write(response, responseMono, com.example.Dto.Writer.INSTANCE));
+                        .send(byteBufConverter.write(response, responseMono, (jsonGenerator, value) -> com.example.DtoConverter.write(jsonGenerator, value)));
             })
         ;
     }

@@ -14,11 +14,13 @@ class NumberConverterMatcher : ConverterMatcher {
             is JsonType.Scalar.NUMBER -> object : ConverterWriter {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.math.BigDecimal"
-                override fun parserCreateExpression() = "io.github.fomin.oasgen.NumberConverter.createParser()"
-                override fun writerCreateExpression() = "io.github.fomin.oasgen.NumberConverter.WRITER"
+                override fun parseExpression(valueExpression: String) =
+                    "io.github.fomin.oasgen.NumberConverter.parse($valueExpression)"
+                override fun writeExpression(valueExpression: String) =
+                    "io.github.fomin.oasgen.NumberConverter.write(jsonGenerator, $valueExpression)"
                 override fun stringParseExpression(valueExpression: String) = "new java.math.BigDecimal($valueExpression)"
                 override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toPlainString()"
-                override fun generate() = ConverterWriter.Result(null, emptyList())
+                override fun generate() = ConverterWriter.Result(emptyList(), emptyList())
             }
             else -> null
         }

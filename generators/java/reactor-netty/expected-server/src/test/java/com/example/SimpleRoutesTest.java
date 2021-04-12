@@ -1,10 +1,15 @@
 package com.example;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.fomin.oasgen.test.BaseServerTest;
-import io.github.fomin.oasgen.test.ReferenceServer;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
+import reactor.core.publisher.Mono;
 import reactor.netty.DisposableServer;
+import reactor.netty.http.server.HttpServer;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class SimpleRoutesTest extends BaseServerTest {
     private static final int PORT = 8084;
@@ -17,7 +22,20 @@ public class SimpleRoutesTest extends BaseServerTest {
 
     @BeforeAll
     public static void beforeAll() {
-        disposableServer = ReferenceServer.create(PORT);
+        SimpleRoutes simpleRoutes = new SimpleRoutes(new ObjectMapper(), "/base") {
+            @Nonnull
+            @Override
+            public Mono<String> simplePost(@Nonnull Mono<Dto> requestBodyMono) {
+                return Mono.just("postResponseValue");
+            }
+
+            @Nonnull
+            @Override
+            public Mono<Dto> simpleGet(@Nonnull String id, @Nonnull String param1, @Nullable Param2OfSimpleGet param2) {
+                return Mono.just(new Dto("value1"));
+            }
+        };
+        disposableServer = HttpServer.create().port(PORT).route(simpleRoutes).bindNow();
     }
 
     @AfterAll

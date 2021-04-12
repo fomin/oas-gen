@@ -1,6 +1,6 @@
 package com.example;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.fomin.oasgen.test.ClientTest;
 import io.github.fomin.oasgen.test.ReferenceServer;
 import org.junit.jupiter.api.AfterAll;
@@ -10,15 +10,7 @@ import reactor.core.publisher.Mono;
 import reactor.netty.DisposableServer;
 import reactor.netty.http.client.HttpClient;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Arrays;
-import java.util.Collections;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class SimpleClientTest implements ClientTest {
 
@@ -32,7 +24,7 @@ class SimpleClientTest implements ClientTest {
     public static void beforeAll() {
         referenceServer = ReferenceServer.create(PORT);
         HttpClient httpClient = HttpClient.create().baseUrl("http://localhost:" + PORT + ReferenceServer.BASE_PATH);
-        simpleClient = new SimpleClient(new JsonFactory(), httpClient);
+        simpleClient = new SimpleClient(new ObjectMapper(), httpClient);
     }
 
     @AfterAll

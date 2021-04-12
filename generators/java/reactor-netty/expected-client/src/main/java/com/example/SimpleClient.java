@@ -1,12 +1,11 @@
 package com.example;
 
-import com.fasterxml.jackson.core.JsonFactory;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.fomin.oasgen.ByteBufConverter;
 import io.github.fomin.oasgen.UrlEncoderUtils;
 import io.netty.buffer.ByteBuf;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
@@ -14,8 +13,8 @@ public class SimpleClient {
     private final ByteBufConverter byteBufConverter;
     private final HttpClient httpClient;
 
-    public SimpleClient(@Nonnull JsonFactory jsonFactory, @Nonnull HttpClient httpClient) {
-        this.byteBufConverter = new ByteBufConverter(jsonFactory);
+    public SimpleClient(@Nonnull ObjectMapper objectMapper, @Nonnull HttpClient httpClient) {
+        this.byteBufConverter = new ByteBufConverter(objectMapper);
         this.httpClient = httpClient;
     }
 
@@ -32,15 +31,16 @@ public class SimpleClient {
             Mono<com.example.Dto> bodyArg
     ) {
 
-        Flux<ByteBuf> responseByteBufFlux = httpClient
+        return httpClient
                 .post()
                 .uri(UrlEncoderUtils.encodeUrl("/path1"))
                 .send((httpClientRequest, nettyOutbound) -> {
-                    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, com.example.Dto.Writer.INSTANCE);
+                    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, (jsonGenerator, value) -> com.example.DtoConverter.write(jsonGenerator, value));
                     return nettyOutbound.send(byteBufMono);
                 })
-                .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, io.github.fomin.oasgen.StringConverter.createParser());
+                .responseSingle((httpClientResponse, byteBufMono) ->
+                        byteBufConverter.parse(byteBufMono, jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode))
+                );
     }
 
     @Nonnull
@@ -63,13 +63,14 @@ public class SimpleClient {
     ) {
         String param0Str = param0 != null ? param0 : null;
         String param1Str = param1 != null ? param1 : null;
-        String param2Str = param2 != null ? com.example.Param2OfSimpleGet.writeString(param2) : null;
-        Flux<ByteBuf> responseByteBufFlux = httpClient
+        String param2Str = param2 != null ? com.example.Param2OfSimpleGetConverter.writeString(param2) : null;
+        return httpClient
                 .get()
                 .uri(UrlEncoderUtils.encodeUrl("/path2/" + UrlEncoderUtils.encode(param0Str), "param1", param1Str, "param2", param2Str))
 
-                .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-        return byteBufConverter.parse(responseByteBufFlux, new com.example.Dto.Parser());
+                .responseSingle((httpClientResponse, byteBufMono) ->
+                        byteBufConverter.parse(byteBufMono, jsonNode -> com.example.DtoConverter.parse(jsonNode))
+                );
     }
 
 }

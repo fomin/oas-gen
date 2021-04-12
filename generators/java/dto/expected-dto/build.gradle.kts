@@ -13,6 +13,7 @@ sourceSets {
         java {
             srcDir("src/simple/java")
             srcDir("src/javadoc/java")
+            srcDir("src/enum/java")
         }
     }
 }

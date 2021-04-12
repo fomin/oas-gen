@@ -1,19 +1,30 @@
 package io.github.fomin.oasgen;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.Collections;
+import java.util.List;
 
-public class NumberConverter {
-    public static ScalarParser<BigDecimal> createParser() {
-        return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_NUMBER_FLOAT || token == JsonToken.VALUE_NUMBER_INT,
-                JsonParser::getDecimalValue
-        );
+public final class NumberConverter {
+
+    private NumberConverter() {
     }
 
-    public static final Writer<BigDecimal> WRITER = JsonGenerator::writeNumber;
+    public static BigDecimal parse(JsonNode jsonNode) {
+        ConverterUtils.checkNodeType(JsonNodeType.NUMBER, jsonNode);
+        return jsonNode.decimalValue();
+    }
+
+    public static List<? extends ValidationError.ValueError> write(
+            JsonGenerator jsonGenerator,
+            BigDecimal value
+    ) throws IOException {
+        jsonGenerator.writeNumber(value);
+        return Collections.emptyList();
+    }
 
 }

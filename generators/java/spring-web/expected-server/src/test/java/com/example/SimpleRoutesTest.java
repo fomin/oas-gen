@@ -1,13 +1,7 @@
 package com.example;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.deser.std.StdScalarDeserializer;
-import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.fomin.oasgen.DefaultHandlerAdapterMapping;
 import io.github.fomin.oasgen.test.BaseServerTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -15,21 +9,11 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.io.ByteArrayResource;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -47,16 +31,26 @@ class SimpleRoutesTest extends BaseServerTest {
     public static class TestApplication implements WebMvcConfigurer {
 
         @Bean
-        public SimpleRoutes.Operations simpleRoutesActions() {
-            return new SimpleRoutes.Operations() {
+        public DefaultHandlerAdapterMapping defaultHandlerMapping() {
+            return new DefaultHandlerAdapterMapping(simpleHandlerAdapter(), BaseServerTest.CONTEXT_PATH);
+        }
+
+        @Bean
+        public SimpleHandlerAdapter simpleHandlerAdapter() {
+            return new SimpleHandlerAdapter(BaseServerTest.CONTEXT_PATH, simpleRoutesActions(), new ObjectMapper());
+        }
+
+        @Bean
+        public SimpleOperations simpleRoutesActions() {
+            return new SimpleOperations() {
                 @Override
-                public ResponseEntity<String> simplePost(@Nonnull Dto dto) {
+                public String simplePost(@Nonnull Dto dto) {
                     assertEquals(REFERENCE_DTO, dto);
-                    return ResponseEntity.ok("postResponseValue");
+                    return "postResponseValue";
                 }
 
                 @Override
-                public ResponseEntity<Dto> simpleGet(
+                public Dto simpleGet(
                         @Nonnull String id,
                         @Nonnull String param1,
                         @Nullable Param2OfSimpleGet param2
@@ -64,47 +58,31 @@ class SimpleRoutesTest extends BaseServerTest {
                     assertEquals("idValue", id);
                     assertEquals("param1Value", param1);
                     assertEquals(Param2OfSimpleGet.VALUE1, param2);
-                    return ResponseEntity.ok(REFERENCE_DTO);
+                    return REFERENCE_DTO;
                 }
-
-                @Override
-                public ResponseEntity<Resource> downloadfile(@Nonnull Resource file, @Nonnull String name) {
-                    return ResponseEntity.ok(new ByteArrayResource("Test".getBytes()));
-                }
-
-                @Override
-                public ResponseEntity<Resource> downloadWithModel(@Nonnull Resource file, @Nonnull DownloadWithModelRequestParams params) {
-                    return ResponseEntity.ok(new ByteArrayResource("Test".getBytes()));
-                }
-
-                @Override
-                public ResponseEntity<MultiValueMap<String, Object>> downloadWithType(@Nonnull Resource file) {
-                    return null;
-                }
-
             };
         }
-
-        @Override
-        public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
-            Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
-            builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-            builder.featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-            builder.featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
-            builder.serializers(new StdScalarSerializer<BigDecimal>(BigDecimal.class) {
-                @Override
-                public void serialize(BigDecimal value, JsonGenerator gen, SerializerProvider provider) throws IOException {
-                    gen.writeString(value.toPlainString());
-                }
-            });
-            builder.deserializers(new StdScalarDeserializer<BigDecimal>(BigDecimal.class) {
-                @Override
-                public BigDecimal deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-                    return new BigDecimal(p.getText());
-                }
-            });
-            converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
-        }
+//
+//        @Override
+//        public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+//            Jackson2ObjectMapperBuilder builder = new Jackson2ObjectMapperBuilder();
+//            builder.featuresToDisable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+//            builder.featuresToDisable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+//            builder.featuresToDisable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+//            builder.serializers(new StdScalarSerializer<BigDecimal>(BigDecimal.class) {
+//                @Override
+//                public void serialize(BigDecimal value, JsonGenerator gen, SerializerProvider provider) throws IOException {
+//                    gen.writeString(value.toPlainString());
+//                }
+//            });
+//            builder.deserializers(new StdScalarDeserializer<BigDecimal>(BigDecimal.class) {
+//                @Override
+//                public BigDecimal deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+//                    return new BigDecimal(p.getText());
+//                }
+//            });
+//            converters.add(new MappingJackson2HttpMessageConverter(builder.build()));
+//        }
     }
 
     private static ConfigurableApplicationContext applicationContext;

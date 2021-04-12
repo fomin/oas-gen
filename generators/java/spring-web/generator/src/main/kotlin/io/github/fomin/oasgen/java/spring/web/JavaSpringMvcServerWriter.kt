@@ -2,34 +2,14 @@ package io.github.fomin.oasgen.java.spring.web
 
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*
-import io.github.fomin.oasgen.java.dto.jackson.annotated.ConverterMatcherProvider
-import io.github.fomin.oasgen.java.dto.jackson.annotated.ConverterRegistry
-import io.github.fomin.oasgen.java.dto.jackson.annotated.JavaDtoWriter
-import java.util.*
-import kotlin.collections.ArrayList
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterMatcherProvider
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterRegistry
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.JavaDtoWriter
 
 class JavaSpringMvcServerWriter(
-        private val basePackage: String,
-        private val converterIds: List<String>
+    private val basePackage: String,
+    private val converterIds: List<String>
 ) : Writer<OpenApiSchema> {
-    private data class OperationOutput(
-            val controllerMethodContent: String,
-            val interfaceMethodContent: String,
-            val dtoSchemas: List<JsonSchema>
-    )
-
-    private data class OperationArg(
-            val name: String,
-            val mappingAnnotation: String,
-            val nullabilityAnnotation: String,
-            val interfaceType: String,
-            val controllerType: String,
-            val operationCallExpression: String
-    )
-
-    private fun isMultipart(value: String): Boolean {
-        return value.startsWith("multipart")
-    }
 
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
@@ -38,201 +18,246 @@ class JavaSpringMvcServerWriter(
         val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
         items.forEach { openApiSchema ->
-            val routesClassName = toJavaClassName(basePackage, openApiSchema, "routes")
-            val filePath = getFilePath(routesClassName)
-
-            val importDeclarations = TreeSet<String>()
-
-            importDeclarations.addAll(listOf(
-                    "import javax.annotation.Nonnull;",
-                    "import javax.annotation.Nullable;",
-                    "import org.springframework.http.ResponseEntity;",
-                    "import org.springframework.stereotype.Controller;",
-                    "import org.springframework.web.bind.annotation.*;"
-            ))
-
-            val methodOutputs = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
+            val dtoSchemas = openApiSchema.paths().pathItems().map { (_, pathItem) ->
                 pathItem.operations().map { operation ->
-                    val response200 = operation.responses().singleOrNull2xx()
-                    val responseEntry = response200?.value?.let { response ->
-                        val entries = response.content().entries
-                        if (entries.isEmpty()) {
-                            null
-                        } else {
-                            entries.single()
+                    val parameterSchemas = operation.parameters().map { parameter ->
+                        parameter.schema()
+                    }
+                    val requestBodySchemas = when (val requestBody = operation.requestBody()) {
+                        null -> emptyList()
+                        else -> requestBody.content().map { (_, mediaTypeObject) ->
+                            mediaTypeObject.schema()
                         }
                     }
-                    val producesPart: String
-                    val responseSchema: JsonSchema?
-                    val responseType: String
-                    if (responseEntry != null) {
-                        producesPart = """, produces = "${responseEntry.key}""""
-                        val schema = responseEntry.value.schema()
-                        if (isMultipart(responseEntry.key) && schema.type  == JsonType.OBJECT) {
-                            responseSchema = null
-                            responseType = "MultiValueMap<String, Object>"
-                            importDeclarations.add("import org.springframework.util.MultiValueMap;")
-                        } else {
-                            responseType = converterRegistry[schema].valueType()
-                            responseSchema = schema
+                    val responseBodySchemas = operation.responses().byCode().map { (_, response) ->
+                        response.content().map { (_, mediaTypeObject) ->
+                            mediaTypeObject.schema()
                         }
-                    } else {
-                        producesPart = ""
-                        responseSchema = null
-                        responseType = "java.lang.Void"
-                    }
-
-                    val mappingAnnotationName = when (operation.operationType) {
-                        OperationType.GET -> "GetMapping"
-                        OperationType.DELETE -> "DeleteMapping"
-                        OperationType.POST -> "PostMapping"
-                        OperationType.PUT -> "PutMapping"
-                    }
-
-                    val requestBody = operation.requestBody()
-                    val bodySchema: List<JsonSchema>?
-                    val bodyArg: List<OperationArg>?
-                    val consumesPart: String
-
-                    if (requestBody != null) {
-                        val entry = requestBody.content().entries.single()
-                        consumesPart = """, consumes = "${entry.key}""""
-                        val jsonSchema = entry.value.schema()
-                        if (isMultipart(entry.key) && jsonSchema.type == JsonType.OBJECT) {
-                            if (jsonSchema.type != JsonType.OBJECT) {
-                                throw UnsupportedOperationException("Response ${entry.key} must have only an object type")
-                            } else {
-                                val partEntries = jsonSchema.properties()
-                                bodySchema = partEntries.map { it.value }
-                                bodyArg = partEntries.map {
-                                    val valueType = converterRegistry[it.value].valueType()
-                                    OperationArg(
-                                            it.key,
-                                            """@RequestPart("${it.key}")""",
-                                            "@Nonnull",
-                                            valueType,
-                                            valueType,
-                                            it.key
-                                    )
-                                }
-                            }
-
-                        } else {
-                            bodySchema = listOf(jsonSchema)
-                            val bodyType = converterRegistry[bodySchema.single()].valueType()
-                            val name = toVariableName(getSimpleName(bodyType))
-                            bodyArg = listOf(
-                                    OperationArg(
-                                            name,
-                                            "@RequestBody",
-                                            "@Nonnull",
-                                            bodyType,
-                                            bodyType,
-                                            name
-                                    )
-                            )
-                        }
-                    } else {
-                        bodySchema = null
-                        consumesPart = ""
-                        bodyArg = null
-                    }
-
-                    val parameterArgs = operation.parameters().map { parameter ->
-                        val mappingAnnotation = when (parameter.parameterIn) {
-                            ParameterIn.PATH -> "PathVariable"
-                            ParameterIn.QUERY -> "RequestParam"
-                        }
-                        val nullAnnotation = when (parameter.required) {
-                            true -> "@Nonnull"
-                            false -> "@Nullable"
-                        }
-                        val variableName = toVariableName(parameter.name)
-                        val converter = converterRegistry[parameter.schema()]
-                        val variableType = converter.valueType()
-                        OperationArg(
-                                variableName,
-                                """@$mappingAnnotation("${parameter.name}")""",
-                                nullAnnotation,
-                                variableType,
-                                "java.lang.String",
-                                "$variableName != null ? ${converter.stringParseExpression(variableName)} : null"
-                        )
-                    }
-                    var operationArgs = ArrayList<OperationArg>()
-                    parameterArgs?.let { operationArgs.addAll(parameterArgs) }
-                    bodyArg?.let { operationArgs.addAll(bodyArg) }
-
-                    val controllerMethodArgs = operationArgs.joinToString(",\n") {
-                        val annotations = listOf(it.nullabilityAnnotation, it.mappingAnnotation).joinToString(" ")
-                        "$annotations ${it.controllerType} ${it.name}"
-                    }
-                    val interfaceMethodArgs = operationArgs.joinToString(",\n") {
-                        "${it.nullabilityAnnotation} ${it.interfaceType} ${it.name}"
-                    }
-                    val interfaceCallArgs = operationArgs.joinToString(",\n") {
-                        it.operationCallExpression
-                    }
-
-                    val methodName = toMethodName(operation.operationId)
-                    val controllerMethodContent =
-                            """|@$mappingAnnotationName(path = "$pathTemplate"$producesPart$consumesPart)
-                               |public ResponseEntity<$responseType> $methodName(
-                               |        ${controllerMethodArgs.indentWithMargin(2)}
-                               |) {
-                               |    return this.operations.$methodName(
-                               |            ${interfaceCallArgs.indentWithMargin(3)}
-                               |    );
-                               |}
-                               |
-                            """.trimMargin()
-                    val interfaceMethodContent =
-                            """|ResponseEntity<$responseType> $methodName(
-                               |        ${interfaceMethodArgs.indentWithMargin(2)}
-                               |);
-                               |
-                            """.trimMargin()
-                    val schemas = ArrayList<JsonSchema>()
-                    bodySchema?.let { schemas.addAll(bodySchema) }
-                    responseSchema?.let { schemas.add(responseSchema) }
-                    val dtoSchemas = schemas + operation.parameters().map { it.schema() }
-                    OperationOutput(controllerMethodContent, interfaceMethodContent, dtoSchemas)
-                }
-            }
-
-            val controllerMethodContentList = methodOutputs.map { it.controllerMethodContent }
-            val interfaceMethodContentList = methodOutputs.map { it.interfaceMethodContent }
-            val dtoSchemas = methodOutputs.flatMap { it.dtoSchemas }
-
-            val content = """
-               |package ${getPackage(routesClassName)};
-               |
-               |${importDeclarations.indentWithMargin(0)}
-               |
-               |@Controller
-               |@RequestMapping("${'$'}{$routesClassName.path:}")
-               |public class ${getSimpleName(routesClassName)} {
-               |    public interface Operations {
-               |        ${interfaceMethodContentList.indentWithMargin(2)}
-               |    }
-               |
-               |    public final Operations operations;
-               |
-               |    public ${getSimpleName(routesClassName)}(Operations operations) {
-               |        this.operations = operations;
-               |    }
-               |
-               |    ${controllerMethodContentList.indentWithMargin(1)}
-               |
-               |}
-               |
-            """.trimMargin()
-
+                    }.flatten()
+                    parameterSchemas + requestBodySchemas + responseBodySchemas
+                }.flatten()
+            }.flatten()
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
-            outputFiles.add(OutputFile(filePath, content))
+            outputFiles.add(handlerAdapter(openApiSchema, converterRegistry))
+            outputFiles.add(operations(openApiSchema, converterRegistry))
         }
 
         return outputFiles
+    }
+
+    private fun handlerAdapter(openApiSchema: OpenApiSchema, converterRegistry: ConverterRegistry): OutputFile {
+        val className = toJavaClassName(basePackage, openApiSchema, "handler-adapter")
+        val filePath = getFilePath(className)
+        val pathEntries = openApiSchema.paths().pathItems().entries
+        val pathPatternDeclarations = pathEntries.mapIndexed { index, (pathPattern, _) ->
+            """private static final PathPattern pathPattern$index = PathPatternParser.defaultInstance.parse("$pathPattern");"""
+        }
+        val operationsClassName = toJavaClassName(basePackage, openApiSchema, "operations")
+        val matchCases = pathEntries.mapIndexed { index, (_, pathItem) ->
+            val operationCases = pathItem.operations().map { operation ->
+                val requestBody = operation.requestBody()
+                val extractBodyBlock = if (requestBody != null) {
+                    val mediaTypeObject = requestBody.content()["application/json"]
+                        ?: error("only application/json request body is supported")
+                    val requestBodySchema = mediaTypeObject.schema()
+                    val converterWriter = converterRegistry[requestBodySchema]
+                    """|${converterWriter.valueType()} requestBodyDto;
+                       |if ("application/json".equals(request.getContentType())) {
+                       |    JsonNode jsonNode = objectMapper.readTree(request.getInputStream());
+                       |    requestBodyDto = ${converterWriter.parseExpression("jsonNode")};
+                       |} else {
+                       |    throw new UnsupportedOperationException(request.getContentType());
+                       |}
+                    """.trimMargin()
+                } else {
+                    ""
+                }
+                val response = operation.responses().singleOrNull2xx()?.value
+                val responseSchema = response?.let { responseLocal ->
+                    val mediaTypeObject = responseLocal.content()["application/json"]
+                        ?: error("only application/json response body is supported")
+                    mediaTypeObject.schema()
+                }
+                val responseVariableDeclaration = if (responseSchema != null) {
+                    """${converterRegistry[responseSchema].valueType()} responseBody = """
+                } else {
+                    ""
+                }
+                val operationArgs = (operation.parameters().mapIndexed { index, _ -> "param$index" }
+                        + requestBody?.let { "requestBodyDto" }).filterNotNull().joinToString(",\n")
+                val writeResponseBodyBlock = if (responseSchema != null) {
+                    """|response.setContentType("application/json");
+                       |JsonGenerator jsonGenerator = objectMapper.createGenerator(response.getOutputStream());
+                       |List<? extends ValidationError> validationErrors = ${
+                        converterRegistry[responseSchema].writeExpression(
+                            "responseBody"
+                        )
+                    };
+                       |jsonGenerator.close();
+                       |if (!validationErrors.isEmpty()) {
+                       |    throw new ValidationException(validationErrors);
+                       |}
+                    """.trimMargin()
+                } else {
+                    ""
+                }
+                val urlVariablesDefinition =
+                    if (operation.parameters().any { parameter -> parameter.parameterIn == ParameterIn.QUERY }) {
+                        "Map<String, String> uriVariables = pathMatchInfo1.getUriVariables();"
+                    } else {
+                        ""
+                    }
+                val parameterDefinitions = operation.parameters().mapIndexed { index, parameter ->
+                    val schema = parameter.schema()
+                    val parameterExpression = when (parameter.parameterIn) {
+                        ParameterIn.PATH -> """uriVariables.get("${parameter.name}")"""
+                        ParameterIn.QUERY -> """request.getParameter("${parameter.name}")"""
+                    }
+                    val converterWriter = converterRegistry[schema]
+                    """${converterWriter.valueType()} param$index = ${
+                        converterWriter.stringParseExpression(
+                            parameterExpression
+                        )
+                    };"""
+                }
+                """|if ("${operation.operationType.name}".equals(request.getMethod())) {
+                   |    $urlVariablesDefinition
+                   |    ${parameterDefinitions.indentWithMargin(1)}
+                   |    ${extractBodyBlock.indentWithMargin(1)}
+                   |    ${responseVariableDeclaration}operations.${toMethodName(operation.operationId)}(
+                   |            ${operationArgs.indentWithMargin(3)}
+                   |    );
+                   |    ${writeResponseBodyBlock.indentWithMargin(1)}
+                   |    response.setStatus(200);
+                   |    return null;
+                   |}
+                """.trimMargin()
+            }
+            """|PathPattern.PathMatchInfo pathMatchInfo$index = pathPattern$index.matchAndExtract(pathContainer);
+               |if (pathMatchInfo$index != null) {
+               |    ${operationCases.indentWithMargin(1)}
+               |}
+            """.trimMargin()
+        }
+        val content =
+            """|package ${getPackage(className)};
+               |
+               |import com.fasterxml.jackson.core.JsonGenerator;
+               |import com.fasterxml.jackson.databind.JsonNode;
+               |import com.fasterxml.jackson.databind.ObjectMapper;
+               |import io.github.fomin.oasgen.ValidationError;
+               |import io.github.fomin.oasgen.ValidationException;
+               |import java.util.List;
+               |import java.util.Map;
+               |import javax.servlet.http.HttpServletRequest;
+               |import javax.servlet.http.HttpServletResponse;
+               |import org.springframework.http.server.PathContainer;
+               |import org.springframework.http.server.RequestPath;
+               |import org.springframework.lang.NonNull;
+               |import org.springframework.web.servlet.HandlerAdapter;
+               |import org.springframework.web.servlet.ModelAndView;
+               |import org.springframework.web.util.pattern.PathPattern;
+               |import org.springframework.web.util.pattern.PathPatternParser;
+               |
+               |public class ${getSimpleName(className)} implements HandlerAdapter {
+               |    ${pathPatternDeclarations.indentWithMargin(1)}
+               |
+               |    private final String baseUrl;
+               |    private final $operationsClassName operations;
+               |    private final ObjectMapper objectMapper;
+               |
+               |    public ${getSimpleName(className)}(
+               |            String baseUrl,
+               |            $operationsClassName operations,
+               |            ObjectMapper objectMapper
+               |    ) {
+               |        this.baseUrl = baseUrl;
+               |        this.operations = operations;
+               |        this.objectMapper = objectMapper;
+               |    }
+               |
+               |    @Override
+               |    public boolean supports(@NonNull Object handler) {
+               |        return true;
+               |    }
+               |
+               |    @Override
+               |    public ModelAndView handle(
+               |            @NonNull HttpServletRequest request,
+               |            @NonNull HttpServletResponse response,
+               |            @NonNull Object handler
+               |    ) throws Exception {
+               |        PathContainer pathContainer = RequestPath.parse(request.getServletPath(), baseUrl).pathWithinApplication();
+               |        ${matchCases.indentWithMargin(2)}
+               |        response.setStatus(404);
+               |        return null;
+               |    }
+               |
+               |    @Override
+               |    public long getLastModified(
+               |            @NonNull HttpServletRequest request,
+               |            @NonNull Object handler
+               |    ) {
+               |        return 0;
+               |    }
+               |}
+               |""".trimMargin()
+        return OutputFile(filePath, content)
+    }
+
+    private fun operations(openApiSchema: OpenApiSchema, converterRegistry: ConverterRegistry): OutputFile {
+        val className = toJavaClassName(basePackage, openApiSchema, "operations")
+        val filePath = getFilePath(className)
+        val methods = openApiSchema.paths().pathItems().entries.map { (_, pathItem) ->
+            pathItem.operations().map { operation ->
+                val response = operation.responses().singleOrNull2xx()?.value
+                val responseSchema = response?.let { responseLocal ->
+                    val mediaTypeObject = responseLocal.content()["application/json"]
+                        ?: error("only application/json response body is supported")
+                    mediaTypeObject.schema()
+                }
+                val returnType = if (responseSchema != null) {
+                    converterRegistry[responseSchema].valueType()
+                } else {
+                    "void"
+                }
+                val parameterArgs = operation.parameters().map { parameter ->
+                    val nullAnnotation = when {
+                        parameter.required -> "@Nonnull"
+                        else -> "@Nullable"
+                    }
+                    "$nullAnnotation ${converterRegistry[parameter.schema()].valueType()} ${toVariableName(parameter.name)}"
+                }
+                val requestBody = operation.requestBody()
+                val bodyArg = requestBody?.let { requestBodyLocal ->
+                    val mediaTypeObject = requestBodyLocal.content()["application/json"]
+                        ?: error("only application/json request body is supported")
+                    val schema = mediaTypeObject.schema()
+                    val valueType = converterRegistry[schema].valueType()
+                    """@Nonnull $valueType ${toVariableName(getSimpleName(valueType))}"""
+                }
+                val args = (parameterArgs + bodyArg).filterNotNull().joinToString(",\n")
+
+                """|${returnType} ${toMethodName(operation.operationId)}(
+                   |        ${args.indentWithMargin(2)}
+                   |);
+                   |
+                """.trimMargin()
+            }
+        }.flatten()
+
+        val content =
+            """|package ${getPackage(className)};
+               |
+               |import javax.annotation.Nonnull;
+               |import javax.annotation.Nullable;
+               |
+               |public interface ${getSimpleName(className)} {
+               |    ${methods.indentWithMargin(1)}
+               |}
+               |
+            """.trimMargin()
+        return OutputFile(filePath, content)
     }
 }

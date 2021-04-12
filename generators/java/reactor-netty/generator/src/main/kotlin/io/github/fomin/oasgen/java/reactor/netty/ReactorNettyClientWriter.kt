@@ -23,13 +23,12 @@ class ReactorNettyClientWriter(
             val importDeclarations = TreeSet<String>()
 
             importDeclarations.addAll(listOf(
-                    "import com.fasterxml.jackson.core.JsonFactory;",
+                    "import com.fasterxml.jackson.databind.ObjectMapper;",
                     "import io.github.fomin.oasgen.ByteBufConverter;",
                     "import io.github.fomin.oasgen.UrlEncoderUtils;",
                     "import io.netty.buffer.ByteBuf;",
                     "import javax.annotation.Nonnull;",
                     "import javax.annotation.Nullable;",
-                    "import reactor.core.publisher.Flux;",
                     "import reactor.core.publisher.Mono;",
                     "import reactor.netty.http.client.HttpClient;"
             ))
@@ -68,15 +67,18 @@ class ReactorNettyClientWriter(
                         .filterNotNull().joinToString(",\n")
                 val responseType = javaOperation.responseVariable.type ?: "java.lang.Void"
 
-                val returnExpression = when (val responseSchema = javaOperation.responseVariable.schema) {
-                    null -> "byteFlux.thenEmpty()"
-                    else -> "byteBufConverter.parse(responseByteBufFlux, ${converterRegistry[responseSchema].parserCreateExpression()})"
+                val responseCall = when (val responseSchema = javaOperation.responseVariable.schema) {
+                    null -> ".response()"
+                    else ->
+                        """|.responseSingle((httpClientResponse, byteBufMono) ->
+                           |        byteBufConverter.parse(byteBufMono, jsonNode -> ${converterRegistry[responseSchema].parseExpression("jsonNode")})
+                           |)""".trimMargin()
                 }
 
                 val sendCall = when (val requestSchema = javaOperation.requestVariable?.schema) {
                     null -> ""
                     else -> """|.send((httpClientRequest, nettyOutbound) -> {
-                               |    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, ${converterRegistry[requestSchema].writerCreateExpression()});
+                               |    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, (jsonGenerator, value) -> ${converterRegistry[requestSchema].writeExpression("value")});
                                |    return nettyOutbound.send(byteBufMono);
                                |})
                                |""".trimMargin()
@@ -109,12 +111,11 @@ class ReactorNettyClientWriter(
                    |        ${methodInternalArgDeclarations.indentWithMargin(2)}
                    |) {
                    |    ${parameterStrDeclarations.indentWithMargin(1)}
-                   |    Flux<ByteBuf> responseByteBufFlux = httpClient
+                   |    return httpClient
                    |            .${javaOperation.operation.operationType.name.toLowerCase()}()
                    |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate)}$queryParameterArgs))
                    |            ${sendCall.indentWithMargin(3)}
-                   |            .response((httpClientResponse, byteBufFlux) -> byteBufFlux);
-                   |    return ${returnExpression};
+                   |            ${responseCall.indentWithMargin(3)};
                    |}
                    |""".trimMargin()
             }
@@ -128,8 +129,8 @@ class ReactorNettyClientWriter(
                |    private final ByteBufConverter byteBufConverter;
                |    private final HttpClient httpClient;
                |
-               |    public ${getSimpleName(clientClassName)}(@Nonnull JsonFactory jsonFactory, @Nonnull HttpClient httpClient) {
-               |        this.byteBufConverter = new ByteBufConverter(jsonFactory);
+               |    public ${getSimpleName(clientClassName)}(@Nonnull ObjectMapper objectMapper, @Nonnull HttpClient httpClient) {
+               |        this.byteBufConverter = new ByteBufConverter(objectMapper);
                |        this.httpClient = httpClient;
                |    }
                |

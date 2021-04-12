@@ -1,0 +1,6 @@
+title: Dto title
+description: Dto description
+type: string
+enum:
+  - value1
+  - value2

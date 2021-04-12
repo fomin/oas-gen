@@ -1,19 +1,29 @@
 package io.github.fomin.oasgen;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
-import java.time.LocalDate;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
-public class BooleanConverter {
-    public static NonBlockingParser<Boolean> createParser() {
-        return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_TRUE || token == JsonToken.VALUE_FALSE,
-                JsonParser::getBooleanValue
-        );
+public final class BooleanConverter {
+
+    private BooleanConverter() {
     }
 
-    public static final Writer<Boolean> WRITER = JsonGenerator::writeBoolean;
+    public static boolean parse(JsonNode jsonNode) {
+        ConverterUtils.checkNodeType(JsonNodeType.BOOLEAN, jsonNode);
+        return jsonNode.booleanValue();
+    }
+
+    public static List<? extends ValidationError.ValueError> write(
+            JsonGenerator jsonGenerator,
+            boolean value
+    ) throws IOException {
+        jsonGenerator.writeBoolean(value);
+        return Collections.emptyList();
+    }
 
 }

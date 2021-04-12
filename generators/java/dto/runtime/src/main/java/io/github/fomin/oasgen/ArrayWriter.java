@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.List;
 
+// TODO REMOVE
 public class ArrayWriter<T> implements Writer<List<T>> {
 
     private final Writer<T> itemWriter;

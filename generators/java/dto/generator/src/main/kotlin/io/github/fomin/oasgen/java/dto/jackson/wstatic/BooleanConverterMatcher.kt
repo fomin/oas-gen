@@ -13,11 +13,13 @@ class BooleanConverterMatcher : ConverterMatcher {
         return if (jsonSchema.type is JsonType.Scalar.BOOLEAN) object : ConverterWriter {
             override val jsonSchema = jsonSchema
             override fun valueType() = "java.lang.Boolean"
-            override fun parserCreateExpression() = "io.github.fomin.oasgen.BooleanConverter.createParser()"
-            override fun writerCreateExpression() = "io.github.fomin.oasgen.BooleanConverter.WRITER"
+            override fun parseExpression(valueExpression: String) =
+                "io.github.fomin.oasgen.BooleanConverter.parse($valueExpression)"
+            override fun writeExpression(valueExpression: String) =
+                "io.github.fomin.oasgen.BooleanConverter.write(jsonGenerator, $valueExpression)"
             override fun stringParseExpression(valueExpression: String) = "java.lang.Boolean.parseBoolean($valueExpression)"
             override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"
-            override fun generate() = ConverterWriter.Result(null, emptyList())
+            override fun generate() = ConverterWriter.Result(emptyList(), emptyList())
         }
         else null
     }

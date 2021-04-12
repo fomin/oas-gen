@@ -1,22 +1,18 @@
 package com.example;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.Objects;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.Objects;
 
 
 public final class Dto {
 
 
     @Nullable
-    @JsonProperty("property1")
     public final java.lang.String property1;
 
-    @JsonCreator
     public Dto(
-            @Nullable @JsonProperty("property1") java.lang.String property1
+            @Nullable java.lang.String property1
     ) {
 
         this.property1 = property1;
@@ -43,4 +39,5 @@ public final class Dto {
                 "property1='" + property1 + '\'' +
                 '}';
     }
+
 }

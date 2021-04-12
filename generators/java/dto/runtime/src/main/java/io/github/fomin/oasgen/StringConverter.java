@@ -1,18 +1,25 @@
 package io.github.fomin.oasgen;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 
-public class StringConverter {
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
 
-    public static ScalarParser<String> createParser() {
-        return new ScalarParser<>(
-                token -> token == JsonToken.VALUE_STRING,
-                JsonParser::getText
-        );
+public final class StringConverter {
+    private StringConverter() {
     }
 
-    public static final Writer<String> WRITER = JsonGenerator::writeString;
+    public static String parse(JsonNode jsonNode) {
+        ConverterUtils.checkNodeType(JsonNodeType.STRING, jsonNode);
+        return jsonNode.textValue();
+    }
+
+    public static List<? extends ValidationError> write(JsonGenerator jsonGenerator, String value) throws IOException {
+        jsonGenerator.writeString(value);
+        return Collections.emptyList();
+    }
 
 }

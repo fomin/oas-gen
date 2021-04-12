@@ -20,18 +20,18 @@ class ArrayConverterMatcher : ConverterMatcher {
                 override fun valueType() =
                         "java.util.List<${converterRegistry[itemsSchema].valueType()}>"
 
-                override fun parserCreateExpression() =
-                        "new io.github.fomin.oasgen.ArrayParser<>(${converterRegistry[itemsSchema].parserCreateExpression()})"
+                override fun parseExpression(valueExpression: String) =
+                        "new io.github.fomin.oasgen.ArrayConverter<>($valueExpression, itemNode -> ${converterRegistry[itemsSchema].parseExpression("itemNode")})"
 
-                override fun writerCreateExpression() =
-                        "new io.github.fomin.oasgen.ArrayWriter<>(${converterRegistry[itemsSchema].writerCreateExpression()})"
+                override fun writeExpression(valueExpression: String) =
+                        "new io.github.fomin.oasgen.ArrayConverter<>(jsonGenerator, item -> ${converterRegistry[itemsSchema].writeExpression("item")}, $valueExpression)"
 
                 override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
 
                 override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
 
                 override fun generate(): ConverterWriter.Result {
-                    return ConverterWriter.Result(null, listOf(itemsSchema))
+                    return ConverterWriter.Result(emptyList(), listOf(itemsSchema))
                 }
             }
             else -> null

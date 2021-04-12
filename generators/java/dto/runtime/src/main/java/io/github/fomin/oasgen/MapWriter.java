@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import java.util.Map;
 
+// TODO REMOVE
 public class MapWriter<T> implements Writer<Map<String, T>> {
 
     private final Writer<T> itemWriter;
