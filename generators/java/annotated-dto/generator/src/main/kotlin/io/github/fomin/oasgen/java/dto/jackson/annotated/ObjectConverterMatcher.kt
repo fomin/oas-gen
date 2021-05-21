@@ -126,7 +126,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                |
                             """.trimMargin().trimEndings()
                     val filePath = getFilePath(valueType())
-                    return ConverterOutput(OutputFile(filePath, content), jointProperties.map { it.value })
+                    return ConverterOutput(OutputFile(filePath, content, OutputFileType.DTO), jointProperties.map { it.value })
                 }
             }
             else -> null

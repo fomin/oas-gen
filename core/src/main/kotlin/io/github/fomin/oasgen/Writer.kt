@@ -1,8 +1,13 @@
 package io.github.fomin.oasgen
 
+enum class OutputFileType {
+    DTO, ROUTE
+}
+
 data class OutputFile(
         val path: String,
-        val content: String
+        val content: String,
+        val type: OutputFileType
 )
 
 abstract class TypedFragment {

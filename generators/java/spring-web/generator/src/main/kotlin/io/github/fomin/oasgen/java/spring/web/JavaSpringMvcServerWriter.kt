@@ -9,7 +9,8 @@ import java.util.*
 import kotlin.collections.ArrayList
 
 class JavaSpringMvcServerWriter(
-        private val basePackage: String,
+        private val dtoPackage: String,
+        private val routesPackage: String,
         private val converterIds: List<String>
 ) : Writer<OpenApiSchema> {
     private data class OperationOutput(
@@ -34,11 +35,11 @@ class JavaSpringMvcServerWriter(
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
-        val converterMatcher = ConverterMatcherProvider.provide(basePackage, converterIds)
+        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds)
         val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
         items.forEach { openApiSchema ->
-            val routesClassName = toJavaClassName(basePackage, openApiSchema, "routes")
+            val routesClassName = toJavaClassName(routesPackage, openApiSchema, "routes")
             val filePath = getFilePath(routesClassName)
 
             val importDeclarations = TreeSet<String>()
@@ -230,7 +231,7 @@ class JavaSpringMvcServerWriter(
 
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
-            outputFiles.add(OutputFile(filePath, content))
+            outputFiles.add(OutputFile(filePath, content, OutputFileType.ROUTE))
         }
 
         return outputFiles

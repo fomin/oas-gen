@@ -24,13 +24,15 @@ import java.io.Serializable
 import javax.inject.Inject
 
 class GenerationSpec(
-        val generatorId: String,
-        val generationSource: GenerationSource,
-        val outputDir: File?,
-        val schemaPath: String,
-        val namespace: String,
-        val converterIds: Array<out String>,
-        val javaSources: Boolean
+    val generatorId: String,
+    val generationSource: GenerationSource,
+    val dtoOutputDir: File?,
+    val routeOutputDir: File?,
+    val schemaPath: String,
+    val dtoNamespace: String,
+    val routeNamespace: String,
+    val converterIds: Array<out String>,
+    val javaSources: Boolean
 )
 
 sealed class GenerationSource
@@ -57,7 +59,22 @@ open class OasGenExtension {
             vararg converterIds: String = emptyArray(),
             javaSources: Boolean = false
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), outputDir, schemaPath, namespace, converterIds, javaSources))
+        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources))
+    }
+
+    @Suppress("Unused")
+    fun generateFromDirectory(
+        generatorId: String,
+        baseDir: File,
+        dtoOutputDir: File? = null,
+        routeOutputDir: File? = null,
+        schemaPath: String,
+        dtoNamespace: String,
+        routeNamespace: String,
+        vararg converterIds: String = emptyArray(),
+        javaSources: Boolean = false
+    ) {
+        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources))
     }
 
     @Suppress("Unused")
@@ -71,7 +88,23 @@ open class OasGenExtension {
             vararg converterIds: String = emptyArray(),
             javaSources: Boolean = false
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), outputDir, schemaPath, namespace, converterIds, javaSources))
+        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources))
+    }
+
+    @Suppress("Unused")
+    fun generateFromDependency(
+        generatorId: String,
+        dependency: String,
+        basePath: String = ".",
+        dtoOutputDir: File? = null,
+        routeOutputDir: File? = null,
+        schemaPath: String,
+        dtoNamespace: String,
+        routeNamespace: String,
+        vararg converterIds: String = emptyArray(),
+        javaSources: Boolean = false
+    ) {
+        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources))
     }
 }
 
@@ -81,12 +114,14 @@ interface GenerationWorkParameters : WorkParameters {
 }
 
 class OasGenActionParameters(
-        val generatorId: String,
-        val baseDir: File,
-        val outputDir: File,
-        val schemaPath: String,
-        val namespace: String,
-        val converterIds: Array<out String>
+    val generatorId: String,
+    val baseDir: File,
+    val dtoOutputDir: File,
+    val routeOutputDir: File,
+    val schemaPath: String,
+    val dtoNamespace: String,
+    val routeNamespace: String,
+    val converterIds: Array<out String>
 ) : Serializable
 
 abstract class OasGenAction : WorkAction<GenerationWorkParameters> {
@@ -95,9 +130,11 @@ abstract class OasGenAction : WorkAction<GenerationWorkParameters> {
             openApiGenerate(
                     item.generatorId,
                     item.baseDir,
-                    item.outputDir,
+                    item.dtoOutputDir,
+                    item.routeOutputDir,
                     item.schemaPath,
-                    item.namespace,
+                    item.dtoNamespace,
+                    item.routeNamespace,
                     item.converterIds.asList()
             )
         }
@@ -147,11 +184,15 @@ open class OasGenTask @Inject constructor(
                         File(unzipDir).resolve(generationSource.basePath).absoluteFile
                     }
                 }
-                val outputDir = effectiveOutputDir(project.buildDir, index, generationSpec)
-                if (outputDir.exists()) {
-                    outputDir.deleteRecursively()
+                val dtoOutputDir = effectiveDtoOutputDir(project.buildDir, index, generationSpec)
+                if (dtoOutputDir.exists()) {
+                    dtoOutputDir.deleteRecursively()
                 }
-                OasGenActionParameters(generationSpec.generatorId, baseDir, outputDir, generationSpec.schemaPath, generationSpec.namespace, generationSpec.converterIds)
+                val routeOutputDir = effectiveRouteOutputDir(project.buildDir, index, generationSpec)
+                if (routeOutputDir.exists()) {
+                    routeOutputDir.deleteRecursively()
+                }
+                OasGenActionParameters(generationSpec.generatorId, baseDir, dtoOutputDir, routeOutputDir, generationSpec.schemaPath, generationSpec.dtoNamespace, generationSpec.routeNamespace, generationSpec.converterIds)
             })
         }
     }
@@ -173,7 +214,8 @@ class OasGenPlugin : Plugin<Project> {
             oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
                 task.inputs.property("generatorId$index", generationSpec.generatorId)
                 task.inputs.property("schemaPath$index", generationSpec.schemaPath)
-                task.inputs.property("namespace$index", generationSpec.namespace)
+                task.inputs.property("dtoNamespace$index", generationSpec.dtoNamespace)
+                task.inputs.property("routeNamespace$index", generationSpec.routeNamespace)
                 task.inputs.property("converterIds$index", generationSpec.converterIds.joinToString())
                 when (val generationSource = generationSpec.generationSource) {
                     is DirectoryGenerationSource -> {
@@ -184,7 +226,12 @@ class OasGenPlugin : Plugin<Project> {
                         task.inputs.property("basePath$index", generationSource.basePath)
                     }
                 }
-                task.outputs.dir(effectiveOutputDir(project.buildDir, index, generationSpec))
+                if (generationSpec.routeOutputDir != null && generationSpec.dtoOutputDir != generationSpec.routeOutputDir) {
+                    task.outputs.dirs(effectiveDtoOutputDir(project.buildDir, index, generationSpec),
+                        effectiveRouteOutputDir(project.buildDir, index, generationSpec))
+                } else {
+                    task.outputs.dir(effectiveDtoOutputDir(project.buildDir, index, generationSpec))
+                }
             }
             task.dependsOn(oasGenConfiguration)
         }
@@ -194,7 +241,12 @@ class OasGenPlugin : Plugin<Project> {
                 if (generationSpec.javaSources) {
                     val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
                     javaConvention.sourceSets.getAt(SourceSet.MAIN_SOURCE_SET_NAME).java {
-                        it.srcDir(effectiveOutputDir(project.buildDir, index, generationSpec))
+                        if (generationSpec.routeOutputDir != null && generationSpec.dtoOutputDir != generationSpec.routeOutputDir) {
+                            it.srcDirs(effectiveDtoOutputDir(project.buildDir, index, generationSpec),
+                                effectiveRouteOutputDir(project.buildDir, index, generationSpec))
+                        } else {
+                            it.srcDir(effectiveDtoOutputDir(project.buildDir, index, generationSpec))
+                        }
                     }
                 }
             }
@@ -206,5 +258,8 @@ class OasGenPlugin : Plugin<Project> {
     }
 }
 
-private fun effectiveOutputDir(buildDir: File, index: Int, generationSpec: GenerationSpec) =
-        generationSpec.outputDir ?: File(buildDir, "oas-gen/generated${index}")
+private fun effectiveDtoOutputDir(buildDir: File, index: Int, generationSpec: GenerationSpec) =
+        generationSpec.dtoOutputDir ?: File(buildDir, "oas-gen/generated${index}")
+
+private fun effectiveRouteOutputDir(buildDir: File, index: Int, generationSpec: GenerationSpec) =
+    generationSpec.routeOutputDir ?: File(buildDir, "oas-gen/generated${index}")
