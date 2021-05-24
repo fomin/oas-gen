@@ -1,0 +1,94 @@
+openapi: "3.0.0"
+info:
+  version: 1.0.0
+  title: TODO
+servers:
+  - url: http://localhost/
+paths:
+  /path1:
+    post:
+      operationId: simple post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/dto'
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                type: string
+  /path2/{id}:
+    get:
+      operationId: simple get
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: param1
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: param2
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - value1
+              - value2
+      responses:
+        '200':
+          description: description
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/dto'
+  /downloadWithModel:
+    post:
+      operationId: downloadWithModel
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                params:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    id:
+                      type: string
+                    list:
+                      type: array
+                      items:
+                        type: string
+            encoding:
+              file:
+                contentType: application/pdf
+      responses:
+        '200':
+          description: description
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+components:
+  schemas:
+    dto:
+      type: object
+      properties:
+        property1:
+          type: string

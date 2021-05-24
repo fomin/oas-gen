@@ -46,7 +46,7 @@ class JavaSpringRestOperationsWriter(
             val methodOutputs = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
                 pathItem.operations().map { operation ->
                     val response200 = operation.responses().singleOrNull2xx()
-                    val responseEntry = response200?.let { response ->
+                    val responseEntry = response200?.value?.let { response ->
                         val entries = response.content().entries
                         if (entries.isEmpty()) {
                             null
@@ -71,18 +71,46 @@ class JavaSpringRestOperationsWriter(
                     val requestBodyArg: String?
                     val requestType: String
                     val buildRequestExpression: String
+                    val requestBodyContent: String?
 
                     if (requestBody != null) {
                         val entry = requestBody.content().entries.single()
                         bodySchema = entry.value.schema()
-                        requestType = converterRegistry[bodySchema].valueType()
-                        requestBodyArgDeclaration = "@Nonnull $requestType ${toVariableName(getSimpleName(requestType))}"
-                        requestBodyInternalArgDeclaration = "$requestType bodyArg"
-                        requestBodyArg = toVariableName(getSimpleName(requestType))
-                        buildRequestExpression =
-                                """|.contentType(MediaType.APPLICATION_JSON)
+                        if (entry.key.startsWith("multipart")) {
+                            if (bodySchema.type != JsonType.OBJECT) {
+                                throw UnsupportedOperationException("Response ${entry.key} must have only an object type")
+                            }
+                            val partEntries = bodySchema.properties()
+                            requestType = "MultiValueMap<String, ?>"
+                            val requestInternType = converterRegistry[bodySchema].valueType()
+                            val argName = toVariableName(getSimpleName(requestInternType))
+                            requestBodyArgDeclaration = "@Nonnull $requestInternType ${argName}"
+                            requestBodyInternalArgDeclaration = "MultiValueMap<String, ?> bodyArg"
+                            importDeclarations.add("import org.springframework.util.MultiValueMap;")
+                            importDeclarations.add("import org.springframework.http.client.MultipartBodyBuilder;")
+                            val internRequestBodyArg = toVariableName(getSimpleName("MultipartBodyBuilder"))
+                            requestBodyArg = "$internRequestBodyArg.build()"
+                            buildRequestExpression =
+                                """|.contentType(${toMediaType(entry.key)})
+                                   |.body(bodyArg);
+                                   |""".trimMargin()
+
+                            val requestBodyContentArgs = requestBodyContentArgs(partEntries, internRequestBodyArg, argName, entry.value.fragment["encoding"], importDeclarations)
+                            requestBodyContent =
+                                """final MultipartBodyBuilder $internRequestBodyArg = new MultipartBodyBuilder();
+                                |${requestBodyContentArgs.joinToString("") { "$it" }.trimMargin()}""".trimMargin()
+                        } else {
+                            requestType = converterRegistry[bodySchema].valueType()
+                            requestBodyArgDeclaration =
+                                "@Nonnull $requestType ${toVariableName(getSimpleName(requestType))}"
+                            requestBodyInternalArgDeclaration = "$requestType bodyArg"
+                            requestBodyArg = toVariableName(getSimpleName(requestType))
+                            buildRequestExpression =
+                                """|.contentType(${toMediaType(entry.key)})
                                    |.body(bodyArg, ${requestType}.class);
                                    |""".trimMargin()
+                            requestBodyContent = null
+                        }
                     } else {
                         bodySchema = null
                         requestBodyArgDeclaration = null
@@ -90,6 +118,7 @@ class JavaSpringRestOperationsWriter(
                         requestBodyInternalArgDeclaration = null
                         requestBodyArg = null
                         buildRequestExpression = ".build();"
+                        requestBodyContent = null
                     }
 
                     val parameterArgDeclarations = operation.parameters().map { parameter ->
@@ -144,7 +173,9 @@ class JavaSpringRestOperationsWriter(
                             """|@Nonnull
                                |public ResponseEntity<$responseType> $methodName(
                                |        ${methodArgDeclarations.indentWithMargin(2)}
-                               |) {
+                               |) {${if (requestBodyContent != null) """
+                                   |    
+                                   |    $requestBodyContent""".trimMargin() else {""}}
                                |    return $methodName$0(
                                |            ${methodArgs.indentWithMargin(2)}
                                |    );
@@ -203,4 +234,17 @@ class JavaSpringRestOperationsWriter(
         return outputFiles
     }
 
+    private fun requestBodyContentArgs(partEntries: Map<String, JsonSchema>, requestBodyArg: String, argName: String, encoding: Fragment, importDeclarations: TreeSet<String>) =
+        partEntries.map {
+            """
+                |    $requestBodyArg.part("${it.key}", $argName.${it.key}${
+                    if (encoding != null && encoding.getOptional(it.key) != null) {
+                    importDeclarations.add("import org.springframework.http.MediaType;")
+                    ", ${toMediaType(encoding[it.key]["contentType"].value as String)});"
+                } else {
+                    ");"
+                }
+            }"""
+
+    }
 }

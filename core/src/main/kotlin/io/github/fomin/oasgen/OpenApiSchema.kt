@@ -71,7 +71,7 @@ class Responses(override val fragment: Fragment, override val parent: TypedFragm
 
     fun default() = byCode()["default"]
 
-    fun singleOrNull2xx() = byCode().entries.singleOrNull { it.key.startsWith("2") }?.value
+    fun singleOrNull2xx() = byCode().entries.singleOrNull { it.key.startsWith("2") }
 }
 
 class Response(override val fragment: Fragment, override val parent: TypedFragment?) : TypedFragment() {

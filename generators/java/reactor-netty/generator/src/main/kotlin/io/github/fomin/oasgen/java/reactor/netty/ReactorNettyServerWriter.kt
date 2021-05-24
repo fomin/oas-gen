@@ -92,6 +92,7 @@ class ReactorNettyServerWriter(
                 val returnStatement = when (val responseSchema = javaOperation.responseVariable.schema) {
                     null -> "return response.send();"
                     else -> """|return response
+                               |        .status(${javaOperation.responseCode})
                                |        .header("Content-Type", "application/json")
                                |        .send(byteBufConverter.write(response, responseMono, ${converterRegistry[responseSchema].writerCreateExpression()}));
                             """.trimMargin()
