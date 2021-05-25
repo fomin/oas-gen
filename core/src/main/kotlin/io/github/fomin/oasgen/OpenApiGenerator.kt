@@ -4,12 +4,14 @@ import java.io.File
 import java.util.*
 
 fun openApiGenerate(
-        generatorId: String,
-        baseDir: File,
-        outputDir: File,
-        schemaPath: String,
-        namespace: String,
-        converterIds: List<String>
+    generatorId: String,
+    baseDir: File,
+    dtoOutputDir: File,
+    routeOutputDir: File,
+    schemaPath: String,
+    dtoNamespace: String,
+    routeNamespace: String,
+    converterIds: List<String>
 ) {
     val serviceLoader = ServiceLoader.load(OpenApiWriterProvider::class.java)
     val providerMap = serviceLoader.iterator()
@@ -24,11 +26,18 @@ fun openApiGenerate(
     val fragmentRegistry = FragmentRegistry(FileContentLoader(baseDir))
     val openApiSchema = OpenApiSchema(fragmentRegistry.get(Reference.root(schemaPath)), null)
 
-    val writer = openApiWriterProvider.provide(namespace, converterIds)
+    val writer = openApiWriterProvider.provide(dtoNamespace, routeNamespace, converterIds)
 
     val outputFiles = writer.write(listOf(openApiSchema))
-    outputDir.mkdirs()
+    dtoOutputDir.mkdirs()
+    if (routeOutputDir != null && dtoOutputDir != routeOutputDir) {
+        routeOutputDir.mkdirs()
+    }
     outputFiles.forEach { outputFile ->
+        val outputDir = when (outputFile.type == OutputFileType.DTO) {
+            true -> dtoOutputDir
+            else -> routeOutputDir
+        }
         val generatedFile = File(outputDir, outputFile.path)
         generatedFile.parentFile.mkdirs()
         generatedFile.writeText(outputFile.content)

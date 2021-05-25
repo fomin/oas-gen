@@ -143,7 +143,7 @@ private fun <T> testCase(
     val outputDirUri = outputDir.toURI()
     val expectedOutputFiles = outputDir.walk().filter { it.isFile }.map {
         val relativePath = outputDirUri.relativize(it.toURI())
-        OutputFile(relativePath.toString(), it.readText().replace("\r", ""))
+        OutputFile(relativePath.toString(), it.readText().replace("\r", ""), OutputFileType.ROUTE)
     }.toList()
 
     TestUtils.assertOutputFilesEquals(

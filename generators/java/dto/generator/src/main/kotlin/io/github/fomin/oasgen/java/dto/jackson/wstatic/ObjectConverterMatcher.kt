@@ -364,7 +364,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     """.trimMargin().trimEndings()
 
                     val propertySchemas = jointProperties.map { it.value }
-                    return ConverterWriter.Result(OutputFile(filePath, content), propertySchemas)
+                    return ConverterWriter.Result(OutputFile(filePath, content, OutputFileType.DTO), propertySchemas)
                 }
             }
             else -> null

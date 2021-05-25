@@ -124,7 +124,7 @@ class SimpleClientWriter(
                        |$dtoContent
                        |""".trimMargin()
 
-            OutputFile(outputFileName, content)
+            OutputFile(outputFileName, content, OutputFileType.ROUTE)
         }
     }
 

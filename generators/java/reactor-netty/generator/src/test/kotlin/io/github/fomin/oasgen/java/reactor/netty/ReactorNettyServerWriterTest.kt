@@ -8,7 +8,7 @@ internal class ReactorNettyServerWriterTest {
     @Test
     fun `generator should create expected output`() {
         openApiTestCase(
-                ReactorNettyServerWriter("com.example", emptyList()),
+                ReactorNettyServerWriter("com.example", "com.example", emptyList()),
                 File("../../../../simple-schema"),
                 "simple.yaml",
                 File("../expected-server/src/main/java")

@@ -59,7 +59,7 @@ class EnumConverterMatcher(val basePackage: String) : ConverterMatcher {
                            |
                         """.trimMargin()
                 val filePath = getFilePath(valueType())
-                return ConverterOutput(OutputFile(filePath, content), emptyList())
+                return ConverterOutput(OutputFile(filePath, content, OutputFileType.DTO), emptyList())
             }
         }
         else null

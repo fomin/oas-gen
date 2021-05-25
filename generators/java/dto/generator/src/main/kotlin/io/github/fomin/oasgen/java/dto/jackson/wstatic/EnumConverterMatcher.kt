@@ -1,9 +1,6 @@
 package io.github.fomin.oasgen.java.dto.jackson.wstatic
 
-import io.github.fomin.oasgen.JsonSchema
-import io.github.fomin.oasgen.JsonType
-import io.github.fomin.oasgen.OutputFile
-import io.github.fomin.oasgen.indentWithMargin
+import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*
 
 class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
@@ -80,7 +77,7 @@ class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
                        |
                     """.trimMargin()
 
-                return ConverterWriter.Result(OutputFile(filePath, content), emptyList())
+                return ConverterWriter.Result(OutputFile(filePath, content, OutputFileType.DTO), emptyList())
 
             }
         }

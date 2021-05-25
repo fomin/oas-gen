@@ -6,18 +6,19 @@ import io.github.fomin.oasgen.java.dto.jackson.wstatic.*
 import java.util.*
 
 class ReactorNettyServerWriter(
-        private val basePackage: String,
+        private val dtoPackage: String,
+        private val routePackage: String,
         private val converterIds: List<String>
 ) : Writer<OpenApiSchema> {
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
-        val converterMatcher = ConverterMatcherProvider.provide(basePackage, converterIds)
+        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds)
         val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
 
         items.forEach { openApiSchema ->
-            val clientClassName = toJavaClassName(basePackage, openApiSchema, "routes")
+            val clientClassName = toJavaClassName(routePackage, openApiSchema, "routes")
             val filePath = getFilePath(clientClassName)
 
             val importDeclarations = TreeSet<String>()
@@ -143,7 +144,7 @@ class ReactorNettyServerWriter(
             })
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
-            outputFiles.add(OutputFile(filePath, content))
+            outputFiles.add(OutputFile(filePath, content, OutputFileType.ROUTE))
         }
 
         return outputFiles
