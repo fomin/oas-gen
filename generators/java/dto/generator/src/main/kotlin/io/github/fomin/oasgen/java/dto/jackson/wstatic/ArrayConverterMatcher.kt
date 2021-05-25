@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class ArrayConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "array"
-        override fun provide(basePackage: String) = ArrayConverterMatcher()
+        override fun provide(dtoPackage: String, routesPackage: String) = ArrayConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
@@ -20,18 +20,18 @@ class ArrayConverterMatcher : ConverterMatcher {
                 override fun valueType() =
                         "java.util.List<${converterRegistry[itemsSchema].valueType()}>"
 
-                override fun parserCreateExpression() =
-                        "new io.github.fomin.oasgen.ArrayParser<>(${converterRegistry[itemsSchema].parserCreateExpression()})"
+                override fun parseExpression(valueExpression: String) =
+                        "io.github.fomin.oasgen.ArrayConverter.parse($valueExpression, itemNode -> ${converterRegistry[itemsSchema].parseExpression("itemNode")})"
 
-                override fun writerCreateExpression() =
-                        "new io.github.fomin.oasgen.ArrayWriter<>(${converterRegistry[itemsSchema].writerCreateExpression()})"
+                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                        "io.github.fomin.oasgen.ArrayConverter.write($jsonGeneratorName, (${jsonGeneratorName}1, item) -> ${converterRegistry[itemsSchema].writeExpression("${jsonGeneratorName}1", "item")}, $valueExpression)"
 
                 override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
 
                 override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
 
                 override fun generate(): ConverterWriter.Result {
-                    return ConverterWriter.Result(null, listOf(itemsSchema))
+                    return ConverterWriter.Result(emptyList(), listOf(itemsSchema))
                 }
             }
             else -> null

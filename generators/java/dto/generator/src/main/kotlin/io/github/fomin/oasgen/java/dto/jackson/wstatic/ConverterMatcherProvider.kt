@@ -4,12 +4,12 @@ import java.util.*
 
 interface ConverterMatcherProvider {
     val id: String
-    fun provide(basePackage: String): ConverterMatcher
+    fun provide(dtoPackage: String, routesPackage: String): ConverterMatcher
 
     class Default : ConverterMatcherProvider {
         override val id = "default"
 
-        override fun provide(basePackage: String): ConverterMatcher {
+        override fun provide(dtoPackage: String, routesPackage: String): ConverterMatcher {
             return CompositeConverterMatcher(
                     listOf(
                             OffsetDateTimeConverterMatcher(),
@@ -18,14 +18,41 @@ interface ConverterMatcherProvider {
                             LocalDateTimeConverterMatcher(),
                             ArrayConverterMatcher(),
                             MapConverterMatcher(),
-                            ObjectConverterMatcher(basePackage),
+                            ObjectConverterMatcher(dtoPackage, routesPackage),
                             Int32ConverterMatcher(),
                             Int64ConverterMatcher(),
                             IntegerConverterMatcher(),
                             DoubleConverterMatcher(),
                             NumberConverterMatcher(),
                             BooleanConverterMatcher(),
-                            EnumConverterMatcher(basePackage),
+                            EnumConverterMatcher(dtoPackage, routesPackage),
+                            DecimalConverterMatcher(),
+                            StringConverterMatcher()
+                    )
+            )
+        }
+    }
+
+    class MutableDefault : ConverterMatcherProvider {
+        override val id = "mutable"
+
+        override fun provide(dtoPackage: String, routesPackage: String): ConverterMatcher {
+            return CompositeConverterMatcher(
+                    listOf(
+                            OffsetDateTimeConverterMatcher(),
+                            LocalDateConverterMatcher(),
+                            CustomLocalDateTimeConverterMatcher(),
+                            LocalDateTimeConverterMatcher(),
+                            ArrayConverterMatcher(),
+                            MapConverterMatcher(),
+                            MutableObjectConverterMatcher(dtoPackage, routesPackage),
+                            Int32ConverterMatcher(),
+                            Int64ConverterMatcher(),
+                            IntegerConverterMatcher(),
+                            DoubleConverterMatcher(),
+                            NumberConverterMatcher(),
+                            BooleanConverterMatcher(),
+                            EnumConverterMatcher(dtoPackage, routesPackage),
                             DecimalConverterMatcher(),
                             StringConverterMatcher()
                     )
@@ -35,9 +62,9 @@ interface ConverterMatcherProvider {
 
     companion object {
 
-        fun provide(basePackage: String, converterIds: List<String>): ConverterMatcher {
+        fun provide(dtoPackage: String, routesPackage: String, converterIds: List<String>): ConverterMatcher {
             if (converterIds.isEmpty()) {
-                return Default().provide(basePackage)
+                return Default().provide(dtoPackage, routesPackage)
             } else {
                 val converterMatcherProviders = mutableMapOf<String, ConverterMatcherProvider>()
                 val serviceLoader = ServiceLoader.load(ConverterMatcherProvider::class.java)
@@ -50,7 +77,7 @@ interface ConverterMatcherProvider {
                 val converterMatchers = converterIds.map { converterId ->
                     val converterMatcherProvider = converterMatcherProviders[converterId]
                             ?: error("Can't find converter with id $converterId")
-                    converterMatcherProvider.provide(basePackage)
+                    converterMatcherProvider.provide(dtoPackage, routesPackage)
                 }
                 return CompositeConverterMatcher(converterMatchers)
             }

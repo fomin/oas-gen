@@ -59,7 +59,9 @@ export interface Dto {
 }
 
 /**
+ * Dto title
  *
+ * Dto description
  */
 export enum Param2OfSimpleGet {
     Value1 = "value1",

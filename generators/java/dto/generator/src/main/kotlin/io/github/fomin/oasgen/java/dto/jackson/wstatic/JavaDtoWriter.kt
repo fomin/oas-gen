@@ -18,9 +18,9 @@ class JavaDtoWriter(
             val jsonSchema = schemaQueue[index]
             if (!processedSchemas.contains(jsonSchema)) {
                 val converterWriter = converterRegistry[jsonSchema]
-                val (outputFile, innerSchemas) = converterWriter.generate()
+                val (schemaOutputFiles, innerSchemas) = converterWriter.generate()
                 processedSchemas.add(jsonSchema)
-                if (outputFile != null) outputFiles.add(outputFile)
+                outputFiles.addAll(schemaOutputFiles)
                 schemaQueue.addAll(innerSchemas)
             }
             index += 1

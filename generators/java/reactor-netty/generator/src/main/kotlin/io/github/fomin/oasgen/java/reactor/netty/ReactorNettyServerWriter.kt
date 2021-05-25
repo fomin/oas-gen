@@ -13,7 +13,7 @@ class ReactorNettyServerWriter(
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
-        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds)
+        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, routePackage, converterIds)
         val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
 
@@ -24,7 +24,7 @@ class ReactorNettyServerWriter(
             val importDeclarations = TreeSet<String>()
 
             importDeclarations.addAll(listOf(
-                    "import com.fasterxml.jackson.core.JsonFactory;",
+                    "import com.fasterxml.jackson.databind.ObjectMapper;",
                     "import io.github.fomin.oasgen.ByteBufConverter;",
                     "import io.github.fomin.oasgen.UrlEncoderUtils;",
                     "import java.util.Map;",
@@ -82,7 +82,7 @@ class ReactorNettyServerWriter(
                     """.trimMargin()
                 }
                 val requestMonoDeclaration = javaOperation.requestVariable?.let { requestVariable ->
-                    "Mono<${requestVariable.type}> requestMono = byteBufConverter.parse(request.receive(), ${converterRegistry[requestVariable.schema].parserCreateExpression()});"
+                    "Mono<${requestVariable.type}> requestMono = byteBufConverter.parse(request.receive().aggregate(), jsonNode -> ${converterRegistry[requestVariable.schema].parseExpression("jsonNode")});"
                 } ?: ""
                 val parameterArgs = javaOperation.parameters.mapIndexed { index, _ -> "param$index" }
                 val requestArg = javaOperation.requestVariable?.let { "requestMono" }
@@ -94,7 +94,7 @@ class ReactorNettyServerWriter(
                     else -> """|return response
                                |        .status(${javaOperation.responseCode})
                                |        .header("Content-Type", "application/json")
-                               |        .send(byteBufConverter.write(response, responseMono, ${converterRegistry[responseSchema].writerCreateExpression()}));
+                               |        .send(byteBufConverter.write(response, responseMono, (jsonGenerator, value) -> ${converterRegistry[responseSchema].writeExpression("jsonGenerator", "value")}));
                             """.trimMargin()
                 }
 
@@ -119,8 +119,8 @@ class ReactorNettyServerWriter(
                |    private final ByteBufConverter byteBufConverter;
                |    private final String baseUrl;
                |
-               |    protected ${getSimpleName(clientClassName)}(JsonFactory jsonFactory, String baseUrl) {
-               |        this.byteBufConverter = new ByteBufConverter(jsonFactory);
+               |    protected ${getSimpleName(clientClassName)}(ObjectMapper objectMapper, String baseUrl) {
+               |        this.byteBufConverter = new ByteBufConverter(objectMapper);
                |        this.baseUrl = baseUrl;
                |    }
                |

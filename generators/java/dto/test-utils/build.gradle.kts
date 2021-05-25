@@ -1,8 +1,11 @@
+description = "oas-gen - java dto test utils"
+
 plugins {
-    id("java-conventions")
+    id("java-library-publishing-conventions")
 }
 
 dependencies {
-    implementation("org.junit.jupiter","junit-jupiter-api", JUNIT_VERSION)
-    implementation(project(":generators:java:dto:runtime"))
+    api("org.junit.jupiter","junit-jupiter-api", JUNIT_VERSION)
+    api("org.junit.jupiter","junit-jupiter-engine", JUNIT_VERSION)
+    api(project(":generators:java:dto:runtime"))
 }

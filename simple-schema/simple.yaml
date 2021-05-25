@@ -1,7 +1,7 @@
 openapi: "3.0.0"
 info:
   version: 1.0.0
-  title: TODO
+  title: Simple schema
 servers:
   - url: http://localhost/
 paths:
@@ -39,6 +39,8 @@ paths:
           in: query
           required: false
           schema:
+            title: Dto title
+            description: Dto description
             type: string
             enum:
               - value1

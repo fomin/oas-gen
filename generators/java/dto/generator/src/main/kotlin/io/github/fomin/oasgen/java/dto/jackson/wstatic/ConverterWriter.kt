@@ -4,12 +4,12 @@ import io.github.fomin.oasgen.JsonSchema
 import io.github.fomin.oasgen.OutputFile
 
 interface ConverterWriter {
-    data class Result(val outputFile: OutputFile?, val jsonSchemas: List<JsonSchema>)
+    data class Result(val outputFiles: List<OutputFile>, val jsonSchemas: List<JsonSchema>)
 
     val jsonSchema: JsonSchema
     fun valueType(): String
-    fun parserCreateExpression(): String
-    fun writerCreateExpression(): String
+    fun parseExpression(valueExpression: String): String
+    fun writeExpression(jsonGeneratorName: String, valueExpression: String): String
     fun stringParseExpression(valueExpression: String): String
     fun stringWriteExpression(valueExpression: String): String
     fun generate(): Result

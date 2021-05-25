@@ -177,6 +177,10 @@ fun toCamelCase(firstUpper: Boolean, vararg parts: String): String {
     return sb.toString()
 }
 
+fun upperFirst(value: String): String {
+    return value.replaceFirstChar { c -> c.uppercase() }
+}
+
 fun getFilePath(className: String): String {
     return "${className.replace('.', '/')}.java"
 }

@@ -1,2 +1,2 @@
-io.github.fomin.oasgen.java.spring.web.JavaSpringRestOperationsWriterProvider
+io.github.fomin.oasgen.java.spring.web.JavaSpringWebClientWriterProvider
 io.github.fomin.oasgen.java.spring.web.JavaSpringMvcServerWriterProvider

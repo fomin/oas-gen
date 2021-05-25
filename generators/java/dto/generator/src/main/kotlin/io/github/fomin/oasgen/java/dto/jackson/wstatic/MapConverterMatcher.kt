@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class MapConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "map"
-        override fun provide(basePackage: String) = MapConverterMatcher()
+        override fun provide(dtoPackage: String, routesPackage: String) = MapConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {
@@ -17,18 +17,18 @@ class MapConverterMatcher : ConverterMatcher {
             override fun valueType() =
                     "java.util.Map<java.lang.String, ${converterRegistry[additionalProperties].valueType()}>"
 
-            override fun parserCreateExpression() =
-                    "new io.github.fomin.oasgen.MapParser<>(${converterRegistry[additionalProperties].parserCreateExpression()})"
+            override fun parseExpression(valueExpression: String) =
+                    "new io.github.fomin.oasgen.MapConverter.parse($valueExpression, itemNode -> ${converterRegistry[additionalProperties].parseExpression("itemNode")})"
 
-            override fun writerCreateExpression() =
-                    "new io.github.fomin.oasgen.MapWriter<>(${converterRegistry[additionalProperties].writerCreateExpression()})"
+            override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                    "new io.github.fomin.oasgen.MapConverter<>($jsonGeneratorName, (${jsonGeneratorName}1, value) -> ${converterRegistry[additionalProperties].writeExpression("${jsonGeneratorName}1", "value")})"
 
             override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
 
             override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()
 
             override fun generate(): ConverterWriter.Result {
-                return ConverterWriter.Result(null, listOf(additionalProperties))
+                return ConverterWriter.Result(emptyList(), listOf(additionalProperties))
             }
         }
         else null

@@ -15,7 +15,12 @@ dependencies {
 }
 
 val unzipTestSchemas by tasks.registering {
+    dependsOn(":test-schemas:jar")
     doLast {
         unzipTo(file("$buildDir/test-schemas"), testSchemas.singleFile)
     }
+}
+
+tasks.test {
+    dependsOn(unzipTestSchemas)
 }
