@@ -11,6 +11,8 @@ fun openApiGenerate(
     schemaPath: String,
     dtoNamespace: String,
     routeNamespace: String,
+    dtoBaseClass: String?,
+    dtoBaseInterface: String?,
     converterIds: List<String>
 ) {
     val serviceLoader = ServiceLoader.load(OpenApiWriterProvider::class.java)
@@ -25,8 +27,7 @@ fun openApiGenerate(
 
     val fragmentRegistry = FragmentRegistry(FileContentLoader(baseDir))
     val openApiSchema = OpenApiSchema(fragmentRegistry.get(Reference.root(schemaPath)), null)
-
-    val writer = openApiWriterProvider.provide(dtoNamespace, routeNamespace, converterIds)
+    val writer = openApiWriterProvider.provide(dtoNamespace, routeNamespace, converterIds, dtoBaseClass, dtoBaseInterface)
 
     val outputFiles = writer.write(listOf(openApiSchema))
     dtoOutputDir.mkdirs()

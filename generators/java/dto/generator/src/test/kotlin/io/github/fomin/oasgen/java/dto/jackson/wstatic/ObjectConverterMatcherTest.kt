@@ -9,7 +9,7 @@ internal class ObjectConverterMatcherTest {
 
     @Test
     fun `matches object`() {
-        val objectConverterMatcher = ObjectConverterMatcher("com.example")
+        val objectConverterMatcher = ObjectConverterMatcher("com.example", null, null)
         val converterRegistry = ConverterRegistry(
             CompositeConverterMatcher(
                 listOf(
@@ -38,7 +38,7 @@ internal class ObjectConverterMatcherTest {
     @Test
     fun `simple dto`() {
         val stringConverterMatcher = StringConverterMatcher()
-        val objectConverterMatcher = ObjectConverterMatcher("com.example.simple")
+        val objectConverterMatcher = ObjectConverterMatcher("com.example.simple", null, null)
         val converterRegistry = ConverterRegistry(
             CompositeConverterMatcher(
                 listOf(
@@ -58,7 +58,7 @@ internal class ObjectConverterMatcherTest {
     @Test
     fun javadoc() {
         val stringConverterMatcher = StringConverterMatcher()
-        val objectConverterMatcher = ObjectConverterMatcher("com.example.javadoc")
+        val objectConverterMatcher = ObjectConverterMatcher("com.example.javadoc", null, null)
         val converterRegistry = ConverterRegistry(
             CompositeConverterMatcher(
                 listOf(

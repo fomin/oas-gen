@@ -3,7 +3,7 @@ package io.github.fomin.oasgen.java.dto.jackson.annotated
 class ConverterMutableMatcherProvider : ConverterMatcherProvider {
     override val id = "mutable"
 
-    override fun provide(basePackage: String): ConverterMatcher {
+    override fun provide(basePackage: String, baseClass: String?, baseInterface: String?): ConverterMatcher {
         return CompositeConverterMatcher(
                 listOf(
                         OffsetDateTimeConverterMatcher(),

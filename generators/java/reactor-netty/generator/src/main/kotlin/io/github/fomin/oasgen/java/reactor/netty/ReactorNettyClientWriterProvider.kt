@@ -4,12 +4,14 @@ import io.github.fomin.oasgen.OpenApiWriterProvider
 
 class ReactorNettyClientWriterProvider : OpenApiWriterProvider {
     override val id = "java-reactor-netty-client"
-    override fun provide(namespace: String, converterIds: List<String>) =
-        ReactorNettyClientWriter(namespace, namespace, converterIds)
+    override fun provide(namespace: String, converterIds: List<String>, dtoBaseClass: String?, dtoBaseInterface: String?) =
+        ReactorNettyClientWriter(namespace, namespace, converterIds, dtoBaseClass, dtoBaseInterface)
 
     override fun provide(
         dtoNamespace: String,
         routesNamespace: String,
-        converterIds: List<String>
-    ) = ReactorNettyClientWriter(dtoNamespace, routesNamespace, converterIds)
+        converterIds: List<String>,
+        dtoBaseClass: String?,
+        dtoBaseInterface: String?
+    ) = ReactorNettyClientWriter(dtoNamespace, routesNamespace, converterIds, dtoBaseClass, dtoBaseInterface)
 }

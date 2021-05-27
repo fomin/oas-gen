@@ -32,7 +32,9 @@ class GenerationSpec(
     val dtoNamespace: String,
     val routeNamespace: String,
     val converterIds: Array<out String>,
-    val javaSources: Boolean
+    val javaSources: Boolean,
+    val baseClass: String?,
+    val baseInterface: String?
 )
 
 sealed class GenerationSource
@@ -57,9 +59,11 @@ open class OasGenExtension {
             schemaPath: String,
             namespace: String,
             vararg converterIds: String = emptyArray(),
-            javaSources: Boolean = false
+            javaSources: Boolean = false,
+            dtoBaseClass: String? = null,
+            dtoBaseInterface: String? = null
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources))
+        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources, dtoBaseClass, dtoBaseInterface))
     }
 
     @Suppress("Unused")
@@ -72,9 +76,11 @@ open class OasGenExtension {
         dtoNamespace: String,
         routeNamespace: String,
         vararg converterIds: String = emptyArray(),
-        javaSources: Boolean = false
+        javaSources: Boolean = false,
+        dtoBaseClass: String? = null,
+        dtoBaseInterface: String? = null
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources))
+        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources, dtoBaseClass, dtoBaseInterface))
     }
 
     @Suppress("Unused")
@@ -86,9 +92,11 @@ open class OasGenExtension {
             schemaPath: String,
             namespace: String,
             vararg converterIds: String = emptyArray(),
-            javaSources: Boolean = false
+            javaSources: Boolean = false,
+            dtoBaseClass: String? = null,
+            dtoBaseInterface: String? = null
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources))
+        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources, dtoBaseClass, dtoBaseInterface))
     }
 
     @Suppress("Unused")
@@ -102,9 +110,11 @@ open class OasGenExtension {
         dtoNamespace: String,
         routeNamespace: String,
         vararg converterIds: String = emptyArray(),
-        javaSources: Boolean = false
+        javaSources: Boolean = false,
+        dtoBaseClass: String? = null,
+        dtoBaseInterface: String? = null
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources))
+        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources, dtoBaseClass, dtoBaseInterface))
     }
 }
 
@@ -121,6 +131,8 @@ class OasGenActionParameters(
     val schemaPath: String,
     val dtoNamespace: String,
     val routeNamespace: String,
+    val dtoBaseClass: String?,
+    val dtoBaseInterface: String?,
     val converterIds: Array<out String>
 ) : Serializable
 
@@ -135,6 +147,8 @@ abstract class OasGenAction : WorkAction<GenerationWorkParameters> {
                     item.schemaPath,
                     item.dtoNamespace,
                     item.routeNamespace,
+                    item.dtoBaseClass,
+                    item.dtoBaseInterface,
                     item.converterIds.asList()
             )
         }
@@ -192,7 +206,16 @@ open class OasGenTask @Inject constructor(
                 if (routeOutputDir.exists()) {
                     routeOutputDir.deleteRecursively()
                 }
-                OasGenActionParameters(generationSpec.generatorId, baseDir, dtoOutputDir, routeOutputDir, generationSpec.schemaPath, generationSpec.dtoNamespace, generationSpec.routeNamespace, generationSpec.converterIds)
+                OasGenActionParameters(generationSpec.generatorId,
+                    baseDir,
+                    dtoOutputDir,
+                    routeOutputDir,
+                    generationSpec.schemaPath,
+                    generationSpec.dtoNamespace,
+                    generationSpec.routeNamespace,
+                    generationSpec.baseClass,
+                    generationSpec.baseInterface,
+                    generationSpec.converterIds)
             })
         }
     }

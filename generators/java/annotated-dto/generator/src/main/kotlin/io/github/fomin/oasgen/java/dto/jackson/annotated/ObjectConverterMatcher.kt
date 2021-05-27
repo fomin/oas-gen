@@ -3,7 +3,7 @@ package io.github.fomin.oasgen.java.dto.jackson.annotated
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*
 
-class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
+class ObjectConverterMatcher(val basePackage: String, val dtoBaseClass: String?, val dtoBaseInterface: String?) : ConverterMatcher {
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): Converter? {
         return when (jsonSchema.type) {
             is JsonType.OBJECT -> object : Converter {
@@ -89,7 +89,13 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                |import java.util.Objects;
                                |
                                |${javaDoc(jsonSchema)}
-                               |public final class $simpleName {
+                               |public final class $simpleName ${when(dtoBaseClass == null) {
+                                false -> "extends $dtoBaseClass "
+                                true -> ""
+                            } }${when(dtoBaseInterface == null) {
+                                false -> "implements $dtoBaseInterface "
+                                true -> ""
+                            } }{
                                |
                                |    ${propertyDeclarations.indentWithMargin(1)}
                                |

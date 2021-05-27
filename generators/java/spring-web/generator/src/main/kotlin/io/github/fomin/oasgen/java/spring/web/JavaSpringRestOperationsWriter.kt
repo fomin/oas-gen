@@ -10,7 +10,9 @@ import java.util.*
 class JavaSpringRestOperationsWriter(
         private val dtoPackage: String,
         private val routesPackage: String,
-        private val converterIds: List<String>
+        private val converterIds: List<String>,
+        private val baseClass: String?,
+        private val baseInterface: String?
 ) : Writer<OpenApiSchema> {
     private data class OperationOutput(
             val methodContent: String,
@@ -20,7 +22,7 @@ class JavaSpringRestOperationsWriter(
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
-        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds)
+        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds, baseClass, baseInterface)
         val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
         items.forEach { openApiSchema ->

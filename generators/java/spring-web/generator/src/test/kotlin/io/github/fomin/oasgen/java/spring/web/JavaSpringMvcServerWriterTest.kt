@@ -8,7 +8,7 @@ internal class JavaSpringMvcServerWriterTest {
     @Test
     fun `generator should create expected output`() {
         openApiTestCase(
-                JavaSpringMvcServerWriter("com.example","com.example", emptyList()),
+                JavaSpringMvcServerWriter("com.example","com.example", emptyList(), null,  null),
                 File("../../../../simple-schema/mvc"),
                 "simple.yaml",
                 File("../expected-server/src/main/java")

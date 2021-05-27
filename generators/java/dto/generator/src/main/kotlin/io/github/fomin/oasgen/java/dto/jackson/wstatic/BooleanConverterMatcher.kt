@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class BooleanConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "boolean"
-        override fun provide(basePackage: String) = BooleanConverterMatcher()
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = BooleanConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {

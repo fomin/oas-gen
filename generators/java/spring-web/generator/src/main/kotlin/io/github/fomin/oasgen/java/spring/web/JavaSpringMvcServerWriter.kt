@@ -11,7 +11,9 @@ import kotlin.collections.ArrayList
 class JavaSpringMvcServerWriter(
         private val dtoPackage: String,
         private val routesPackage: String,
-        private val converterIds: List<String>
+        private val converterIds: List<String>,
+        private val dtoBaseClass: String?,
+        private val dtoBaseInterface: String?
 ) : Writer<OpenApiSchema> {
     private data class OperationOutput(
             val controllerMethodContent: String,
@@ -35,7 +37,7 @@ class JavaSpringMvcServerWriter(
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
-        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds)
+        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds, dtoBaseClass, dtoBaseInterface)
         val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
         items.forEach { openApiSchema ->

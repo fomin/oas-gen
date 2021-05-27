@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class LocalDateConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "local-date"
-        override fun provide(basePackage: String) = LocalDateConverterMatcher()
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = LocalDateConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {

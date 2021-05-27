@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class Int64ConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "int32"
-        override fun provide(basePackage: String) = Int64ConverterMatcher()
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = Int64ConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {

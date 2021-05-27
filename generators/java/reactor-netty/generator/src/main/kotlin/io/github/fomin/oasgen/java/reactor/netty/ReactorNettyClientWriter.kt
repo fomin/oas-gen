@@ -8,12 +8,13 @@ import java.util.*
 class ReactorNettyClientWriter(
         private val dtoPackage: String,
         private val routePackage: String,
-        private val converterIds: List<String>
+        private val converterIds: List<String>,
+        private val baseClass: String?,
+        private val baseInterface: String?
 ) : Writer<OpenApiSchema> {
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
-
-        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds)
+        val converterMatcher = ConverterMatcherProvider.provide(dtoPackage, converterIds, baseClass, baseInterface)
         val converterRegistry = ConverterRegistry(converterMatcher)
         val javaDtoWriter = JavaDtoWriter(converterRegistry)
 

@@ -5,52 +5,55 @@ import io.github.fomin.oasgen.java.*
 
 data class ClassMember(val content: String, val importedClasses: List<String>)
 
-class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
+class ObjectConverterMatcher(val basePackage: String, val dtoBaseClass: String?, val dtoBaseInterface: String?) :
+    ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "object"
-        override fun provide(basePackage: String) = ObjectConverterMatcher(basePackage)
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) =
+            ObjectConverterMatcher(basePackage, baseClass, baseInterface)
     }
 
     data class JavaProperty(
-            val name: String,
-            val variableName: String,
-            val type: String,
-            val jsonSchema: JsonSchema,
-            val internalVariableName: String,
-            val nullAnnotation: String
+        val name: String,
+        val variableName: String,
+        val type: String,
+        val jsonSchema: JsonSchema,
+        val internalVariableName: String,
+        val nullAnnotation: String
     )
 
     class JacksonParserWriter(private val converterRegistry: ConverterRegistry) {
         private data class ParserPair(
-                val valueType: String,
-                val parserCreateExpression: String
+            val valueType: String,
+            val parserCreateExpression: String
         ) : Comparable<ParserPair> {
             override fun compareTo(other: ParserPair) =
-                    this.parserCreateExpression.compareTo(other.parserCreateExpression)
+                this.parserCreateExpression.compareTo(other.parserCreateExpression)
         }
 
         fun write(
-                jsonSchema: JsonSchema,
-                dtoClassName: String
+            jsonSchema: JsonSchema,
+            dtoClassName: String
         ): ClassMember {
             val importedClasses = listOf(
-                    "com.fasterxml.jackson.core.JsonGenerator",
-                    "com.fasterxml.jackson.core.JsonToken",
-                    "com.fasterxml.jackson.core.json.async.NonBlockingJsonParser",
-                    "java.io.IOException",
-                    "io.github.fomin.oasgen.NonBlockingParser",
-                    "io.github.fomin.oasgen.ObjectParserState",
-                    "io.github.fomin.oasgen.ParseResult",
-                    "io.github.fomin.oasgen.SkipValueParser",
-                    "javax.annotation.Nonnull",
-                    "javax.annotation.Nullable"
+                "com.fasterxml.jackson.core.JsonGenerator",
+                "com.fasterxml.jackson.core.JsonToken",
+                "com.fasterxml.jackson.core.json.async.NonBlockingJsonParser",
+                "java.io.IOException",
+                "io.github.fomin.oasgen.NonBlockingParser",
+                "io.github.fomin.oasgen.ObjectParserState",
+                "io.github.fomin.oasgen.ParseResult",
+                "io.github.fomin.oasgen.SkipValueParser",
+                "javax.annotation.Nonnull",
+                "javax.annotation.Nullable"
             )
 
             val jointProperties = jsonSchema.jointProperties()
-            val builderPropertyDeclarations = jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
-                val converterWriter = converterRegistry[propertySchema]
-                "private ${converterWriter.valueType()} p$index; // $propertyName"
-            }
+            val builderPropertyDeclarations =
+                jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
+                    val converterWriter = converterRegistry[propertySchema]
+                    "private ${converterWriter.valueType()} p$index; // $propertyName"
+                }
 
             val parserPairs = jointProperties.map { (_, propertySchema) ->
                 val converterWriter = converterRegistry[propertySchema]
@@ -64,7 +67,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
             val parseValueCases = jointProperties.entries.mapIndexed { index, (propertyName, propertySchema) ->
                 val converterWriter = converterRegistry[propertySchema]
 
-                val parserIndex = parserPairs.indexOfFirst { it.parserCreateExpression == converterWriter.parserCreateExpression() }
+                val parserIndex =
+                    parserPairs.indexOfFirst { it.parserCreateExpression == converterWriter.parserCreateExpression() }
                 """|case "$propertyName":
                |    if (parser$parserIndex.parseNext(jsonParser)) {
                |        ParseResult<${converterWriter.valueType()}> parseResult = parser${parserIndex}.build();
@@ -78,8 +82,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
             }
 
             val constructorArgs = jointProperties.entries
-                    .mapIndexed { index, _ -> index }
-                    .joinToString(", ") { "this.p${it}" }
+                .mapIndexed { index, _ -> index }
+                .joinToString(", ") { "this.p${it}" }
 
             val resetFieldExpressions = jointProperties.entries.mapIndexed { index, _ -> "this.p$index = null;" }
             val parseFieldValueCase = when (parseValueCases.isNotEmpty()) {
@@ -184,19 +188,19 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
 
     class JacksonWriterWriter(private val converterRegistry: ConverterRegistry) {
         private data class WriterPair(
-                val valueType: String,
-                val writerCreateExpression: String
+            val valueType: String,
+            val writerCreateExpression: String
         ) : Comparable<WriterPair> {
             override fun compareTo(other: WriterPair) =
-                    this.writerCreateExpression.compareTo(other.writerCreateExpression)
+                this.writerCreateExpression.compareTo(other.writerCreateExpression)
         }
 
         fun write(
-                jsonSchema: JsonSchema,
-                dtoClassName: String
+            jsonSchema: JsonSchema,
+            dtoClassName: String
         ): ClassMember {
             val importedClasses = listOf(
-                    "com.fasterxml.jackson.core.JsonGenerator"
+                "com.fasterxml.jackson.core.JsonGenerator"
             )
 
             val jointProperties = jsonSchema.jointProperties()
@@ -213,7 +217,8 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                 val converterWriter = converterRegistry[propertySchema]
 
                 val fieldName = toVariableName(propertyName)
-                val writerIndex = writerPairs.indexOfFirst { it.writerCreateExpression == converterWriter.writerCreateExpression() }
+                val writerIndex =
+                    writerPairs.indexOfFirst { it.writerCreateExpression == converterWriter.writerCreateExpression() }
                 """|if (value.$fieldName != null) {
                |    jsonGenerator.writeFieldName("$propertyName");
                |    WRITER_$writerIndex.write(jsonGenerator, value.$fieldName);
@@ -260,12 +265,12 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                             else -> "@Nullable"
                         }
                         JavaProperty(
-                                propertyName,
-                                toVariableName(propertyName),
-                                propertyType,
-                                propertySchema,
-                                "p$index",
-                                nullAnnotation
+                            propertyName,
+                            toVariableName(propertyName),
+                            propertyType,
+                            propertySchema,
+                            "p$index",
+                            nullAnnotation
                         )
                     }
 
@@ -314,7 +319,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     val jacksonWriterWriter = JacksonWriterWriter(converterRegistry)
                     val (writerContent, writerImports) = jacksonWriterWriter.write(jsonSchema, valueType())
                     val importDeclarations = (parserImports + writerImports + "java.util.Objects")
-                            .map { "import $it;" }.toSortedSet()
+                        .map { "import $it;" }.toSortedSet()
 
                     val simpleName = getSimpleName(valueType())
                     val content = """
@@ -323,7 +328,13 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                        |${importDeclarations.indentWithMargin(0)}
                        |
                        |${javaDoc(jsonSchema)}
-                       |public final class $simpleName {
+                       |public final class $simpleName ${when(dtoBaseClass == null) { 
+                           false -> "extends $dtoBaseClass "
+                           true -> ""
+                    } }${when(dtoBaseInterface == null) {
+                        false -> "implements $dtoBaseInterface "
+                        true -> ""
+                    } }{
                        |
                        |    ${fieldDeclarations.indentWithMargin(1)}
                        |

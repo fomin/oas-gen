@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class DecimalConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "decimal"
-        override fun provide(basePackage: String) = DecimalConverterMatcher()
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = DecimalConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {

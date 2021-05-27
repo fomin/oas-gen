@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class NumberConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "number"
-        override fun provide(basePackage: String) = NumberConverterMatcher()
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = NumberConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {

@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class CustomLocalDateTimeConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "custom-local-date-time"
-        override fun provide(basePackage: String) = CustomLocalDateTimeConverterMatcher()
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = CustomLocalDateTimeConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {

@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.JsonType
 class DoubleConverterMatcher : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "double"
-        override fun provide(basePackage: String) = DoubleConverterMatcher()
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = DoubleConverterMatcher()
     }
 
     override fun match(converterRegistry: ConverterRegistry, jsonSchema: JsonSchema): ConverterWriter? {

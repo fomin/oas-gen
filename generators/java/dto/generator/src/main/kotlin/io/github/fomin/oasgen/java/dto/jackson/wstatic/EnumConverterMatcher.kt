@@ -6,7 +6,7 @@ import io.github.fomin.oasgen.java.*
 class EnumConverterMatcher(private val basePackage: String) : ConverterMatcher {
     class Provider : ConverterMatcherProvider {
         override val id = "enum"
-        override fun provide(basePackage: String) = EnumConverterMatcher(basePackage)
+        override fun provide(basePackage: String, baseClass: String?, baseInterface: String?) = EnumConverterMatcher(basePackage)
     }
 
 

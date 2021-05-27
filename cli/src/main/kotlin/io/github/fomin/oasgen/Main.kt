@@ -56,5 +56,5 @@ fun main(args: Array<String>) {
     }
 
     val outputDir = File(outputDirArg)
-    openApiGenerate(generatorId, baseDir, outputDir,outputDir, schemaPath, namespaceArg, namespaceArg, converterIds)
+    openApiGenerate(generatorId, baseDir, outputDir,outputDir, schemaPath, namespaceArg, namespaceArg, null, null, converterIds)
 }
