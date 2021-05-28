@@ -86,10 +86,11 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                                |import com.fasterxml.jackson.annotation.JsonProperty;
                                |import javax.annotation.Nonnull;
                                |import javax.annotation.Nullable;
+                               |import java.io.Serializable;
                                |import java.util.Objects;
                                |
                                |${javaDoc(jsonSchema)}
-                               |public final class $simpleName {
+                               |public final class $simpleName implements Serializable {
                                |
                                |    ${propertyDeclarations.indentWithMargin(1)}
                                |
