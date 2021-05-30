@@ -313,7 +313,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                     val (parserContent, parserImports) = jacksonParserWriter.write(jsonSchema, valueType())
                     val jacksonWriterWriter = JacksonWriterWriter(converterRegistry)
                     val (writerContent, writerImports) = jacksonWriterWriter.write(jsonSchema, valueType())
-                    val importDeclarations = (parserImports + writerImports + "java.util.Objects")
+                    val importDeclarations = (parserImports + writerImports + "java.util.Objects" + "java.io.Serializable")
                             .map { "import $it;" }.toSortedSet()
 
                     val simpleName = getSimpleName(valueType())
@@ -323,7 +323,7 @@ class ObjectConverterMatcher(val basePackage: String) : ConverterMatcher {
                        |${importDeclarations.indentWithMargin(0)}
                        |
                        |${javaDoc(jsonSchema)}
-                       |public final class $simpleName {
+                       |public final class $simpleName implements Serializable {
                        |
                        |    ${fieldDeclarations.indentWithMargin(1)}
                        |
