@@ -74,7 +74,7 @@ class SimpleClientTest implements ClientTest {
     @Override
     @Test
     public void testGet() {
-        Dto response = simpleClient.simpleGet("idValue", "param1Value", Param2OfSimpleGet.VALUE1);
+        Dto response = simpleClient.simpleGet("HEADER", "idValue", "param1Value", Param2OfSimpleGet.VALUE1);
         assertEquals(REFERENCE_DTO, response);
     }
 }

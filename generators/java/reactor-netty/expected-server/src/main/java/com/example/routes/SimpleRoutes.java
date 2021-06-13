@@ -23,7 +23,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     public abstract Mono<java.lang.String> simplePost(@Nonnull Mono<com.example.dto.Dto> requestBodyMono);
 
     @Nonnull
-    public abstract Mono<com.example.dto.Dto> simpleGet(@Nonnull java.lang.String id, @Nonnull java.lang.String param1, @Nullable com.example.dto.Param2OfSimpleGet param2);
+    public abstract Mono<com.example.dto.Dto> simpleGet(@Nullable java.lang.String xHeader, @Nonnull java.lang.String id, @Nonnull java.lang.String param1, @Nullable com.example.dto.Param2OfSimpleGet param2);
 
     @Override
     public final void accept(HttpServerRoutes httpServerRoutes) {
@@ -40,14 +40,15 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
             })
             .get(baseUrl + "/path2/{id}", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
-                String param0Str = request.param("id");
-                java.lang.String param0 = param0Str != null ? param0Str : null;
-                String param1Str = queryParams.get("param1");
+                String param0 = request.requestHeaders().get("X-header");
+                String param1Str = request.param("id");
                 java.lang.String param1 = param1Str != null ? param1Str : null;
-                String param2Str = queryParams.get("param2");
-                com.example.dto.Param2OfSimpleGet param2 = param2Str != null ? com.example.routes.Param2OfSimpleGetConverter.parseString(param2Str) : null;
+                String param2Str = queryParams.get("param1");
+                java.lang.String param2 = param2Str != null ? param2Str : null;
+                String param3Str = queryParams.get("param2");
+                com.example.dto.Param2OfSimpleGet param3 = param3Str != null ? com.example.routes.Param2OfSimpleGetConverter.parseString(param3Str) : null;
 
-                Mono<com.example.dto.Dto> responseMono = simpleGet(param0, param1, param2);
+                Mono<com.example.dto.Dto> responseMono = simpleGet(param0, param1, param2, param3);
                 return response
                         .status(200)
                         .header("Content-Type", "application/json")

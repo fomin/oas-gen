@@ -9,6 +9,7 @@ public interface SimpleOperations {
     );
 
     com.example.dto.Dto simpleGet(
+            @Nullable java.lang.String xHeader,
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
             @Nullable com.example.dto.Param2OfSimpleGet param2

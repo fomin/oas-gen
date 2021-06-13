@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public final class SpringMvcClient {
@@ -41,13 +42,17 @@ public final class SpringMvcClient {
             HttpMethod httpMethod,
             T requestBody,
             ValueWriter<T> requestValueWriter,
-            Function<JsonNode, R> parseFunction
+            Function<JsonNode, R> parseFunction,
+            Consumer<HttpHeaders> headersConsumer
     ) {
         ClientHttpRequest request;
         ClientHttpResponse response = null;
         try {
             request = requestFactory.createRequest(uri, httpMethod);
             HttpHeaders headers = request.getHeaders();
+            if (headersConsumer != null) {
+                headersConsumer.accept(headers);
+            }
             requestCallbacks.onRequest(request);
             if (requestBody != null) {
                 headers.setContentType(MediaType.APPLICATION_JSON);

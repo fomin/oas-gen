@@ -66,21 +66,25 @@ class ReactorNettyServerWriter(
                 else
                     ""
                 val parameterDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
-                    val javaType = javaParameter.javaVariable.type
-                    val schema = javaParameter.schemaParameter.schema()
-                    val converterWriter = converterRegistry[schema]
-                    val parameterStrExpression = when (val paramterIn = javaParameter.schemaParameter.parameterIn) {
-                        ParameterIn.PATH ->
-                            """request.param("${javaParameter.name}")"""
-                        ParameterIn.QUERY ->
-                            """queryParams.get("${javaParameter.name}")"""
-                        else -> error("unsupported parameter type $paramterIn")
-                    }
-                    val stringParseExpression = converterWriter.stringParseExpression("param${index}Str")
-                    """|String param${index}Str = $parameterStrExpression;
+                            if (javaParameter.schemaParameter.parameterIn != ParameterIn.HEADER) {
+                                val javaType = javaParameter.javaVariable.type
+                                val schema = javaParameter.schemaParameter.schema()
+                                val converterWriter = converterRegistry[schema]
+                                val parameterStrExpression = when (val paramterIn = javaParameter.schemaParameter.parameterIn) {
+                                    ParameterIn.PATH ->
+                                        """request.param("${javaParameter.name}")"""
+                                    ParameterIn.QUERY ->
+                                        """queryParams.get("${javaParameter.name}")"""
+                                    else -> error("unsupported parameter type $paramterIn")
+                                }
+                                val stringParseExpression = converterWriter.stringParseExpression("param${index}Str")
+                                """|String param${index}Str = $parameterStrExpression;
                        |$javaType param$index = param${index}Str != null ? $stringParseExpression : null;
                     """.trimMargin()
-                }
+                            } else {
+                                """String param$index = request.requestHeaders().get("${javaParameter.name}");"""
+                            }
+                        }
                 val requestMonoDeclaration = javaOperation.requestVariable?.let { requestVariable ->
                     "Mono<${requestVariable.type}> requestMono = byteBufConverter.parse(request.receive().aggregate(), jsonNode -> ${converterRegistry[requestVariable.schema].parseExpression("jsonNode")});"
                 } ?: ""

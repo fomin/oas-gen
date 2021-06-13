@@ -44,7 +44,7 @@ class SimpleClientTest implements ClientTest {
     @Test
     @Override
     public void testGet() {
-        Mono<Dto> response = simpleClient.simpleGet("idValue", "param1Value", Param2OfSimpleGet.VALUE1);
+        Mono<Dto> response = simpleClient.simpleGet("HEADER", "idValue", "param1Value", Param2OfSimpleGet.VALUE1);
         assertEquals(REFERENCE_DTO, response.block());
     }
 }

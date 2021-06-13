@@ -43,6 +43,7 @@ server.timeout = 100;
 test('should get dto', (done) => {
     simpleGet(
         'http://localhost:8080',
+        'HEADER',
         'idValue',
         'param1Value',
         Param2OfSimpleGet.Value1,

@@ -52,7 +52,7 @@ class RequestBody(override val fragment: Fragment, override val parent: TypedFra
 }
 
 enum class ParameterIn {
-    PATH, QUERY
+    PATH, QUERY, HEADER
 }
 
 class Parameter(override val fragment: Fragment, override val parent: TypedFragment?) : TypedFragment() {

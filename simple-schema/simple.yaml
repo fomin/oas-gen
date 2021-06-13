@@ -25,6 +25,10 @@ paths:
     get:
       operationId: simple get
       parameters:
+        - in: header
+          name: X-header
+          schema:
+            type: string
         - name: id
           in: path
           required: true

@@ -41,7 +41,9 @@ class SimpleClientWriter(
                     val bodySchema = requestEntry?.value?.schema()
                     val bodyArguments = if (bodySchema == null) emptyList()
                     else listOf("body: ${typeConverterRegistry[bodySchema].type()}")
-                    val queryString = operation.parameters().mapNotNull { parameter ->
+                    val queryString = operation.parameters()
+                            .filter { parameter -> parameter.parameterIn != ParameterIn.HEADER }
+                            .mapNotNull { parameter ->
                         val jsonConverter = typeConverterRegistry[parameter.schema()].jsonConverter
                         val valueExpression = toVariableName(parameter.name)
                         val toStrExression = jsonConverter?.toJson(valueExpression) ?: valueExpression
@@ -73,6 +75,14 @@ class SimpleClientWriter(
                         "undefined"
                     }
 
+                    val headersTransformation = operation.parameters().mapNotNull { parameter ->
+                        if (parameter.parameterIn == ParameterIn.HEADER) {
+                            """['${parameter.name}', ${toLowerCamelCase(parameter.name)}]"""
+                        } else {
+                            null
+                        }
+                    }.joinToString(", ")
+
                     val methodArguments = listOf(
                             "baseUrl: string"
                     ) + bodyArguments + parameterArguments + listOf(
@@ -93,6 +103,7 @@ class SimpleClientWriter(
                                |        $responseType,
                                |        $requestTransformation,
                                |        timeout,
+                               |        ${if (headersTransformation.isNotBlank()) """new Map([$headersTransformation])""" else "undefined"},
                                |        onLoadCallback,
                                |        onErrorCallback,
                                |        onTimeoutCallback,
@@ -100,7 +111,9 @@ class SimpleClientWriter(
                                |    )
                                |}
                                |""".trimMargin(),
-                            listOfNotNull(bodySchema, responseSchema) + operation.parameters().map { it.schema() }
+                            listOfNotNull(bodySchema, responseSchema) + operation.parameters()
+                                    .filter { parameter -> parameter.parameterIn != ParameterIn.HEADER }
+                                    .map { it.schema() }
                     )
                 }
             }

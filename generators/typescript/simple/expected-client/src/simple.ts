@@ -16,6 +16,7 @@ export function simplePost(
         "json",
         JSON.stringify(body),
         timeout,
+        undefined,
         onLoadCallback,
         onErrorCallback,
         onTimeoutCallback,
@@ -25,6 +26,7 @@ export function simplePost(
 
 export function simpleGet(
     baseUrl: string,
+    xHeader: string,
     id: string,
     param1: string,
     param2: Param2OfSimpleGet,
@@ -41,6 +43,7 @@ export function simpleGet(
         "json",
         undefined,
         timeout,
+        new Map([['X-header', xHeader]]),
         onLoadCallback,
         onErrorCallback,
         onTimeoutCallback,

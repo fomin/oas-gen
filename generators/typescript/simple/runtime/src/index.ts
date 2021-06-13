@@ -8,6 +8,7 @@ export class RestRequest<T> {
         responseType: XMLHttpRequestResponseType,
         body?: Blob | BufferSource | FormData | URLSearchParams | string,
         timeout?: number,
+        headers?: Map<string, string>,
         onLoadCallback?: (value: T) => void,
         onErrorCallback?: (reason: any) => void,
         onTimeoutCallback?: () => void,
@@ -17,6 +18,11 @@ export class RestRequest<T> {
         this.request.open(method, url)
         this.request.responseType = responseType
         if (timeout) this.request.timeout = timeout
+        if (headers) {
+            headers.forEach((value: string, key: string) => {
+                this.request.setRequestHeader(key, value)
+            })
+        }
 
         if (onLoadCallback) {
             this.request.onload = () => {

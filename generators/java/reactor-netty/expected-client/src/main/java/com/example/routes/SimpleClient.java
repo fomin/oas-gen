@@ -32,6 +32,7 @@ public class SimpleClient {
     ) {
 
         return httpClient
+
                 .post()
                 .uri(UrlEncoderUtils.encodeUrl("/path1"))
                 .send((httpClientRequest, nettyOutbound) -> {
@@ -45,11 +46,13 @@ public class SimpleClient {
 
     @Nonnull
     public Mono<com.example.dto.Dto> simpleGet(
+            @Nullable java.lang.String xHeader,
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
             @Nullable com.example.dto.Param2OfSimpleGet param2
     ) {
         return simpleGet$0(
+                xHeader,
                 id,
                 param1,
                 param2
@@ -59,14 +62,16 @@ public class SimpleClient {
     private Mono<com.example.dto.Dto> simpleGet$0(
             java.lang.String param0,
             java.lang.String param1,
-            com.example.dto.Param2OfSimpleGet param2
+            java.lang.String param2,
+            com.example.dto.Param2OfSimpleGet param3
     ) {
-        String param0Str = param0 != null ? param0 : null;
         String param1Str = param1 != null ? param1 : null;
-        String param2Str = param2 != null ? com.example.routes.Param2OfSimpleGetConverter.writeString(param2) : null;
+        String param2Str = param2 != null ? param2 : null;
+        String param3Str = param3 != null ? com.example.routes.Param2OfSimpleGetConverter.writeString(param3) : null;
         return httpClient
+                .headers(headers -> headers.add("X-header", param0 != null ? param0 : null))
                 .get()
-                .uri(UrlEncoderUtils.encodeUrl("/path2/" + UrlEncoderUtils.encode(param0Str), "param1", param1Str, "param2", param2Str))
+                .uri(UrlEncoderUtils.encodeUrl("/path2/" + UrlEncoderUtils.encode(param1Str), "param1", param2Str, "param2", param3Str))
 
                 .responseSingle((httpClientResponse, byteBufMono) ->
                         byteBufConverter.parse(byteBufMono, jsonNode -> com.example.routes.DtoConverter.parse(jsonNode))

@@ -55,6 +55,7 @@ class SimpleRoutesTest extends BaseServerTest {
 
                 @Override
                 public Dto simpleGet(
+                        @Nullable java.lang.String xHeader,
                         @Nonnull String id,
                         @Nonnull String param1,
                         @Nullable Param2OfSimpleGet param2

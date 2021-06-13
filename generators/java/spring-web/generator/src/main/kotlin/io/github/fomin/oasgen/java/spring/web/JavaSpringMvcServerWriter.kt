@@ -93,7 +93,8 @@ class JavaSpringMvcServerWriter(
                 } else {
                     ""
                 }
-                val operationArgs = (operation.parameters().mapIndexed { index, _ -> "param$index" }
+                val operationArgs = (operation.parameters()
+                        .mapIndexed { index, _ -> "param$index" }
                         + requestBody?.let { "requestBodyDto" }).filterNotNull().joinToString(",\n")
                 val writeResponseBodyBlock = if (responseSchema != null) {
                     """|response.setContentType("application/json");
@@ -112,26 +113,42 @@ class JavaSpringMvcServerWriter(
                 } else {
                     ""
                 }
+                val headerDefinitions = operation.parameters()
+                        .mapIndexedNotNull { index, parameter ->
+                            if (parameter.parameterIn == ParameterIn.HEADER) {
+                                """java.lang.String param0 = request.getHeader("${parameter.name}");"""
+                            } else {
+                                null
+                            }
+                        }
                 val urlVariablesDefinition =
                     if (operation.parameters().any { parameter -> parameter.parameterIn == ParameterIn.PATH }) {
                         "Map<String, String> uriVariables = pathMatchInfo$index.getUriVariables();"
                     } else {
                         ""
                     }
-                val parameterDefinitions = operation.parameters().mapIndexed { index, parameter ->
-                    val schema = parameter.schema()
-                    val parameterExpression = when (parameter.parameterIn) {
-                        ParameterIn.PATH -> """uriVariables.get("${parameter.name}")"""
-                        ParameterIn.QUERY -> """request.getParameter("${parameter.name}")"""
-                    }
-                    val converterWriter = converterRegistry[schema]
-                    """${converterWriter.valueType()} param$index = ${
-                        converterWriter.stringParseExpression(
-                            parameterExpression
-                        )
-                    };"""
+                val parameterDefinitions = operation.parameters()
+                        .mapIndexedNotNull { index, parameter ->
+                            if (parameter.parameterIn != ParameterIn.HEADER) {
+                                val schema = parameter.schema()
+                                val parameterExpression = when (parameter.parameterIn) {
+                                    ParameterIn.PATH -> """uriVariables.get("${parameter.name}")"""
+                                    ParameterIn.QUERY -> """request.getParameter("${parameter.name}")"""
+                                    else -> ""
+                                }
+                                val converterWriter = converterRegistry[schema]
+                                """${converterWriter.valueType()} param$index = ${
+                                    converterWriter.stringParseExpression(
+                                            parameterExpression
+                                    )
+                                };"""
+                            } else {
+                                null
+                            }
                 }
+
                 """|if ("${operation.operationType.name}".equals(request.getMethod())) {
+                   |    ${headerDefinitions.indentWithMargin(1)}
                    |    $urlVariablesDefinition
                    |    ${parameterDefinitions.indentWithMargin(1)}
                    |    ${extractBodyBlock.indentWithMargin(1)}
@@ -246,7 +263,8 @@ class JavaSpringMvcServerWriter(
                 } else {
                     "void"
                 }
-                val parameterArgs = operation.parameters().map { parameter ->
+                val parameterArgs = operation.parameters()
+                        .map { parameter ->
                     val nullAnnotation = when {
                         parameter.required -> "@Nonnull"
                         else -> "@Nullable"

@@ -52,6 +52,7 @@ public class SimpleHandlerAdapter implements MatchingHandlerAdapter {
             if ("POST".equals(request.getMethod())) {
 
 
+
                 com.example.dto.Dto requestBodyDto;
                 if ("application/json".equals(request.getContentType())) {
                     JsonNode jsonNode = objectMapper.readTree(request.getInputStream());
@@ -76,15 +77,17 @@ public class SimpleHandlerAdapter implements MatchingHandlerAdapter {
         PathPattern.PathMatchInfo pathMatchInfo1 = pathPattern1.matchAndExtract(pathContainer);
         if (pathMatchInfo1 != null) {
             if ("GET".equals(request.getMethod())) {
+                java.lang.String param0 = request.getHeader("X-header");
                 Map<String, String> uriVariables = pathMatchInfo1.getUriVariables();
-                java.lang.String param0 = uriVariables.get("id");
-                java.lang.String param1 = request.getParameter("param1");
-                com.example.dto.Param2OfSimpleGet param2 = com.example.routes.Param2OfSimpleGetConverter.parseString(request.getParameter("param2"));
+                java.lang.String param1 = uriVariables.get("id");
+                java.lang.String param2 = request.getParameter("param1");
+                com.example.dto.Param2OfSimpleGet param3 = com.example.routes.Param2OfSimpleGetConverter.parseString(request.getParameter("param2"));
 
                 com.example.dto.Dto responseBody = operations.simpleGet(
                         param0,
                         param1,
-                        param2
+                        param2,
+                        param3
                 );
                 response.setContentType("application/json");
                 JsonGenerator jsonGenerator = objectMapper.createGenerator(response.getOutputStream());
