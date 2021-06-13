@@ -41,17 +41,20 @@ public class SimpleClient {
                 HttpMethod.POST,
                 bodyArg,
                 (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value),
-                jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode)
+                jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode),
+                null
         );
     }
 
     @Nonnull
     public com.example.dto.Dto simpleGet(
+            @Nullable java.time.LocalDate xHeader,
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
             @Nullable com.example.dto.Param2OfSimpleGet param2
     ) {
         return simpleGet$0(
+                xHeader,
                 id,
                 param1,
                 param2
@@ -59,23 +62,29 @@ public class SimpleClient {
     }
 
     private com.example.dto.Dto simpleGet$0(
-            java.lang.String param0,
+            java.time.LocalDate param0,
             java.lang.String param1,
-            com.example.dto.Param2OfSimpleGet param2
+            java.lang.String param2,
+            com.example.dto.Param2OfSimpleGet param3
     ) {
         Map<String, Object> uriVariables = new HashMap<>();
-        uriVariables.put("id", param0 != null ? param0 : null);
+        uriVariables.put("id", param1 != null ? param1 : null);
         URI uri = UriComponentsBuilder
                 .fromUriString(baseUrl + "/path2/{id}")
-                .queryParam("param1", param1 != null ? param1 : null)
-                .queryParam("param2", param2 != null ? com.example.routes.Param2OfSimpleGetConverter.writeString(param2) : null)
+                .queryParam("param1", param2 != null ? param2 : null)
+                .queryParam("param2", param3 != null ? com.example.routes.Param2OfSimpleGetConverter.writeString(param3) : null)
                 .build(uriVariables);
         return springMvcClient.doRequest(
                 uri,
                 HttpMethod.GET,
                 null,
                 null,
-                jsonNode -> com.example.routes.DtoConverter.parse(jsonNode)
+                jsonNode -> com.example.routes.DtoConverter.parse(jsonNode),
+                headers -> {
+                    if (param0 != null) {
+                      headers.add("X-header", param0.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE));
+                    }
+                }
         );
     }
 

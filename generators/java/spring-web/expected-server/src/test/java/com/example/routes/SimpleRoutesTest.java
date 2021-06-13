@@ -55,12 +55,14 @@ class SimpleRoutesTest extends BaseServerTest {
 
                 @Override
                 public Dto simpleGet(
+                        @Nullable java.time.LocalDate xHeader,
                         @Nonnull String id,
                         @Nonnull String param1,
                         @Nullable Param2OfSimpleGet param2
                 ) {
                     assertEquals("idValue", id);
                     assertEquals("param1Value", param1);
+                    assertEquals(DATE, xHeader);
                     assertEquals(Param2OfSimpleGet.VALUE1, param2);
                     return REFERENCE_DTO;
                 }

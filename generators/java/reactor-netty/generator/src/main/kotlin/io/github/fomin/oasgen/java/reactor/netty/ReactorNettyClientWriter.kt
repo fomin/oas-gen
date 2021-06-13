@@ -93,10 +93,29 @@ class ReactorNettyClientWriter(
                     }
                 }.joinToString("")
 
-                val parameterStrDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
-                    val stringWriteExpression =
-                            converterRegistry[javaParameter.schemaParameter.schema()].stringWriteExpression("param$index")
-                    "String param${index}Str = param$index != null ? $stringWriteExpression : null;"
+                val parameterStrDeclarations = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
+                            if (javaParameter.schemaParameter.parameterIn != ParameterIn.HEADER) {
+                                val stringWriteExpression =
+                                        converterRegistry[javaParameter.schemaParameter.schema()].stringWriteExpression("param$index")
+                                "String param${index}Str = param$index != null ? $stringWriteExpression : null;"
+                            } else {
+                                null
+                            }
+                }
+
+                val headerArgs = javaOperation.parameters
+                        .mapIndexedNotNull { index, parameter ->
+                            if (parameter.schemaParameter.parameterIn == ParameterIn.HEADER) {
+                                val stringWriteExpression =
+                                        converterRegistry[parameter.schemaParameter.schema()].stringWriteExpression("param$index")
+                                """.add("${parameter.name}", param$index != null ? $stringWriteExpression : null)"""
+                            } else {
+                                null
+                            }
+                        }
+                val headerArgsBlock = when(headerArgs.isNotEmpty()) {
+                    true -> """.headers(headers -> headers${headerArgs.indentWithMargin(5)})""".trimMargin()
+                    false -> ""
                 }
 
                 """|@Nonnull
@@ -113,8 +132,9 @@ class ReactorNettyClientWriter(
                    |) {
                    |    ${parameterStrDeclarations.indentWithMargin(1)}
                    |    return httpClient
+                   |            $headerArgsBlock
                    |            .${javaOperation.operation.operationType.name.toLowerCase()}()
-                   |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate)}$queryParameterArgs))
+                   |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate, javaOperation.parameters)}$queryParameterArgs))
                    |            ${sendCall.indentWithMargin(3)}
                    |            ${responseCall.indentWithMargin(3)};
                    |}
@@ -155,19 +175,19 @@ class ReactorNettyClientWriter(
         return outputFiles
     }
 
-    private fun pathTemplateToUrl(pathTemplate: String): String {
+    private fun pathTemplateToUrl(pathTemplate: String, parameters: List<JavaParameter>): String {
+        val parametersMap = parameters.map { it.name to it.index }.toMap()
         val expressionParts = mutableListOf<String>()
         var openBraceIndex = -1
         var closeBraceIndex = -1
-        var parameterIndex = 0
         do {
             openBraceIndex = pathTemplate.indexOf('{', openBraceIndex + 1)
             if (openBraceIndex > 0) {
                 expressionParts.quoteAndAdd(pathTemplate.substring(closeBraceIndex + 1, openBraceIndex))
                 closeBraceIndex = pathTemplate.indexOf('}', closeBraceIndex + 1)
+                val paramName = pathTemplate.substring(openBraceIndex + 1, closeBraceIndex)
                 if (closeBraceIndex > 0) {
-                    expressionParts.add("UrlEncoderUtils.encode(param${parameterIndex}Str)")
-                    parameterIndex += 1
+                    expressionParts.add("UrlEncoderUtils.encode(param${parametersMap[paramName]}Str)")
                 } else {
                     expressionParts.quoteAndAdd(pathTemplate.substring(openBraceIndex + 1))
                 }

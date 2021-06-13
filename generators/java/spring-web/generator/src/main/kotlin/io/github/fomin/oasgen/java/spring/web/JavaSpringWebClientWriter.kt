@@ -94,7 +94,8 @@ class JavaSpringWebClientWriter(
                         val parameterType = converterRegistry[parameter.schema()].valueType()
                         """$nullAnnotation $parameterType ${toVariableName(parameter.name)}"""
                     }
-                    val parameterInternalArgDeclarations = operation.parameters().mapIndexed { index, parameter ->
+                    val parameterInternalArgDeclarations = operation.parameters()
+                                    .mapIndexed { index, parameter ->
                         val parameterType = converterRegistry[parameter.schema()].valueType()
                         """$parameterType param$index"""
                     }
@@ -108,15 +109,17 @@ class JavaSpringWebClientWriter(
                     val methodArgs = (parameterArgs + requestBodyArg)
                             .filterNotNull().joinToString(",\n")
 
-                    val pathParameterEntries = operation.parameters().mapIndexedNotNull { index, parameter ->
-                        val stringWriteExpression =
-                                converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
-                        if (parameter.parameterIn == ParameterIn.PATH) {
-                            "uriVariables.put(\"${parameter.name}\", param${index} != null ? $stringWriteExpression : null);"
-                        } else {
-                            null
-                        }
+                    val pathParameterEntries = operation.parameters()
+                            .mapIndexedNotNull { index, parameter ->
+                                if (ParameterIn.PATH == parameter.parameterIn) {
+                                    val stringWriteExpression =
+                                            converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
+                                    "uriVariables.put(\"${parameter.name}\", param${index} != null ? $stringWriteExpression : null);"
+                                } else {
+                                    null
+                                }
                     }
+
                     val uriVariablesBlock = if (pathParameterEntries.isEmpty()) {
                         "Map<String, Object> uriVariables = Collections.emptyMap();"
                     } else {
@@ -125,7 +128,29 @@ class JavaSpringWebClientWriter(
                         """.trimMargin()
                     }
 
-                    val queryParameterCalls = operation.parameters().mapIndexedNotNull { index, parameter ->
+                    val headerEntries = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        if (parameter.parameterIn == ParameterIn.HEADER) {
+                            val stringWriteExpression =
+                                    converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
+                            """|if (param${index} != null) {
+                               |  headers.add("${parameter.name}", $stringWriteExpression);
+                               |}
+                            """.trimMargin()
+                        } else {
+                            null
+                        }
+                    }
+
+                    val headerBlock = if (headerEntries.isNotEmpty()) {
+                        """|headers -> {
+                           |            ${headerEntries.indentWithMargin(3)}
+                           |        }""".trimMargin()
+                    } else {
+                        ""
+                    }
+
+                    val queryParameterCalls = operation.parameters()
+                            .mapIndexedNotNull { index, parameter ->
                         val stringWriteExpression =
                                 converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
                         if (parameter.parameterIn == ParameterIn.QUERY)
@@ -157,7 +182,10 @@ class JavaSpringWebClientWriter(
                                |            HttpMethod.${operation.operationType.name},
                                |            ${if (bodySchema != null) "bodyArg" else "null"},
                                |            ${if (bodySchema != null) "(jsonGenerator, value) -> ${converterRegistry[bodySchema].writeExpression("jsonGenerator", "value")}" else "null"},
-                               |            $responseParserArg
+                               |            $responseParserArg,
+                               |            ${if (headerBlock.isNotBlank()) 
+                                   """${headerBlock.indentWithMargin(1)}""" 
+                               else "null"}
                                |    );
                                |}
                                |""".trimMargin()

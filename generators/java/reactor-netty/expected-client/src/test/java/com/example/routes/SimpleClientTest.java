@@ -12,6 +12,8 @@ import reactor.core.publisher.Mono;
 import reactor.netty.DisposableServer;
 import reactor.netty.http.client.HttpClient;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SimpleClientTest implements ClientTest {
@@ -44,7 +46,7 @@ class SimpleClientTest implements ClientTest {
     @Test
     @Override
     public void testGet() {
-        Mono<Dto> response = simpleClient.simpleGet("idValue", "param1Value", Param2OfSimpleGet.VALUE1);
+        Mono<Dto> response = simpleClient.simpleGet(LocalDate.now(), "idValue", "param1Value", Param2OfSimpleGet.VALUE1);
         assertEquals(REFERENCE_DTO, response.block());
     }
 }

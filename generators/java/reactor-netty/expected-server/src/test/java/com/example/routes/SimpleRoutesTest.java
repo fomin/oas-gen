@@ -33,7 +33,7 @@ public class SimpleRoutesTest extends BaseServerTest {
 
             @Nonnull
             @Override
-            public Mono<Dto> simpleGet(@Nonnull String id, @Nonnull String param1, @Nullable Param2OfSimpleGet param2) {
+            public Mono<Dto> simpleGet(@Nullable java.time.LocalDate xHeader, @Nonnull String id, @Nonnull String param1, @Nullable Param2OfSimpleGet param2) {
                 return Mono.just(new Dto("value1"));
             }
         };
