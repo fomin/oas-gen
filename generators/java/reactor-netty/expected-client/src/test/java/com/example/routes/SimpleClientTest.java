@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SimpleClientTest implements ClientTest {
 
-    private static final int PORT = 8083;
+    private static final int PORT = 9083;
     public static final Dto REFERENCE_DTO = new Dto("value1");
 
     private static DisposableServer referenceServer;

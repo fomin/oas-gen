@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SimpleRoutesTest extends BaseServerTest {
 
-    private static final int PORT = 8081;
+    private static final int PORT = 9081;
     public static final Dto REFERENCE_DTO = new Dto("value1");
 
     public SimpleRoutesTest() {

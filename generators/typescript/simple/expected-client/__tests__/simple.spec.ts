@@ -36,13 +36,13 @@ let server = http.createServer((req, res) => {
             res.statusCode = 404
         }
     }
-).listen(8080, "127.0.0.1");
+).listen(9080, "127.0.0.1");
 
 server.timeout = 100;
 
 test('should get dto', (done) => {
     simpleGet(
-        'http://localhost:8080',
+        'http://localhost:9080',
         'idValue',
         'param1Value',
         Param2OfSimpleGet.Value1,
@@ -60,7 +60,7 @@ test('should get dto', (done) => {
 
 test('should post dto', (done) => {
     simplePost(
-        'http://localhost:8080',
+        'http://localhost:9080',
         referenceDto,
         1000,
         value => {
