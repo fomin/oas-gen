@@ -36,7 +36,7 @@ let server = http.createServer((req, res) => {
             res.statusCode = 404
         }
     }
-).listen(8080);
+).listen(8080, "127.0.0.1");
 
 server.timeout = 100;
 
