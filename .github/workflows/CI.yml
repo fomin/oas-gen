@@ -13,4 +13,4 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Run a one-line script
-        run: ./gradlew test
+        run: ./gradlew test --stacktrace
