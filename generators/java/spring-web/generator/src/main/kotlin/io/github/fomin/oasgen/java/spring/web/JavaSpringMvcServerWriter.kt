@@ -42,6 +42,7 @@ class JavaSpringMvcServerWriter(
             outputFiles.addAll(dtoFiles)
             outputFiles.add(handlerAdapter(openApiSchema, converterRegistry))
             outputFiles.add(operations(openApiSchema, converterRegistry))
+            outputFiles.add(configuration(openApiSchema))
         }
 
         return outputFiles
@@ -279,6 +280,56 @@ class JavaSpringMvcServerWriter(
                |
                |public interface ${getSimpleName(className)} {
                |    ${methods.indentWithMargin(1)}
+               |}
+               |
+            """.trimMargin()
+        return OutputFile(filePath, content, OutputFileType.ROUTE)
+    }
+
+    private fun configuration(openApiSchema: OpenApiSchema): OutputFile {
+        val className = toJavaClassName(routesPackage, openApiSchema, "configuration")
+        val operationsClassName = toJavaClassName(routesPackage, openApiSchema, "operations")
+        val handlerAdapterClassName = toJavaClassName(routesPackage, openApiSchema, "handler-adapter")
+        val filePath = getFilePath(className)
+        val operationSimpleName = getSimpleName(operationsClassName)
+        val (_, name) = TypeName.toTypeName(openApiSchema)
+        val content =
+            """|package ${getPackage(className)};
+               |
+               |import com.fasterxml.jackson.databind.ObjectMapper;
+               |import io.github.fomin.oasgen.DefaultHandlerAdapterMapping;
+               |import io.github.fomin.oasgen.MatchingHandlerAdapter;
+               |import org.springframework.beans.factory.annotation.Value;
+               |import org.springframework.context.annotation.Bean;
+               |import org.springframework.context.annotation.Configuration;
+               |import org.springframework.web.servlet.HandlerMapping;
+               |
+               |@Configuration
+               |public class ${getSimpleName(className)} {
+               |
+               |    private final String basePath;
+               |    private final $operationSimpleName ${toVariableName(operationSimpleName)};
+               |    private final ObjectMapper objectMapper;
+               |
+               |    public ${getSimpleName(className)}(
+               |            @Value("${'$'}{${operationsClassName}.basePath:}") String basePath,
+               |            $operationSimpleName ${toVariableName(operationSimpleName)},
+               |            ObjectMapper objectMapper
+               |    ) {
+               |        this.basePath = basePath;
+               |        this.simpleOperations = simpleOperations;
+               |        this.objectMapper = objectMapper;
+               |    }
+               |
+               |    @Bean
+               |    public HandlerMapping ${lowerFirst(name)}HandlerMapping() {
+               |        return new DefaultHandlerAdapterMapping(${lowerFirst(name)}HandlerAdapter());
+               |    }
+               |
+               |    @Bean
+               |    public MatchingHandlerAdapter ${lowerFirst(name)}HandlerAdapter() {
+               |        return new ${getSimpleName(handlerAdapterClassName)}(basePath, ${toVariableName(operationSimpleName)}, objectMapper);
+               |    }
                |}
                |
             """.trimMargin()

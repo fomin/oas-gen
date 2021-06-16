@@ -186,6 +186,10 @@ fun upperFirst(value: String): String {
     return value.replaceFirstChar { c -> c.uppercase() }
 }
 
+fun lowerFirst(value: String): String {
+    return value.replaceFirstChar { c -> c.lowercase() }
+}
+
 fun getFilePath(className: String): String {
     return "${className.replace('.', '/')}.java"
 }
