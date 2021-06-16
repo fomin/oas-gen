@@ -121,7 +121,7 @@ fun isUpperSnakeCase(part: String) =
     part.asSequence().all { it.isUpperCase() || isOtherSnakeCaseChar(it) }
 
 fun isLowerSnakeCase(part: String) =
-    part.asSequence().all { it.isUpperCase() || isOtherSnakeCaseChar(it) }
+    part.asSequence().all { it.isLowerCase() || isOtherSnakeCaseChar(it) }
 
 fun isOtherSnakeCaseChar(c: Char) = c.isDigit() || c == '_' || c == '$'
 
@@ -129,12 +129,17 @@ fun toUpperSnakeCase(vararg parts: String): String {
     val sb = StringBuilder()
     parts.forEachIndexed { index, part ->
         if (index > 0) sb.append("_")
+        else {
+            if (part.isNotEmpty() && !part.first().isLetter()) {
+                sb.append('$')
+            }
+        }
         when {
             isUpperSnakeCase(part) -> sb.append(part)
             isLowerSnakeCase(part) -> sb.append(part.toUpperCase())
             else -> part.forEach { char ->
                 when {
-                    char == '-' -> sb.append('_')
+                    char == '-' || char == ' ' -> sb.append('_')
                     char.isUpperCase() -> sb.append("_").append(char)
                     else -> sb.append(char.toUpperCase())
                 }

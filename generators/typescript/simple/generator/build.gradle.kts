@@ -1,7 +1,7 @@
 description = "oas-gen - typescript simple generator"
 
 plugins {
-    id("kotlin-publishing-conventions")
+    id("generator-conventions")
 }
 
 dependencies {

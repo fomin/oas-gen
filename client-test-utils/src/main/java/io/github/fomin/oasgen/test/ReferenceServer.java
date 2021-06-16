@@ -16,7 +16,7 @@ public class ReferenceServer {
     public static final String POST_RESPONSE_VALUE_STR = "postResponseValue";
 
     public static DisposableServer create(int port) {
-        HttpServer httpServer = HttpServer.create().port(port).port(port).route(httpServerRoutes ->
+        HttpServer httpServer = HttpServer.create().host("127.0.0.1").port(port).route(httpServerRoutes ->
                 httpServerRoutes
                         .post(BASE_PATH + "/path1", (request, response) -> {
                             Mono<String> requestMono = request.receive().aggregate().asString();

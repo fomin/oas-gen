@@ -14,7 +14,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public class SimpleRoutesTest extends BaseServerTest {
-    private static final int PORT = 8084;
+    private static final int PORT = 9084;
 
     private static DisposableServer disposableServer;
 
@@ -37,7 +37,7 @@ public class SimpleRoutesTest extends BaseServerTest {
                 return Mono.just(new Dto("value1"));
             }
         };
-        disposableServer = HttpServer.create().port(PORT).route(simpleRoutes).bindNow();
+        disposableServer = HttpServer.create().host("127.0.0.1").port(PORT).route(simpleRoutes).bindNow();
     }
 
     @AfterAll
