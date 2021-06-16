@@ -2,9 +2,6 @@ package com.example.routes;
 
 import com.example.dto.Dto;
 import com.example.dto.Param2OfSimpleGet;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.github.fomin.oasgen.DefaultHandlerAdapterMapping;
-import io.github.fomin.oasgen.MatchingHandlerAdapter;
 import io.github.fomin.oasgen.test.BaseServerTest;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -12,7 +9,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -33,16 +29,6 @@ class SimpleRoutesTest extends BaseServerTest {
     @SpringBootApplication
     @EnableWebMvc
     public static class TestApplication implements WebMvcConfigurer {
-
-        @Bean
-        public HandlerMapping defaultHandlerMapping() {
-            return new DefaultHandlerAdapterMapping(simpleHandlerAdapter());
-        }
-
-        @Bean
-        public MatchingHandlerAdapter simpleHandlerAdapter() {
-            return new SimpleHandlerAdapter(BaseServerTest.CONTEXT_PATH, simpleRoutesActions(), new ObjectMapper());
-        }
 
         @Bean
         public SimpleOperations simpleRoutesActions() {
