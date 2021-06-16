@@ -9,7 +9,7 @@ internal class SimpleClientWriterTest {
     fun `generator should create expected output`() {
         openApiTestCase(
                 SimpleClientWriter(emptyList()),
-                File("../../../../simple-schema"),
+                File("build/test-schemas/openapi"),
                 "simple.yaml",
                 File("../expected-client/src")
         )

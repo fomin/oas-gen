@@ -1,7 +1,7 @@
 description = "oas-gen - java spring-web generator"
 
 plugins {
-    id("kotlin-publishing-conventions")
+    id("generator-conventions")
 }
 
 dependencies {
