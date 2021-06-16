@@ -103,7 +103,7 @@ class ReactorNettyClientWriter(
                             }
                 }
 
-                val headerArgsBlock = javaOperation.parameters
+                val headerArgs = javaOperation.parameters
                         .mapIndexedNotNull { index, parameter ->
                             if (parameter.schemaParameter.parameterIn == ParameterIn.HEADER) {
                                 val stringWriteExpression =
@@ -113,6 +113,10 @@ class ReactorNettyClientWriter(
                                 null
                             }
                         }
+                val headerArgsBlock = when(headerArgs.isNotEmpty()) {
+                    true -> """|        .headers(headers -> headers${headerArgs.indentWithMargin(5)})""".trimMargin()
+                    false -> ""
+                }
 
                 """|@Nonnull
                    |public Mono<$responseType> ${javaOperation.methodName}(
@@ -128,9 +132,7 @@ class ReactorNettyClientWriter(
                    |) {
                    |    ${parameterStrDeclarations.indentWithMargin(1)}
                    |    return httpClient
-                   ${if(headerArgsBlock.isNotEmpty()) 
-                       """|            .headers(headers -> headers${headerArgsBlock.indentWithMargin(5)})""" 
-                   else ""}
+                   |    $headerArgsBlock
                    |            .${javaOperation.operation.operationType.name.toLowerCase()}()
                    |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate, javaOperation.parameters)}$queryParameterArgs))
                    |            ${sendCall.indentWithMargin(3)}

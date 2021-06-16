@@ -12,7 +12,7 @@ export function simplePost(
     return new RestRequest<string>(
         `${baseUrl}/path1`,
         "POST",
-        value => value,
+        (value: any) => value,
         "json",
         JSON.stringify(body),
         timeout,
@@ -39,7 +39,7 @@ export function simpleGet(
     return new RestRequest<Dto>(
         `${baseUrl}/path2/${id}?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
         "GET",
-        value => value,
+        (value: any) => value,
         "json",
         undefined,
         timeout,

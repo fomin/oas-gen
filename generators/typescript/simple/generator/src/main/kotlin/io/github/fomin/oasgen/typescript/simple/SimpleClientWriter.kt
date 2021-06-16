@@ -55,7 +55,7 @@ class SimpleClientWriter(
                     val url = "${pathTemplateToUrl(pathTemplate)}${if (queryString.isNotEmpty()) "?$queryString" else ""}"
                     val responseTransformation = if (responseSchema != null) {
                         val jsonConverter = typeConverterRegistry[responseSchema].jsonConverter
-                        "value => " + (jsonConverter?.fromJson("value") ?: "value")
+                        "(value: any) => " + (jsonConverter?.fromJson("value") ?: "value")
                     } else {
                         "undefined"
                     }
