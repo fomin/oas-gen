@@ -34,7 +34,8 @@ class SimpleClientWriter(
                     else typeConverterRegistry[responseSchema].type()
 
                     val functionName = toLowerCamelCase(operation.operationId)
-                    val parameterArguments = operation.parameters().map { parameter ->
+                    //TODO: Add processing of HEADER
+                    val parameterArguments = operation.parameters().filter { parameter -> parameter.parameterIn != ParameterIn.HEADER }.mapNotNull { parameter ->
                         "${toLowerCamelCase(parameter.name)}: ${typeConverterRegistry[parameter.schema()].type()}"
                     }
                     val requestEntry = operation.requestBody()?.content()?.entries?.single()
@@ -55,7 +56,7 @@ class SimpleClientWriter(
                     val url = "${pathTemplateToUrl(pathTemplate)}${if (queryString.isNotEmpty()) "?$queryString" else ""}"
                     val responseTransformation = if (responseSchema != null) {
                         val jsonConverter = typeConverterRegistry[responseSchema].jsonConverter
-                        "(value: any) => " + (jsonConverter?.fromJson("value") ?: "value")
+                        "value => " + (jsonConverter?.fromJson("value") ?: "value")
                     } else {
                         "undefined"
                     }
@@ -74,14 +75,6 @@ class SimpleClientWriter(
                     } else {
                         "undefined"
                     }
-
-                    val headersTransformation = operation.parameters().mapNotNull { parameter ->
-                        if (parameter.parameterIn == ParameterIn.HEADER) {
-                            """['${parameter.name}', ${toLowerCamelCase(parameter.name)}]"""
-                        } else {
-                            null
-                        }
-                    }.joinToString(", ")
 
                     val methodArguments = listOf(
                             "baseUrl: string"
@@ -103,7 +96,6 @@ class SimpleClientWriter(
                                |        $responseType,
                                |        $requestTransformation,
                                |        timeout,
-                               |        ${if (headersTransformation.isNotBlank()) """new Map([$headersTransformation])""" else "undefined"},
                                |        onLoadCallback,
                                |        onErrorCallback,
                                |        onTimeoutCallback,
@@ -111,9 +103,7 @@ class SimpleClientWriter(
                                |    )
                                |}
                                |""".trimMargin(),
-                            listOfNotNull(bodySchema, responseSchema) + operation.parameters()
-                                    .filter { parameter -> parameter.parameterIn != ParameterIn.HEADER }
-                                    .map { it.schema() }
+                            listOfNotNull(bodySchema, responseSchema) + operation.parameters().map { it.schema() }
                     )
                 }
             }

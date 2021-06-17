@@ -12,11 +12,10 @@ export function simplePost(
     return new RestRequest<string>(
         `${baseUrl}/path1`,
         "POST",
-        (value: any) => value,
+        value => value,
         "json",
         JSON.stringify(body),
         timeout,
-        undefined,
         onLoadCallback,
         onErrorCallback,
         onTimeoutCallback,
@@ -26,7 +25,6 @@ export function simplePost(
 
 export function simpleGet(
     baseUrl: string,
-    xHeader: string,
     id: string,
     param1: string,
     param2: Param2OfSimpleGet,
@@ -39,11 +37,10 @@ export function simpleGet(
     return new RestRequest<Dto>(
         `${baseUrl}/path2/${id}?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
         "GET",
-        (value: any) => value,
+        value => value,
         "json",
         undefined,
         timeout,
-        new Map([['X-header', xHeader]]),
         onLoadCallback,
         onErrorCallback,
         onTimeoutCallback,
