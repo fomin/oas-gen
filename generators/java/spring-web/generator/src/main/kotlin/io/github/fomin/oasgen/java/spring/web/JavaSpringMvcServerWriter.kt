@@ -317,7 +317,7 @@ class JavaSpringMvcServerWriter(
                |            ObjectMapper objectMapper
                |    ) {
                |        this.basePath = basePath;
-               |        this.simpleOperations = simpleOperations;
+               |        this.${toVariableName(operationSimpleName)} = ${toVariableName(operationSimpleName)};
                |        this.objectMapper = objectMapper;
                |    }
                |
