@@ -1,9 +1,10 @@
 package io.github.fomin.oasgen;
 
+import org.springframework.core.Ordered;
 import org.springframework.web.servlet.HandlerExecutionChain;
 import org.springframework.web.servlet.HandlerMapping;
 
-public class DefaultHandlerAdapterMapping implements HandlerMapping {
+public class DefaultHandlerAdapterMapping implements HandlerMapping, Ordered {
 
     private final MatchingHandlerAdapter handlerAdapter;
 
@@ -20,4 +21,8 @@ public class DefaultHandlerAdapterMapping implements HandlerMapping {
         }
     }
 
+    @Override
+    public int getOrder() {
+        return 0;
+    }
 }
