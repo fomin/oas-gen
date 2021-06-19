@@ -14,7 +14,7 @@ class IntegerConverterMatcher : ConverterMatcher {
             override val jsonSchema = jsonSchema
             override fun valueType() = "java.math.BigInteger"
             override fun parseExpression(valueExpression: String) =
-                "io.github.fomin.oasgen.IntegerConverter.parse()"
+                "io.github.fomin.oasgen.IntegerConverter.parse($valueExpression)"
             override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
                 "io.github.fomin.oasgen.IntegerConverter.write($jsonGeneratorName, $valueExpression)"
             override fun stringParseExpression(valueExpression: String) = "new java.math.BigInteger($valueExpression)"
