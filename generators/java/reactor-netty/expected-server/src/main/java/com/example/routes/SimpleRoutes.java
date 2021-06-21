@@ -23,7 +23,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     public abstract Mono<java.lang.String> simplePost(@Nonnull Mono<com.example.dto.Dto> requestBodyMono);
 
     @Nonnull
-    public abstract Mono<com.example.dto.Dto> simpleGet(@Nonnull java.lang.String id, @Nonnull java.lang.String param1, @Nullable com.example.dto.Param2OfSimpleGet param2);
+    public abstract Mono<com.example.dto.Dto> simpleGet(@Nonnull java.lang.String id, @Nonnull java.lang.String param1, @Nullable com.example.dto.Param2OfSimpleGet param2, @Nullable java.time.LocalDate param3);
 
     @Override
     public final void accept(HttpServerRoutes httpServerRoutes) {
@@ -46,8 +46,10 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 java.lang.String param1 = param1Str != null ? param1Str : null;
                 String param2Str = queryParams.get("param2");
                 com.example.dto.Param2OfSimpleGet param2 = param2Str != null ? com.example.routes.Param2OfSimpleGetConverter.parseString(param2Str) : null;
+                String param3Str = request.requestHeaders().get("param3");
+                java.time.LocalDate param3 = param3Str != null ? java.time.LocalDate.parse(param3Str) : null;
 
-                Mono<com.example.dto.Dto> responseMono = simpleGet(param0, param1, param2);
+                Mono<com.example.dto.Dto> responseMono = simpleGet(param0, param1, param2, param3);
                 return response
                         .status(200)
                         .header("Content-Type", "application/json")

@@ -110,7 +110,7 @@ class JavaSpringWebClientWriter(
 
                     val pathParameterEntries = operation.parameters().mapIndexedNotNull { index, parameter ->
                         val stringWriteExpression =
-                                converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
+                            converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
                         if (parameter.parameterIn == ParameterIn.PATH) {
                             "uriVariables.put(\"${parameter.name}\", param${index} != null ? $stringWriteExpression : null);"
                         } else {
@@ -123,6 +123,19 @@ class JavaSpringWebClientWriter(
                         """|Map<String, Object> uriVariables = new HashMap<>();
                            |${pathParameterEntries.indentWithMargin(0)}
                         """.trimMargin()
+                    }
+
+                    val headerEntries = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        if (parameter.parameterIn == ParameterIn.HEADER) {
+                            val stringWriteExpression =
+                                    converterRegistry[parameter.schema()].stringWriteExpression("param${index}")
+                            """|if (param${index} != null) {
+                               |    headers.set("${parameter.name}", $stringWriteExpression);
+                               |}
+                            """.trimMargin()
+                        } else {
+                            null
+                        }
                     }
 
                     val queryParameterCalls = operation.parameters().mapIndexedNotNull { index, parameter ->
@@ -157,7 +170,10 @@ class JavaSpringWebClientWriter(
                                |            HttpMethod.${operation.operationType.name},
                                |            ${if (bodySchema != null) "bodyArg" else "null"},
                                |            ${if (bodySchema != null) "(jsonGenerator, value) -> ${converterRegistry[bodySchema].writeExpression("jsonGenerator", "value")}" else "null"},
-                               |            $responseParserArg
+                               |            $responseParserArg,
+                               |            headers -> {
+                               |                ${headerEntries.indentWithMargin(4)}
+                               |            }
                                |    );
                                |}
                                |""".trimMargin()

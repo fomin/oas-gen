@@ -32,6 +32,7 @@ public class SimpleClient {
     ) {
 
         return httpClient
+
                 .post()
                 .uri(UrlEncoderUtils.encodeUrl("/path1"))
                 .send((httpClientRequest, nettyOutbound) -> {
@@ -47,24 +48,33 @@ public class SimpleClient {
     public Mono<com.example.dto.Dto> simpleGet(
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
-            @Nullable com.example.dto.Param2OfSimpleGet param2
+            @Nullable com.example.dto.Param2OfSimpleGet param2,
+            @Nullable java.time.LocalDate param3
     ) {
         return simpleGet$0(
                 id,
                 param1,
-                param2
+                param2,
+                param3
         );
     }
 
     private Mono<com.example.dto.Dto> simpleGet$0(
             java.lang.String param0,
             java.lang.String param1,
-            com.example.dto.Param2OfSimpleGet param2
+            com.example.dto.Param2OfSimpleGet param2,
+            java.time.LocalDate param3
     ) {
         String param0Str = param0 != null ? param0 : null;
         String param1Str = param1 != null ? param1 : null;
         String param2Str = param2 != null ? com.example.routes.Param2OfSimpleGetConverter.writeString(param2) : null;
+        String param3Str = param3 != null ? param3.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE) : null;
         return httpClient
+                .headers(headers -> {
+                    if (param3Str != null) {
+                        headers.set("param3", param3Str);
+                    }
+                })
                 .get()
                 .uri(UrlEncoderUtils.encodeUrl("/path2/" + UrlEncoderUtils.encode(param0Str), "param1", param1Str, "param2", param2Str))
 

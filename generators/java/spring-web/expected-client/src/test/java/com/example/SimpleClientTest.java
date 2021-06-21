@@ -19,6 +19,8 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import reactor.netty.DisposableServer;
 
+import java.time.LocalDate;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SimpleClientTest implements ClientTest {
@@ -74,7 +76,7 @@ class SimpleClientTest implements ClientTest {
     @Override
     @Test
     public void testGet() {
-        Dto response = simpleClient.simpleGet("idValue", "param1Value", Param2OfSimpleGet.VALUE1);
+        Dto response = simpleClient.simpleGet("idValue", "param1Value", Param2OfSimpleGet.VALUE1, LocalDate.parse("2021-06-01"));
         assertEquals(REFERENCE_DTO, response);
     }
 }

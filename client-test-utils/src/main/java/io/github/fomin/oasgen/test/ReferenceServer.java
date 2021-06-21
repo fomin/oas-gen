@@ -30,6 +30,7 @@ public class ReferenceServer {
                         })
                         .get(BASE_PATH + "/path2/{id}", (request, response) -> {
                             assertEquals("idValue", request.param("id"));
+                            assertEquals("2021-06-01", request.requestHeaders().get("param3"));
                             Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
                             assertEquals("param1Value", queryParams.get("param1"));
                             assertEquals("value1", queryParams.get("param2"));

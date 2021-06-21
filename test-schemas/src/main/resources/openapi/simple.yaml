@@ -45,6 +45,11 @@ paths:
             enum:
               - value1
               - value2
+        - in: header
+          name: param3
+          schema:
+            type: string
+            format: date
       responses:
         '200':
           description: description

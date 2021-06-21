@@ -99,6 +99,25 @@ class ReactorNettyClientWriter(
                     "String param${index}Str = param$index != null ? $stringWriteExpression : null;"
                 }
 
+                val headerCallList = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
+                    if (javaParameter.schemaParameter.parameterIn == ParameterIn.HEADER)
+                        """|if (param${index}Str != null) {
+                           |    headers.set("${javaParameter.name}", param${index}Str);
+                           |}
+                        """.trimMargin()
+                    else {
+                        null
+                    }
+                }
+                val headersCall = if (headerCallList.isNotEmpty()) {
+                    """|.headers(headers -> {
+                       |    ${headerCallList.indentWithMargin(1)}
+                       |})
+                    """.trimMargin()
+                } else {
+                    ""
+                }
+
                 """|@Nonnull
                    |public Mono<$responseType> ${javaOperation.methodName}(
                    |        ${methodArgDeclarations.indentWithMargin(2)}
@@ -113,8 +132,9 @@ class ReactorNettyClientWriter(
                    |) {
                    |    ${parameterStrDeclarations.indentWithMargin(1)}
                    |    return httpClient
+                   |            ${headersCall.indentWithMargin(3)}
                    |            .${javaOperation.operation.operationType.name.toLowerCase()}()
-                   |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate)}$queryParameterArgs))
+                   |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate, javaOperation.parameters)}$queryParameterArgs))
                    |            ${sendCall.indentWithMargin(3)}
                    |            ${responseCall.indentWithMargin(3)};
                    |}
@@ -155,19 +175,19 @@ class ReactorNettyClientWriter(
         return outputFiles
     }
 
-    private fun pathTemplateToUrl(pathTemplate: String): String {
+    private fun pathTemplateToUrl(pathTemplate: String, parameters: List<JavaParameter>): String {
+        val parametersMap = parameters.map { it.name to it.index }.toMap()
         val expressionParts = mutableListOf<String>()
         var openBraceIndex = -1
         var closeBraceIndex = -1
-        var parameterIndex = 0
         do {
             openBraceIndex = pathTemplate.indexOf('{', openBraceIndex + 1)
             if (openBraceIndex > 0) {
                 expressionParts.quoteAndAdd(pathTemplate.substring(closeBraceIndex + 1, openBraceIndex))
                 closeBraceIndex = pathTemplate.indexOf('}', closeBraceIndex + 1)
+                val paramName = pathTemplate.substring(openBraceIndex + 1, closeBraceIndex)
                 if (closeBraceIndex > 0) {
-                    expressionParts.add("UrlEncoderUtils.encode(param${parameterIndex}Str)")
-                    parameterIndex += 1
+                    expressionParts.add("UrlEncoderUtils.encode(param${parametersMap[paramName]}Str)")
                 } else {
                     expressionParts.quoteAndAdd(pathTemplate.substring(openBraceIndex + 1))
                 }

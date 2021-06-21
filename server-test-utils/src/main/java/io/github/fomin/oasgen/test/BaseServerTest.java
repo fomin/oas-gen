@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
+import java.time.LocalDate;
+
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -38,6 +40,7 @@ public abstract class BaseServerTest {
     @Test
     public void testGet() {
         String body = httpClient
+                .headers(headers -> headers.add("param3", LocalDate.parse("2021-06-01")))
                 .get()
                 .uri("/path2/idValue?param1=param1Value&param2=value1")
                 .responseSingle((httpClientResponse, byteBufMono) -> {

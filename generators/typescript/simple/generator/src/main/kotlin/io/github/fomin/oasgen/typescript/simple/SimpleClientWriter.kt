@@ -34,14 +34,19 @@ class SimpleClientWriter(
                     else typeConverterRegistry[responseSchema].type()
 
                     val functionName = toLowerCamelCase(operation.operationId)
-                    val parameterArguments = operation.parameters().map { parameter ->
+                    //TODO: Add processing of HEADER
+                    val parameterArguments = operation.parameters().filter { parameter ->
+                        parameter.parameterIn != ParameterIn.HEADER
+                    }.map { parameter ->
                         "${toLowerCamelCase(parameter.name)}: ${typeConverterRegistry[parameter.schema()].type()}"
                     }
                     val requestEntry = operation.requestBody()?.content()?.entries?.single()
                     val bodySchema = requestEntry?.value?.schema()
                     val bodyArguments = if (bodySchema == null) emptyList()
                     else listOf("body: ${typeConverterRegistry[bodySchema].type()}")
-                    val queryString = operation.parameters().mapNotNull { parameter ->
+                    val queryString = operation.parameters()
+                            .filter { parameter -> parameter.parameterIn != ParameterIn.HEADER }
+                            .mapNotNull { parameter ->
                         val jsonConverter = typeConverterRegistry[parameter.schema()].jsonConverter
                         val valueExpression = toVariableName(parameter.name)
                         val toStrExression = jsonConverter?.toJson(valueExpression) ?: valueExpression
@@ -100,7 +105,7 @@ class SimpleClientWriter(
                                |    )
                                |}
                                |""".trimMargin(),
-                            listOfNotNull(bodySchema, responseSchema) + operation.parameters().map { it.schema() }
+                            listOfNotNull(bodySchema, responseSchema) + operation.parameters().filter { it.parameterIn != ParameterIn.HEADER }.map { it.schema() }
                     )
                 }
             }

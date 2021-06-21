@@ -2,7 +2,9 @@ package io.github.fomin.oasgen.java.reactor.netty
 
 import io.github.fomin.oasgen.*
 import io.github.fomin.oasgen.java.*
-import io.github.fomin.oasgen.java.dto.jackson.wstatic.*
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterMatcherProvider
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterRegistry
+import io.github.fomin.oasgen.java.dto.jackson.wstatic.JavaDtoWriter
 import java.util.*
 
 class ReactorNettyServerWriter(
@@ -74,6 +76,8 @@ class ReactorNettyServerWriter(
                             """request.param("${javaParameter.name}")"""
                         ParameterIn.QUERY ->
                             """queryParams.get("${javaParameter.name}")"""
+                        ParameterIn.HEADER ->
+                            """request.requestHeaders().get("${javaParameter.name}")"""
                         else -> error("unsupported parameter type $paramterIn")
                     }
                     val stringParseExpression = converterWriter.stringParseExpression("param${index}Str")

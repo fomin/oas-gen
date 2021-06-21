@@ -124,6 +124,7 @@ class JavaSpringMvcServerWriter(
                     val parameterExpression = when (parameter.parameterIn) {
                         ParameterIn.PATH -> """uriVariables.get("${parameter.name}")"""
                         ParameterIn.QUERY -> """request.getParameter("${parameter.name}")"""
+                        ParameterIn.HEADER -> """request.getHeader("${parameter.name}")"""
                     }
                     val converterWriter = converterRegistry[schema]
                     """${converterWriter.valueType()} param$index = ${

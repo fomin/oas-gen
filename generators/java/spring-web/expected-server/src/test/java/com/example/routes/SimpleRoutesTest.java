@@ -14,6 +14,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -43,11 +44,13 @@ class SimpleRoutesTest extends BaseServerTest {
                 public Dto simpleGet(
                         @Nonnull String id,
                         @Nonnull String param1,
-                        @Nullable Param2OfSimpleGet param2
+                        @Nullable Param2OfSimpleGet param2,
+                        @Nullable java.time.LocalDate param3
                 ) {
                     assertEquals("idValue", id);
                     assertEquals("param1Value", param1);
                     assertEquals(Param2OfSimpleGet.VALUE1, param2);
+                    assertEquals(LocalDate.parse("2021-06-01"), param3);
                     return REFERENCE_DTO;
                 }
             };

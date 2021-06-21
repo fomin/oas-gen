@@ -41,7 +41,10 @@ public class SimpleClient {
                 HttpMethod.POST,
                 bodyArg,
                 (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value),
-                jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode)
+                jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode),
+                headers -> {
+
+                }
         );
     }
 
@@ -49,19 +52,22 @@ public class SimpleClient {
     public com.example.dto.Dto simpleGet(
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
-            @Nullable com.example.dto.Param2OfSimpleGet param2
+            @Nullable com.example.dto.Param2OfSimpleGet param2,
+            @Nullable java.time.LocalDate param3
     ) {
         return simpleGet$0(
                 id,
                 param1,
-                param2
+                param2,
+                param3
         );
     }
 
     private com.example.dto.Dto simpleGet$0(
             java.lang.String param0,
             java.lang.String param1,
-            com.example.dto.Param2OfSimpleGet param2
+            com.example.dto.Param2OfSimpleGet param2,
+            java.time.LocalDate param3
     ) {
         Map<String, Object> uriVariables = new HashMap<>();
         uriVariables.put("id", param0 != null ? param0 : null);
@@ -75,7 +81,12 @@ public class SimpleClient {
                 HttpMethod.GET,
                 null,
                 null,
-                jsonNode -> com.example.routes.DtoConverter.parse(jsonNode)
+                jsonNode -> com.example.routes.DtoConverter.parse(jsonNode),
+                headers -> {
+                    if (param3 != null) {
+                        headers.set("param3", param3.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE));
+                    }
+                }
         );
     }
 
