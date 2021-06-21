@@ -66,4 +66,14 @@ internal class TypeNameKtTest {
     fun `upper camel case from lower snake case`() {
         assertEquals("Part1Part2Part3", toUpperCamelCase("part1_part2_part3"))
     }
+
+    @Test
+    fun `upper camel case starting with digit`() {
+        assertEquals("$1Part", toUpperCamelCase("1_PART"))
+    }
+
+    @Test
+    fun `upper camel case with spaces`() {
+        assertEquals("Part1Part2", toUpperCamelCase("part1 part2"))
+    }
 }

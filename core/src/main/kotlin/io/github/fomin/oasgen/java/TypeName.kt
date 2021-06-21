@@ -158,6 +158,11 @@ fun toCamelCase(firstUpper: Boolean, vararg parts: String): String {
     var nextInUpper = firstUpper
     parts.forEachIndexed { partIndex, part ->
         if (partIndex > 0) nextInUpper = true
+        else {
+            if (part.isNotEmpty() && !part.first().isLetter()) {
+                sb.append('$')
+            }
+        }
         val preparedPart = when {
             isUpperSnakeCase(part) -> part.toLowerCase()
             else -> part
