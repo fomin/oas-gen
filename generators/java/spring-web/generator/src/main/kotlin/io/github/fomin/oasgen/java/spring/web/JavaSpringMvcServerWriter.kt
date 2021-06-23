@@ -68,11 +68,13 @@ class JavaSpringMvcServerWriter(
                     val requestBodySchema = mediaTypeObject.schema()
                     val converterWriter = converterRegistry[requestBodySchema]
                     """|${converterWriter.valueType()} requestBodyDto;
-                       |if ("application/json".equals(request.getContentType())) {
+                       |String contentType = request.getContentType();
+                       |MediaType mediaType = MediaType.parseMediaType(contentType);
+                       |if (mediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
                        |    JsonNode jsonNode = objectMapper.readTree(request.getInputStream());
                        |    requestBodyDto = ${converterWriter.parseExpression("jsonNode")};
                        |} else {
-                       |    throw new UnsupportedOperationException(request.getContentType());
+                       |    throw new UnsupportedOperationException(contentType);
                        |}
                     """.trimMargin()
                 } else {
@@ -163,6 +165,7 @@ class JavaSpringMvcServerWriter(
                |import java.util.Map;
                |import javax.servlet.http.HttpServletRequest;
                |import javax.servlet.http.HttpServletResponse;
+               |import org.springframework.http.MediaType;
                |import org.springframework.http.server.PathContainer;
                |import org.springframework.http.server.RequestPath;
                |import org.springframework.lang.NonNull;
