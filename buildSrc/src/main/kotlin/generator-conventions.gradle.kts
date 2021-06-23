@@ -1,25 +1,20 @@
 import org.gradle.kotlin.dsl.*
-import org.gradle.kotlin.dsl.support.unzipTo
 
 plugins {
     id("kotlin-publishing-conventions")
 }
 
-val testSchemas = configurations.create("testSchemas")
-
-dependencies {
-    testSchemas(project(":test-schemas"))
-}
-
-val unzipTestSchemas by tasks.registering {
-    dependsOn(":test-schemas:jar")
-    val outputDir = "$buildDir/test-schemas"
-    outputs.dir(outputDir)
+val copyTestSchemas by tasks.registering {
     doLast {
-        unzipTo(file(outputDir), testSchemas.singleFile)
+        val outputDir = file("$buildDir/test-schemas")
+        if (outputDir.exists()) outputDir.deleteRecursively()
+        copy {
+            from("$rootDir/test-schemas/src/main/resources")
+            into(outputDir)
+        }
     }
 }
 
 tasks.test {
-    dependsOn(unzipTestSchemas)
+    dependsOn(copyTestSchemas)
 }
