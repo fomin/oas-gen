@@ -37,7 +37,12 @@ public class ReferenceServer {
                             return response
                                     .header("Content-Type", "application/json")
                                     .sendString(Mono.just(DTO_JSON));
-                        }));
+                        })
+                        .post(BASE_PATH + "/path3", (request, response) -> {
+                            assertTrue(request.uri().endsWith("?param1"));
+                            return response.send();
+                        })
+        );
         return httpServer.bindNow();
     }
 

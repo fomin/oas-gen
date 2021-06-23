@@ -20,6 +20,7 @@ import org.springframework.web.util.pattern.PathPatternParser;
 public class SimpleHandlerAdapter implements MatchingHandlerAdapter {
     private static final PathPattern pathPattern0 = PathPatternParser.defaultInstance.parse("/path1");
     private static final PathPattern pathPattern1 = PathPatternParser.defaultInstance.parse("/path2/{id}");
+    private static final PathPattern pathPattern2 = PathPatternParser.defaultInstance.parse("/path3");
 
     private final String baseUrl;
     private final com.example.routes.SimpleOperations operations;
@@ -77,10 +78,14 @@ public class SimpleHandlerAdapter implements MatchingHandlerAdapter {
         if (pathMatchInfo1 != null) {
             if ("GET".equals(request.getMethod())) {
                 Map<String, String> uriVariables = pathMatchInfo1.getUriVariables();
-                java.lang.String param0 = uriVariables.get("id");
-                java.lang.String param1 = request.getParameter("param1");
-                com.example.dto.Param2OfSimpleGet param2 = com.example.routes.Param2OfSimpleGetConverter.parseString(request.getParameter("param2"));
-                java.time.LocalDate param3 = java.time.LocalDate.parse(request.getHeader("param3"));
+                String param0Str = uriVariables.get("id");
+                java.lang.String param0 = param0Str != null ? param0Str : null;
+                String param1Str = request.getParameter("param1");
+                java.lang.String param1 = param1Str != null ? param1Str : null;
+                String param2Str = request.getParameter("param2");
+                com.example.dto.Param2OfSimpleGet param2 = param2Str != null ? com.example.routes.Param2OfSimpleGetConverter.parseString(param2Str) : null;
+                String param3Str = request.getHeader("param3");
+                java.time.LocalDate param3 = param3Str != null ? java.time.LocalDate.parse(param3Str) : null;
 
                 com.example.dto.Dto responseBody = operations.simpleGet(
                         param0,
@@ -95,6 +100,21 @@ public class SimpleHandlerAdapter implements MatchingHandlerAdapter {
                 if (!validationErrors.isEmpty()) {
                     throw new ValidationException(validationErrors);
                 }
+                response.setStatus(200);
+                return null;
+            }
+        }
+        PathPattern.PathMatchInfo pathMatchInfo2 = pathPattern2.matchAndExtract(pathContainer);
+        if (pathMatchInfo2 != null) {
+            if ("POST".equals(request.getMethod())) {
+
+                String param0Str = request.getParameter("param1");
+                java.time.LocalDate param0 = param0Str != null ? java.time.LocalDate.parse(param0Str) : null;
+
+                operations.testNullableParameter(
+                        param0
+                );
+
                 response.setStatus(200);
                 return null;
             }
@@ -118,6 +138,7 @@ public class SimpleHandlerAdapter implements MatchingHandlerAdapter {
         }
         PathContainer pathContainer = RequestPath.parse(request.getServletPath(), baseUrl).pathWithinApplication();
         return pathPattern0.matches(pathContainer)
-                || pathPattern1.matches(pathContainer);
+                || pathPattern1.matches(pathContainer)
+                || pathPattern2.matches(pathContainer);
     }
 }

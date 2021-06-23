@@ -69,7 +69,7 @@ class ReactorNettyClientWriter(
                 val responseType = javaOperation.responseVariable.type ?: "java.lang.Void"
 
                 val responseCall = when (val responseSchema = javaOperation.responseVariable.schema) {
-                    null -> ".response()"
+                    null -> ".response().then()"
                     else ->
                         """|.responseSingle((httpClientResponse, byteBufMono) ->
                            |        byteBufConverter.parse(byteBufMono, jsonNode -> ${converterRegistry[responseSchema].parseExpression("jsonNode")})

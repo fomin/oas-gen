@@ -1,3 +1,4 @@
+import {DateTimeFormatter, LocalDate} from "@js-joda/core";
 import {RestRequest, mapObjectProperties} from "@andrey.n.fomin/oas-gen-typescript-dto-runtime";
 
 export function simplePost(
@@ -9,6 +10,7 @@ export function simplePost(
     onTimeoutCallback?: () => void,
     onAbortCallback?: () => void
 ): RestRequest<string> {
+
     return new RestRequest<string>(
         `${baseUrl}/path1`,
         "POST",
@@ -27,18 +29,59 @@ export function simpleGet(
     baseUrl: string,
     id: string,
     param1: string,
-    param2: Param2OfSimpleGet,
+    param2?: Param2OfSimpleGet,
     timeout?: number,
     onLoadCallback?: (value: Dto) => void,
     onErrorCallback?: (reason: any) => void,
     onTimeoutCallback?: () => void,
     onAbortCallback?: () => void
 ): RestRequest<Dto> {
+    let param1Str
+    if (param1) {
+        param1Str = encodeURIComponent(param1)
+    } else {
+        param1Str = ""
+    }
+    let param2Str
+    if (param2) {
+        param2Str = encodeURIComponent(param2)
+    } else {
+        param2Str = ""
+    }
     return new RestRequest<Dto>(
-        `${baseUrl}/path2/${id}?param1=${encodeURIComponent(param1)}&param2=${encodeURIComponent(param2)}`,
+        `${baseUrl}/path2/${id}?param1=${param1Str}&param2=${param2Str}`,
         "GET",
         value => value,
         "json",
+        undefined,
+        timeout,
+        onLoadCallback,
+        onErrorCallback,
+        onTimeoutCallback,
+        onAbortCallback
+    )
+}
+
+export function testNullableParameter(
+    baseUrl: string,
+    param1?: LocalDate,
+    timeout?: number,
+    onLoadCallback?: (value: void) => void,
+    onErrorCallback?: (reason: any) => void,
+    onTimeoutCallback?: () => void,
+    onAbortCallback?: () => void
+): RestRequest<void> {
+    let param1Str
+    if (param1) {
+        param1Str = encodeURIComponent((param1 as LocalDate).format(DateTimeFormatter.ISO_LOCAL_DATE))
+    } else {
+        param1Str = ""
+    }
+    return new RestRequest<void>(
+        `${baseUrl}/path3?param1=${param1Str}`,
+        "POST",
+        value => undefined,
+        "text",
         undefined,
         timeout,
         onLoadCallback,

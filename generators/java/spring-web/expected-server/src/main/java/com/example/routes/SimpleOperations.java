@@ -14,4 +14,8 @@ public interface SimpleOperations {
             @Nullable com.example.dto.Param2OfSimpleGet param2,
             @Nullable java.time.LocalDate param3
     );
+
+    void testNullableParameter(
+            @Nullable java.time.LocalDate param1
+    );
 }

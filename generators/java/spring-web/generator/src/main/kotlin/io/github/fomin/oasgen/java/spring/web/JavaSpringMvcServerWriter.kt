@@ -127,11 +127,9 @@ class JavaSpringMvcServerWriter(
                         ParameterIn.HEADER -> """request.getHeader("${parameter.name}")"""
                     }
                     val converterWriter = converterRegistry[schema]
-                    """${converterWriter.valueType()} param$index = ${
-                        converterWriter.stringParseExpression(
-                            parameterExpression
-                        )
-                    };"""
+                    """|String param${index}Str = $parameterExpression;
+                       |${converterWriter.valueType()} param$index = param${index}Str != null ? ${converterWriter.stringParseExpression("param${index}Str")} : null;
+                    """.trimMargin()
                 }
                 """|if ("${operation.operationType.name}".equals(request.getMethod())) {
                    |    $urlVariablesDefinition

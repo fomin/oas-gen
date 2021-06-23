@@ -25,6 +25,9 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     @Nonnull
     public abstract Mono<com.example.dto.Dto> simpleGet(@Nonnull java.lang.String id, @Nonnull java.lang.String param1, @Nullable com.example.dto.Param2OfSimpleGet param2, @Nullable java.time.LocalDate param3);
 
+    @Nonnull
+    public abstract Mono<Void> testNullableParameter(@Nullable java.time.LocalDate param1);
+
     @Override
     public final void accept(HttpServerRoutes httpServerRoutes) {
         httpServerRoutes
@@ -54,6 +57,14 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                         .status(200)
                         .header("Content-Type", "application/json")
                         .send(byteBufConverter.write(response, responseMono, (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value)));
+            })
+            .post(baseUrl + "/path3", (request, response) -> {
+                Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
+                String param0Str = queryParams.get("param1");
+                java.time.LocalDate param0 = param0Str != null ? java.time.LocalDate.parse(param0Str) : null;
+
+                Mono<Void> responseMono = testNullableParameter(param0);
+                return responseMono.thenEmpty(response.send());
             })
         ;
     }

@@ -12,6 +12,9 @@ import reactor.netty.http.server.HttpServer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.time.LocalDate;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class SimpleRoutesTest extends BaseServerTest {
     private static final int PORT = 9084;
@@ -35,6 +38,13 @@ public class SimpleRoutesTest extends BaseServerTest {
             @Override
             public Mono<Dto> simpleGet(@Nonnull String id, @Nonnull String param1, @Nullable Param2OfSimpleGet param2, @Nullable java.time.LocalDate param3) {
                 return Mono.just(new Dto("value1"));
+            }
+
+            @Nonnull
+            @Override
+            public Mono<Void> testNullableParameter(@Nullable LocalDate param1) {
+                assertNull(param1);
+                return Mono.empty();
             }
         };
         disposableServer = HttpServer.create().host("127.0.0.1").port(PORT).route(simpleRoutes).bindNow();

@@ -56,8 +56,10 @@ class ReactorNettyServerWriter(
                         .filterNotNull()
                         .joinToString(", ")
 
+                val responseType = javaOperation.responseVariable.type ?: "Void"
+
                 """|@Nonnull
-                   |public abstract Mono<${javaOperation.responseVariable.type}> ${javaOperation.methodName}($args);
+                   |public abstract Mono<$responseType> ${javaOperation.methodName}($args);
                    |
                 """.trimMargin()
             }
@@ -91,10 +93,11 @@ class ReactorNettyServerWriter(
                 val parameterArgs = javaOperation.parameters.mapIndexed { index, _ -> "param$index" }
                 val requestArg = javaOperation.requestVariable?.let { "requestMono" }
                 val args = (parameterArgs + requestArg).filterNotNull().joinToString(", ")
+                val responseType = javaOperation.responseVariable.type ?: "Void"
                 val responseMonoDeclaration =
-                        "Mono<${javaOperation.responseVariable.type}> responseMono = ${javaOperation.methodName}($args);"
+                        "Mono<${responseType}> responseMono = ${javaOperation.methodName}($args);"
                 val returnStatement = when (val responseSchema = javaOperation.responseVariable.schema) {
-                    null -> "return response.send();"
+                    null -> "return responseMono.thenEmpty(response.send());"
                     else -> """|return response
                                |        .status(${javaOperation.responseCode})
                                |        .header("Content-Type", "application/json")

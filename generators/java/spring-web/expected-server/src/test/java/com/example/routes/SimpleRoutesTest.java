@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class SimpleRoutesTest extends BaseServerTest {
 
@@ -52,6 +53,11 @@ class SimpleRoutesTest extends BaseServerTest {
                     assertEquals(Param2OfSimpleGet.VALUE1, param2);
                     assertEquals(LocalDate.parse("2021-06-01"), param3);
                     return REFERENCE_DTO;
+                }
+
+                @Override
+                public void testNullableParameter(@Nullable LocalDate param1) {
+                    assertNull(param1);
                 }
             };
         }

@@ -4,4 +4,6 @@ public interface ClientTest {
     void testPost();
 
     void testGet();
+
+    void testNullableParameter();
 }

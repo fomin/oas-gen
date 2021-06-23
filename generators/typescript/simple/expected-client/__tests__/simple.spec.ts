@@ -1,6 +1,7 @@
 import * as http from "http";
 import {IncomingMessage} from "http";
 import {Dto, Param2OfSimpleGet, simpleGet, simplePost} from "../out/simple";
+import {testNullableParameter} from "../src/simple";
 
 const dtoJson = '{"property1":"value1"}'
 const referenceDto: Dto = {property1: "value1"}
@@ -31,6 +32,11 @@ let server = http.createServer((req, res) => {
             onContent(req, content => {
                 expect(content).toEqual(dtoJson)
                 res.end('"postResponseValue"')
+            })
+        } else if (req.url == "/path3?param1=" && req.method == 'POST') {
+            onContent(req, content => {
+                expect(content).toEqual("")
+                res.end()
             })
         } else {
             res.statusCode = 404
@@ -66,6 +72,22 @@ test('should post dto', (done) => {
         value => {
             try {
                 expect(value).toEqual('postResponseValue')
+                done()
+            } catch (error) {
+                done(error)
+            }
+        }
+    );
+})
+
+test('should send empty parameters', (done) => {
+    testNullableParameter(
+        'http://localhost:9080',
+        undefined,
+        1000,
+        value => {
+            try {
+                expect(value).toEqual(undefined)
                 done()
             } catch (error) {
                 done(error)

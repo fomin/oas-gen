@@ -51,4 +51,15 @@ public abstract class BaseServerTest {
         assertEquals(DTO_JSON, body);
     }
 
+    @Test
+    public void testNullableParameter() {
+        httpClient
+                .post()
+                .uri("/path3")
+                .responseSingle((httpClientResponse, byteBufMono) -> {
+                    assertEquals(OK, httpClientResponse.status());
+                    return byteBufMono.then();
+                })
+                .block();
+    }
 }

@@ -49,4 +49,11 @@ class SimpleClientTest implements ClientTest {
         Mono<Dto> response = simpleClient.simpleGet("idValue", "param1Value", Param2OfSimpleGet.VALUE1, LocalDate.parse("2021-06-01"));
         assertEquals(REFERENCE_DTO, response.block());
     }
+
+    @Test
+    @Override
+    public void testNullableParameter() {
+        Mono<Void> response = simpleClient.testNullableParameter(null);
+        response.block();
+    }
 }

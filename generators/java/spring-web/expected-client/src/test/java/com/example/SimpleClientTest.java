@@ -79,4 +79,10 @@ class SimpleClientTest implements ClientTest {
         Dto response = simpleClient.simpleGet("idValue", "param1Value", Param2OfSimpleGet.VALUE1, LocalDate.parse("2021-06-01"));
         assertEquals(REFERENCE_DTO, response);
     }
+
+    @Override
+    @Test
+    public void testNullableParameter() {
+        simpleClient.testNullableParameter(null);
+    }
 }

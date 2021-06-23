@@ -57,7 +57,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/dto'
-
+  /path3:
+    post:
+      operationId: test nullable parameter
+      parameters:
+        - name: param1
+          in: query
+          schema:
+            type: string
+            format: date
+          required: false
+      responses:
+        '200':
+          description: description
 components:
   schemas:
     dto:

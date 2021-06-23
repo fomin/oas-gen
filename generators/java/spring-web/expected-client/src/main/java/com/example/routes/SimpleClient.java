@@ -90,4 +90,33 @@ public class SimpleClient {
         );
     }
 
+    @Nonnull
+    public java.lang.Void testNullableParameter(
+            @Nullable java.time.LocalDate param1
+    ) {
+        return testNullableParameter$0(
+                param1
+        );
+    }
+
+    private java.lang.Void testNullableParameter$0(
+            java.time.LocalDate param0
+    ) {
+        Map<String, Object> uriVariables = Collections.emptyMap();
+        URI uri = UriComponentsBuilder
+                .fromUriString(baseUrl + "/path3")
+                .queryParam("param1", param0 != null ? param0.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE) : null)
+                .build(uriVariables);
+        return springMvcClient.doRequest(
+                uri,
+                HttpMethod.POST,
+                null,
+                null,
+                null,
+                headers -> {
+
+                }
+        );
+    }
+
 }

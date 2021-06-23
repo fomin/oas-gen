@@ -83,4 +83,25 @@ public class SimpleClient {
                 );
     }
 
+    @Nonnull
+    public Mono<java.lang.Void> testNullableParameter(
+            @Nullable java.time.LocalDate param1
+    ) {
+        return testNullableParameter$0(
+                param1
+        );
+    }
+
+    private Mono<java.lang.Void> testNullableParameter$0(
+            java.time.LocalDate param0
+    ) {
+        String param0Str = param0 != null ? param0.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE) : null;
+        return httpClient
+
+                .post()
+                .uri(UrlEncoderUtils.encodeUrl("/path3", "param1", param0Str))
+
+                .response().then();
+    }
+
 }
