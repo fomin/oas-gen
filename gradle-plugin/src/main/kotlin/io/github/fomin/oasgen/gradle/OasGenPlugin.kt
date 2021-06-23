@@ -211,6 +211,7 @@ class OasGenPlugin : Plugin<Project> {
 
         val oasGenTask = project.tasks.register("oasGen", OasGenTask::class.java, oasGenExtension, oasGenConfiguration)
         oasGenTask.configure { task ->
+            task.dependsOn(oasGenConfiguration)
             oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
                 task.inputs.property("generatorId$index", generationSpec.generatorId)
                 task.inputs.property("schemaPath$index", generationSpec.schemaPath)
