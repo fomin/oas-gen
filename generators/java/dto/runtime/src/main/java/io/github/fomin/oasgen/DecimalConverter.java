@@ -33,7 +33,7 @@ public final class DecimalConverter {
             JsonGenerator jsonGenerator,
             BigDecimal value
     ) throws IOException {
-        jsonGenerator.writeNumber(value);
+        jsonGenerator.writeString(value.toPlainString());
         return Collections.emptyList();
     }
 

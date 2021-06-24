@@ -15,6 +15,7 @@ sourceSets {
             srcDir("src/javadoc/java")
             srcDir("src/enum/java")
             srcDir("src/map/java")
+            srcDir("src/builtin/java")
         }
     }
 }
