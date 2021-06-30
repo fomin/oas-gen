@@ -98,7 +98,7 @@ export interface Dto {
     /**
      *
      */
-    readonly "property1"?: string;
+    "property1"?: string;
 }
 
 /**

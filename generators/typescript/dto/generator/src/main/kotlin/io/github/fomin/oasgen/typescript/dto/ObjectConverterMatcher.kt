@@ -28,7 +28,7 @@ class ObjectConverterMatcher(
                         val optionalFlag = if (!jsonSchema.required().contains(propertyName)) "?" else ""
 
                         """|${jsDoc(propertySchema)}
-                           |readonly "$propertyName"$optionalFlag: ${typeConverterRegistry[propertySchema].type()};
+                           |"$propertyName"$optionalFlag: ${typeConverterRegistry[propertySchema].type()};
                            |""".trimMargin()
                     }
 

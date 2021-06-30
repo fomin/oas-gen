@@ -16,7 +16,7 @@ class ArrayConverterMatcher : TypeConverterMatcher {
                 val itemsTypeConverter = typeConverterRegistry[itemsSchema]
                 val itemsJsonConverter = itemsTypeConverter.jsonConverter
 
-                override fun type() = "readonly ${itemsTypeConverter.type()}[]"
+                override fun type() = "${itemsTypeConverter.type()}[]"
 
                 override fun content(): String? = null
 
