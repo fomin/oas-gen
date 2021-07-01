@@ -8,8 +8,8 @@ interface ConverterWriter {
 
     val jsonSchema: JsonSchema
     fun valueType(): String
-    fun parseExpression(valueExpression: String): String
-    fun writeExpression(jsonGeneratorName: String, valueExpression: String): String
+    fun parseExpression(valueExpression: String, localVariableSuffix: Int = 0): String
+    fun writeExpression(jsonGeneratorName: String, valueExpression: String, localVariableSuffix: Int = 0): String
     fun stringParseExpression(valueExpression: String): String
     fun stringWriteExpression(valueExpression: String): String
     fun generate(): Result

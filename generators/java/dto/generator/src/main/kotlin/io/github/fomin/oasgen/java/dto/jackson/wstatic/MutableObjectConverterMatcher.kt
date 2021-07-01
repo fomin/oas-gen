@@ -16,9 +16,13 @@ class MutableObjectConverterMatcher(val dtoBasePackage: String, val routesBasePa
                 private val converterType = toJavaClassName(routesBasePackage, jsonSchema, "converter")
                 override val jsonSchema = jsonSchema
                 override fun valueType() = toJavaClassName(dtoBasePackage, jsonSchema)
-                override fun parseExpression(valueExpression: String) =
+                override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                     "${converterType}.parse($valueExpression)"
-                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                override fun writeExpression(
+                    jsonGeneratorName: String,
+                    valueExpression: String,
+                    localVariableSuffix: Int
+                ) =
                     "${converterType}.write($jsonGeneratorName, $valueExpression)"
                 override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
                 override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()

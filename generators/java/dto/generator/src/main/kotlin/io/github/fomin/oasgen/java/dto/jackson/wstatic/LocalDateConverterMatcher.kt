@@ -14,9 +14,13 @@ class LocalDateConverterMatcher : ConverterMatcher {
             object : ConverterWriter {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.time.LocalDate"
-                override fun parseExpression(valueExpression: String) =
+                override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                     "io.github.fomin.oasgen.LocalDateConverter.parse($valueExpression)"
-                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                override fun writeExpression(
+                    jsonGeneratorName: String,
+                    valueExpression: String,
+                    localVariableSuffix: Int
+                ) =
                     "io.github.fomin.oasgen.LocalDateConverter.write($jsonGeneratorName, $valueExpression)"
                 override fun stringParseExpression(valueExpression: String) = "java.time.LocalDate.parse($valueExpression)"
                 override fun stringWriteExpression(valueExpression: String) = "$valueExpression.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE)"

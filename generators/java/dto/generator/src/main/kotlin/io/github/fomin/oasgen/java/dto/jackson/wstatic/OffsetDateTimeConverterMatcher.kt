@@ -14,9 +14,13 @@ class OffsetDateTimeConverterMatcher : ConverterMatcher {
             object : ConverterWriter {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.time.OffsetDateTime"
-                override fun parseExpression(valueExpression: String) =
+                override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                     "io.github.fomin.oasgen.OffsetDateTimeConverter.parse($valueExpression)"
-                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                override fun writeExpression(
+                    jsonGeneratorName: String,
+                    valueExpression: String,
+                    localVariableSuffix: Int
+                ) =
                     "io.github.fomin.oasgen.OffsetDateTimeConverter.write($jsonGeneratorName, $valueExpression)"
                 override fun stringParseExpression(valueExpression: String) = "java.time.OffsetDateTime.parse($valueExpression)"
                 override fun stringWriteExpression(valueExpression: String) = "$valueExpression.format(java.time.format.DateTimeFormatter.ISO_OFFSET_DATE_TIME)"

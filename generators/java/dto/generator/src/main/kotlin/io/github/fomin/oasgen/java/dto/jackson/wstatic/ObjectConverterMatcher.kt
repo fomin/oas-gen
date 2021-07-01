@@ -48,7 +48,10 @@ class ObjectConverterMatcher(val dtoBasePackage: String, val routesBasePackage: 
                 val variableName = javaProperty.variableName
                 """|if (value.$variableName != null) {
                    |    jsonGenerator.writeFieldName("${javaProperty.name}");
-                   |    List<? extends ValidationError> validationErrors = ${converterRegistry[javaProperty.jsonSchema].writeExpression("jsonGenerator", "value.$variableName")};
+                   |    List<? extends ValidationError> validationErrors = ${converterRegistry[javaProperty.jsonSchema].writeExpression(
+                    "jsonGenerator",
+                    "value.$variableName",
+                )};
                    |    if (!validationErrors.isEmpty()) {
                    |        if (errors == null) {
                    |            errors = new ArrayList<>();
@@ -135,9 +138,13 @@ class ObjectConverterMatcher(val dtoBasePackage: String, val routesBasePackage: 
                 private val converterType = toJavaClassName(routesBasePackage, jsonSchema, "converter")
                 override val jsonSchema = jsonSchema
                 override fun valueType() = toJavaClassName(dtoBasePackage, jsonSchema)
-                override fun parseExpression(valueExpression: String) =
+                override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                     "${converterType}.parse($valueExpression)"
-                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                override fun writeExpression(
+                    jsonGeneratorName: String,
+                    valueExpression: String,
+                    localVariableSuffix: Int
+                ) =
                     "${converterType}.write($jsonGeneratorName, $valueExpression)"
                 override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
                 override fun stringWriteExpression(valueExpression: String) = throw UnsupportedOperationException()

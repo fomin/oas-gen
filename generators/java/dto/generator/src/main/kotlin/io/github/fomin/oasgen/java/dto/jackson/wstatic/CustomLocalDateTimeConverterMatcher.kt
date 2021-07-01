@@ -15,9 +15,13 @@ class CustomLocalDateTimeConverterMatcher : ConverterMatcher {
                 val pattern = jsonSchema.fragment["datePattern"].asString()
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.time.LocalDateTime"
-                override fun parseExpression(valueExpression: String) =
+                override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                     "io.github.fomin.oasgen.LocalDateTimeConverter.parse($valueExpression, \"$pattern\")"
-                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                override fun writeExpression(
+                    jsonGeneratorName: String,
+                    valueExpression: String,
+                    localVariableSuffix: Int
+                ) =
                     "io.github.fomin.oasgen.LocalDateTimeConverter.write($jsonGeneratorName, \"$pattern\", $valueExpression)"
                 override fun stringParseExpression(valueExpression: String) = "java.time.LocalDateTime.parse($valueExpression, io.github.fomin.oasgen.DateTimeFormatterCache.get(\"$pattern\"))"
                 override fun stringWriteExpression(valueExpression: String) = "$valueExpression.format(io.github.fomin.oasgen.DateTimeFormatterCache.get(\"$pattern\"))"

@@ -17,11 +17,25 @@ class MapConverterMatcher : ConverterMatcher {
             override fun valueType() =
                     "java.util.Map<java.lang.String, ${converterRegistry[additionalProperties].valueType()}>"
 
-            override fun parseExpression(valueExpression: String) =
-                    "new io.github.fomin.oasgen.MapConverter.parse($valueExpression, itemNode -> ${converterRegistry[additionalProperties].parseExpression("itemNode")})"
+            override fun parseExpression(valueExpression: String, localVariableSuffix: Int): String {
+                val localItemVariable = "itemNode$localVariableSuffix"
+                val localParseExpression = converterRegistry[additionalProperties].parseExpression(
+                    localItemVariable,
+                    localVariableSuffix + 1
+                )
+                return "io.github.fomin.oasgen.MapConverter.parse($valueExpression, $localItemVariable -> $localParseExpression)"
+            }
 
-            override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
-                    "new io.github.fomin.oasgen.MapConverter<>($jsonGeneratorName, (${jsonGeneratorName}1, value) -> ${converterRegistry[additionalProperties].writeExpression("${jsonGeneratorName}1", "value")})"
+            override fun writeExpression(jsonGeneratorName: String, valueExpression: String, localVariableSuffix: Int): String {
+                val localJsonGenerator = "jsonGenerator$localVariableSuffix"
+                val localValue = "value$localVariableSuffix"
+                val localWriteExpression = converterRegistry[additionalProperties].writeExpression(
+                    localJsonGenerator,
+                    localValue,
+                    localVariableSuffix + 1
+                )
+                return "io.github.fomin.oasgen.MapConverter.write($jsonGeneratorName, ($localJsonGenerator, $localValue) -> $localWriteExpression, $valueExpression)"
+            }
 
             override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
 

@@ -13,9 +13,9 @@ class Int32ConverterMatcher : ConverterMatcher {
         return if (jsonSchema.type is JsonType.Scalar.INTEGER && jsonSchema.format == "int32") object : ConverterWriter {
             override val jsonSchema = jsonSchema
             override fun valueType() = "java.lang.Integer"
-            override fun parseExpression(valueExpression: String) =
+            override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                 "io.github.fomin.oasgen.Int32Converter.parse($valueExpression)"
-            override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+            override fun writeExpression(jsonGeneratorName: String, valueExpression: String, localVariableSuffix: Int) =
                 "io.github.fomin.oasgen.Int32Converter.write($jsonGeneratorName, $valueExpression)"
             override fun stringParseExpression(valueExpression: String) = "java.lang.Integer.parseInt($valueExpression)"
             override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"

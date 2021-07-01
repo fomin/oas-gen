@@ -13,9 +13,9 @@ class BooleanConverterMatcher : ConverterMatcher {
         return if (jsonSchema.type is JsonType.Scalar.BOOLEAN) object : ConverterWriter {
             override val jsonSchema = jsonSchema
             override fun valueType() = "java.lang.Boolean"
-            override fun parseExpression(valueExpression: String) =
+            override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                 "io.github.fomin.oasgen.BooleanConverter.parse($valueExpression)"
-            override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+            override fun writeExpression(jsonGeneratorName: String, valueExpression: String, localVariableSuffix: Int) =
                 "io.github.fomin.oasgen.BooleanConverter.write($jsonGeneratorName, $valueExpression)"
             override fun stringParseExpression(valueExpression: String) = "java.lang.Boolean.parseBoolean($valueExpression)"
             override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"

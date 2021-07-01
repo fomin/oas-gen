@@ -15,9 +15,9 @@ class EnumConverterMatcher(private val dtoBasePackage: String, private val route
             private val converterType = toJavaClassName(routesBasePackage, jsonSchema, "converter")
             override val jsonSchema = jsonSchema
             override fun valueType() = toJavaClassName(dtoBasePackage, jsonSchema)
-            override fun parseExpression(valueExpression: String) =
+            override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                 "${converterType}.parse($valueExpression)"
-            override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+            override fun writeExpression(jsonGeneratorName: String, valueExpression: String, localVariableSuffix: Int) =
                 "${converterType}.write($jsonGeneratorName, $valueExpression)"
             override fun stringParseExpression(valueExpression: String) =
                 "${converterType}.parseString($valueExpression)"

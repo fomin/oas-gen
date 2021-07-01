@@ -13,9 +13,9 @@ class Int64ConverterMatcher : ConverterMatcher {
         return if (jsonSchema.type is JsonType.Scalar.INTEGER && jsonSchema.format == "int64") object : ConverterWriter {
             override val jsonSchema = jsonSchema
             override fun valueType() = "java.lang.Long"
-            override fun parseExpression(valueExpression: String) =
+            override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                 "io.github.fomin.oasgen.Int64Converter.parse($valueExpression)"
-            override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+            override fun writeExpression(jsonGeneratorName: String, valueExpression: String, localVariableSuffix: Int) =
                 "io.github.fomin.oasgen.Int64Converter.write($jsonGeneratorName, $valueExpression)"
             override fun stringParseExpression(valueExpression: String) = "java.lang.Long.parseLong($valueExpression)"
             override fun stringWriteExpression(valueExpression: String) = "$valueExpression.toString()"

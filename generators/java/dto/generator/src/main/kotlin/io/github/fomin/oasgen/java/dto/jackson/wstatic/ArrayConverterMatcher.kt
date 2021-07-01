@@ -20,11 +20,29 @@ class ArrayConverterMatcher : ConverterMatcher {
                 override fun valueType() =
                         "java.util.List<${converterRegistry[itemsSchema].valueType()}>"
 
-                override fun parseExpression(valueExpression: String) =
-                        "io.github.fomin.oasgen.ArrayConverter.parse($valueExpression, itemNode -> ${converterRegistry[itemsSchema].parseExpression("itemNode")})"
+                override fun parseExpression(valueExpression: String, localVariableSuffix: Int): String {
+                    val localValueName = "itemNode$localVariableSuffix"
+                    val localParseExpression = converterRegistry[itemsSchema].parseExpression(
+                        localValueName,
+                        localVariableSuffix + 1
+                    )
+                    return "io.github.fomin.oasgen.ArrayConverter.parse($valueExpression, $localValueName -> $localParseExpression)"
+                }
 
-                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
-                        "io.github.fomin.oasgen.ArrayConverter.write($jsonGeneratorName, (${jsonGeneratorName}1, item) -> ${converterRegistry[itemsSchema].writeExpression("${jsonGeneratorName}1", "item")}, $valueExpression)"
+                override fun writeExpression(
+                    jsonGeneratorName: String,
+                    valueExpression: String,
+                    localVariableSuffix: Int
+                ): String {
+                    val localJsonGeneratorName = "jsonGenerator$localVariableSuffix"
+                    val localValueName = "item$localVariableSuffix"
+                    val localWriteExpression = converterRegistry[itemsSchema].writeExpression(
+                        localJsonGeneratorName,
+                        localValueName,
+                        localVariableSuffix + 1
+                    )
+                    return "io.github.fomin.oasgen.ArrayConverter.write($jsonGeneratorName, ($localJsonGeneratorName, $localValueName) -> $localWriteExpression, $valueExpression)"
+                }
 
                 override fun stringParseExpression(valueExpression: String) = throw UnsupportedOperationException()
 

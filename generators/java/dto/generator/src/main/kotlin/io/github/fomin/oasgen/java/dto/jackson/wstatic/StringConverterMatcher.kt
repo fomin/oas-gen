@@ -14,9 +14,13 @@ class StringConverterMatcher : ConverterMatcher {
             is JsonType.Scalar.STRING -> object : ConverterWriter {
                 override val jsonSchema = jsonSchema
                 override fun valueType() = "java.lang.String"
-                override fun parseExpression(valueExpression: String) =
+                override fun parseExpression(valueExpression: String, localVariableSuffix: Int) =
                     "io.github.fomin.oasgen.StringConverter.parse($valueExpression)"
-                override fun writeExpression(jsonGeneratorName: String, valueExpression: String) =
+                override fun writeExpression(
+                    jsonGeneratorName: String,
+                    valueExpression: String,
+                    localVariableSuffix: Int
+                ) =
                     "io.github.fomin.oasgen.StringConverter.write($jsonGeneratorName, $valueExpression)"
                 override fun stringParseExpression(valueExpression: String) = valueExpression;
                 override fun stringWriteExpression(valueExpression: String) = valueExpression;
