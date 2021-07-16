@@ -14,11 +14,13 @@ public class ReferenceServer {
     public static final String DTO_JSON = "{\"property1\":\"value1\"}";
     public static final String POST_RESPONSE_VALUE_JSON = "\"postResponseValue\"";
     public static final String POST_RESPONSE_VALUE_STR = "postResponseValue";
+    public static final byte[] TEST_BYTES = new byte[]{1, 2, 3, 100, 101, 102};
 
     public static DisposableServer create(int port) {
         HttpServer httpServer = HttpServer.create().host("127.0.0.1").port(port).route(httpServerRoutes ->
                 httpServerRoutes
                         .post(BASE_PATH + "/path1", (request, response) -> {
+                            assertEquals("application/json", request.requestHeaders().get("Content-Type"));
                             Mono<String> requestMono = request.receive().aggregate().asString();
                             Mono<String> responseMono = requestMono.map(requestBodyString -> {
                                 assertEquals(DTO_JSON, requestBodyString);
@@ -41,6 +43,17 @@ public class ReferenceServer {
                         .post(BASE_PATH + "/path3", (request, response) -> {
                             assertTrue(request.uri().endsWith("?param1"));
                             return response.send();
+                        })
+                        .get(BASE_PATH + "/path4", (request, response) -> {
+                            response.header("Content-Type", "application/octet-stream");
+                            return response.sendByteArray(request.receive().then(Mono.just(TEST_BYTES)));
+                        })
+                        .post(BASE_PATH + "/path5", (request, response) -> {
+                            assertEquals("application/octet-stream", request.requestHeaders().get("Content-Type"));
+                            Mono<byte[]> requestBodyMono = request.receive().aggregate().asByteArray().doOnNext(bytes ->
+                                    assertArrayEquals(TEST_BYTES, bytes)
+                            );
+                            return response.send(requestBodyMono.then(Mono.empty()));
                         })
         );
         return httpServer.bindNow();

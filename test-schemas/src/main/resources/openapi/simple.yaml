@@ -70,6 +70,29 @@ paths:
       responses:
         '200':
           description: description
+  /path4:
+    get:
+      operationId: return octet stream
+      responses:
+        200:
+          description: description
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+  /path5:
+    post:
+      operationId: send octet stream
+      requestBody:
+        content:
+          application/octet-stream:
+            schema:
+              type: string
+              format: binary
+      responses:
+        200:
+          description: description
 components:
   schemas:
     dto:

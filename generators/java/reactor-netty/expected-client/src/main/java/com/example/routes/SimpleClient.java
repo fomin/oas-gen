@@ -6,6 +6,8 @@ import io.github.fomin.oasgen.UrlEncoderUtils;
 import io.netty.buffer.ByteBuf;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import io.netty.handler.codec.http.HttpResponseStatus;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 
@@ -32,16 +34,23 @@ public class SimpleClient {
     ) {
 
         return httpClient
-
+                .headers(headers -> {
+                    headers.set("Content-Type", "application/json");
+                })
                 .post()
                 .uri(UrlEncoderUtils.encodeUrl("/path1"))
                 .send((httpClientRequest, nettyOutbound) -> {
                     Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value));
                     return nettyOutbound.send(byteBufMono);
                 })
-                .responseSingle((httpClientResponse, byteBufMono) ->
-                        byteBufConverter.parse(byteBufMono, jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode))
-                );
+                .responseSingle((httpClientResponse, byteBufMono) -> {
+                    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                    if (httpResponseStatus.code() == 200) {
+                        return byteBufConverter.parse(byteBufMono, jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode));
+                    } else {
+                        return Mono.error(new RuntimeException(httpResponseStatus.toString()));
+                    }
+                });
     }
 
     @Nonnull
@@ -78,9 +87,14 @@ public class SimpleClient {
                 .get()
                 .uri(UrlEncoderUtils.encodeUrl("/path2/" + UrlEncoderUtils.encode(param0Str), "param1", param1Str, "param2", param2Str))
 
-                .responseSingle((httpClientResponse, byteBufMono) ->
-                        byteBufConverter.parse(byteBufMono, jsonNode -> com.example.routes.DtoConverter.parse(jsonNode))
-                );
+                .responseSingle((httpClientResponse, byteBufMono) -> {
+                    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                    if (httpResponseStatus.code() == 200) {
+                        return byteBufConverter.parse(byteBufMono, jsonNode -> com.example.routes.DtoConverter.parse(jsonNode));
+                    } else {
+                        return Mono.error(new RuntimeException(httpResponseStatus.toString()));
+                    }
+                });
     }
 
     @Nonnull
@@ -101,7 +115,76 @@ public class SimpleClient {
                 .post()
                 .uri(UrlEncoderUtils.encodeUrl("/path3", "param1", param0Str))
 
-                .response().then();
+                .response()
+                .handle((httpClientResponse, sink) -> {
+                    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                    if (httpResponseStatus.code() == 200) {
+                        sink.complete();
+                    } else {
+                        sink.error(new RuntimeException(httpResponseStatus.toString()));
+                    }
+                });
+    }
+
+    @Nonnull
+    public Flux<ByteBuf> returnOctetStream(
+
+    ) {
+        return returnOctetStream$0(
+
+        );
+    }
+
+    private Flux<ByteBuf> returnOctetStream$0(
+
+    ) {
+
+        return httpClient
+
+                .get()
+                .uri(UrlEncoderUtils.encodeUrl("/path4"))
+
+                .response((httpClientResponse, byteBufFlux) -> {
+                    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                    if (httpResponseStatus.code() == 200) {
+                        return byteBufFlux;
+                    } else {
+                        return Flux.error(new RuntimeException(httpResponseStatus.toString()));
+                    }
+                });
+    }
+
+    @Nonnull
+    public Mono<java.lang.Void> sendOctetStream(
+            @Nonnull Flux<ByteBuf> requestBodyFlux
+    ) {
+        return sendOctetStream$0(
+                requestBodyFlux
+        );
+    }
+
+    private Mono<java.lang.Void> sendOctetStream$0(
+            @Nonnull Flux<ByteBuf> requestBodyFlux
+    ) {
+
+        return httpClient
+                .headers(headers -> {
+                    headers.set("Content-Type", "application/octet-stream");
+                })
+                .post()
+                .uri(UrlEncoderUtils.encodeUrl("/path5"))
+                .send((httpClientRequest, nettyOutbound) -> {
+                    return nettyOutbound.send(requestBodyFlux);
+                })
+                .response()
+                .handle((httpClientResponse, sink) -> {
+                    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                    if (httpResponseStatus.code() == 200) {
+                        sink.complete();
+                    } else {
+                        sink.error(new RuntimeException(httpResponseStatus.toString()));
+                    }
+                });
     }
 
 }

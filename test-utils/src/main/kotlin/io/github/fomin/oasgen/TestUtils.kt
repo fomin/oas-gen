@@ -16,7 +16,7 @@ sealed class FileTreeNode
 
 class FileNode(val content: String) : FileTreeNode()
 
-class DirectoryNode(val children: MutableMap<String, FileTreeNode>) : FileTreeNode() {
+data class DirectoryNode(val children: MutableMap<String, FileTreeNode>) : FileTreeNode() {
     fun addFile(path: String, content: String) {
         addFile(path.split("/"), content)
     }

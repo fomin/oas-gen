@@ -1,5 +1,8 @@
 package com.example.routes;
 
+import io.github.fomin.oasgen.IoConsumer;
+import io.github.fomin.oasgen.RequestConsumer;
+import io.github.fomin.oasgen.ResponseFunction;
 import io.github.fomin.oasgen.SpringMvcClient;
 import java.net.URI;
 import java.util.Collections;
@@ -39,12 +42,18 @@ public class SimpleClient {
         return springMvcClient.doRequest(
                 uri,
                 HttpMethod.POST,
-                bodyArg,
-                (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value),
-                jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode),
                 headers -> {
 
-                }
+                },
+                RequestConsumer.json(
+                        bodyArg,
+                        (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value),
+                        springMvcClient.objectMapper
+                ),
+                ResponseFunction.json(
+                        jsonNode -> io.github.fomin.oasgen.StringConverter.parse(jsonNode),
+                        springMvcClient.objectMapper
+                )
         );
     }
 
@@ -79,14 +88,16 @@ public class SimpleClient {
         return springMvcClient.doRequest(
                 uri,
                 HttpMethod.GET,
-                null,
-                null,
-                jsonNode -> com.example.routes.DtoConverter.parse(jsonNode),
                 headers -> {
                     if (param3 != null) {
                         headers.set("param3", param3.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE));
                     }
-                }
+                },
+                null,
+                ResponseFunction.json(
+                        jsonNode -> com.example.routes.DtoConverter.parse(jsonNode),
+                        springMvcClient.objectMapper
+                )
         );
     }
 
@@ -110,12 +121,70 @@ public class SimpleClient {
         return springMvcClient.doRequest(
                 uri,
                 HttpMethod.POST,
-                null,
-                null,
-                null,
                 headers -> {
 
-                }
+                },
+                null,
+                null
+        );
+    }
+
+    @Nonnull
+    public java.lang.Void returnOctetStream(
+            IoConsumer<java.io.InputStream> inputStreamConsumer
+    ) {
+        return returnOctetStream$0(
+                inputStreamConsumer
+        );
+    }
+
+    private java.lang.Void returnOctetStream$0(
+            IoConsumer<java.io.InputStream> inputStreamConsumer
+    ) {
+        Map<String, Object> uriVariables = Collections.emptyMap();
+        URI uri = UriComponentsBuilder
+                .fromUriString(baseUrl + "/path4")
+
+                .build(uriVariables);
+        return springMvcClient.doRequest(
+                uri,
+                HttpMethod.GET,
+                headers -> {
+
+                },
+                null,
+                new ResponseFunction<>("application/octet-stream", inputStream -> {
+                    inputStreamConsumer.accept(inputStream);
+                    return null;
+                })
+        );
+    }
+
+    @Nonnull
+    public java.lang.Void sendOctetStream(
+            IoConsumer<java.io.OutputStream> outputStreamIoConsumer
+    ) {
+        return sendOctetStream$0(
+                outputStreamIoConsumer
+        );
+    }
+
+    private java.lang.Void sendOctetStream$0(
+            IoConsumer<java.io.OutputStream> outputStreamIoConsumer
+    ) {
+        Map<String, Object> uriVariables = Collections.emptyMap();
+        URI uri = UriComponentsBuilder
+                .fromUriString(baseUrl + "/path5")
+
+                .build(uriVariables);
+        return springMvcClient.doRequest(
+                uri,
+                HttpMethod.POST,
+                headers -> {
+
+                },
+                new RequestConsumer("application/octet-stream", outputStreamIoConsumer),
+                null
         );
     }
 

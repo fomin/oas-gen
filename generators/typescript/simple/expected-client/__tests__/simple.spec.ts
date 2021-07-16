@@ -1,10 +1,11 @@
 import * as http from "http";
 import {IncomingMessage} from "http";
 import {Dto, Param2OfSimpleGet, simpleGet, simplePost} from "../out/simple";
-import {testNullableParameter} from "../src/simple";
+import {returnOctetStream, sendOctetStream, testNullableParameter} from "../src/simple";
 
 const dtoJson = '{"property1":"value1"}'
 const referenceDto: Dto = {property1: "value1"}
+const referenceBlob = "123456789"
 
 function onContent(req: IncomingMessage, callback: (content: string) => void) {
     const chunks: Array<any> = []
@@ -36,6 +37,16 @@ let server = http.createServer((req, res) => {
         } else if (req.url == "/path3?param1=" && req.method == 'POST') {
             onContent(req, content => {
                 expect(content).toEqual("")
+                res.end()
+            })
+        } else if (req.url == "/path4" && req.method == "GET") {
+            onContent(req, content => {
+                expect(content).toEqual("")
+                res.end(referenceBlob)
+            })
+        } else if (req.url == "/path5" && req.method == "POST") {
+            onContent(req, content => {
+                expect(content).toEqual(referenceBlob)
                 res.end()
             })
         } else {
@@ -84,6 +95,37 @@ test('should send empty parameters', (done) => {
     testNullableParameter(
         'http://localhost:9080',
         undefined,
+        1000,
+        value => {
+            try {
+                expect(value).toEqual(undefined)
+                done()
+            } catch (error) {
+                done(error)
+            }
+        }
+    );
+})
+
+test('should return octet stream', (done) => {
+    returnOctetStream(
+        'http://localhost:9080',
+        1000,
+        value => {
+            try {
+                expect(value.size).toEqual(9)
+                done()
+            } catch (error) {
+                done(error)
+            }
+        }
+    );
+})
+
+test('should send octet stream', (done) => {
+    sendOctetStream(
+        'http://localhost:9080',
+        new Blob([referenceBlob]),
         1000,
         value => {
             try {

@@ -18,4 +18,12 @@ public interface SimpleOperations {
     void testNullableParameter(
             @Nullable java.time.LocalDate param1
     );
+
+    void returnOctetStream(
+            @Nonnull java.io.OutputStream outputStream
+    ) throws java.io.IOException;
+
+    void sendOctetStream(
+            @Nonnull java.io.InputStream inputStream
+    ) throws java.io.IOException;
 }

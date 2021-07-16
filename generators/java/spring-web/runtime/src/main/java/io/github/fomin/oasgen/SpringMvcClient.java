@@ -1,7 +1,5 @@
 package io.github.fomin.oasgen;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -14,15 +12,13 @@ import org.springframework.web.client.ResponseErrorHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
-import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public final class SpringMvcClient {
 
     private final ClientHttpRequestFactory requestFactory;
     private final ResponseErrorHandler errorHandler;
-    private final ObjectMapper objectMapper;
+    public final ObjectMapper objectMapper;
     private final RequestCallbacks requestCallbacks;
 
     public SpringMvcClient(
@@ -37,50 +33,43 @@ public final class SpringMvcClient {
         this.requestCallbacks = requestCallbacks;
     }
 
-    public <T, R> R doRequest(
+    public <R> R doRequest(
             URI uri,
             HttpMethod httpMethod,
-            T requestBody,
-            ValueWriter<T> requestValueWriter,
-            Function<JsonNode, R> parseFunction,
-            Consumer<HttpHeaders> headersConsumer
+            Consumer<HttpHeaders> headersConsumer,
+            RequestConsumer requestBodyConsumer,
+            ResponseFunction<R> responseBodyConsumer
     ) {
-        ClientHttpRequest request;
-        ClientHttpResponse response = null;
         try {
-            request = requestFactory.createRequest(uri, httpMethod);
+            ClientHttpRequest request = requestFactory.createRequest(uri, httpMethod);
             HttpHeaders headers = request.getHeaders();
             if (headersConsumer != null) {
                 headersConsumer.accept(headers);
             }
             requestCallbacks.onRequest(request);
-            if (requestBody != null) {
-                headers.setContentType(MediaType.APPLICATION_JSON);
-                OutputStream body = request.getBody();
-                JsonGenerator jsonGenerator = objectMapper.createGenerator(body);
-                List<? extends ValidationError> errors = requestValueWriter.write(jsonGenerator, requestBody);
-                if (!errors.isEmpty()) {
-                    throw new ValidationException(errors);
+            if (requestBodyConsumer != null) {
+                headers.setContentType(MediaType.parseMediaType(requestBodyConsumer.contentType));
+                try (OutputStream requestBody = request.getBody()) {
+                    requestBodyConsumer.consumer.accept(requestBody);
                 }
-                jsonGenerator.close();
             }
-            response = request.execute();
-            requestCallbacks.onResponse(response);
-            if (errorHandler.hasError(response)) {
-                errorHandler.handleError(uri, httpMethod, response);
-            }
-            if (parseFunction != null) {
-                JsonNode responseJsonNode = objectMapper.readTree(response.getBody());
-                return parseFunction.apply(responseJsonNode);
-            } else {
-                return null;
+            try (ClientHttpResponse response = request.execute()) {
+                requestCallbacks.onResponse(response);
+                if (errorHandler.hasError(response)) {
+                    errorHandler.handleError(uri, httpMethod, response);
+                }
+                if (responseBodyConsumer != null) {
+                    MediaType contentType = response.getHeaders().getContentType();
+                    if (!MediaType.parseMediaType(responseBodyConsumer.contentType).isCompatibleWith(contentType)) {
+                        throw new UnsupportedOperationException("" + contentType);
+                    }
+                    return responseBodyConsumer.function.accept(response.getBody());
+                } else {
+                    return null;
+                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
-        } finally {
-            if (response != null) {
-                response.close();
-            }
         }
     }
 
