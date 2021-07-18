@@ -91,6 +91,53 @@ export function testNullableParameter(
     )
 }
 
+export function returnOctetStream(
+    baseUrl: string,
+    timeout?: number,
+    onLoadCallback?: (value: Blob) => void,
+    onErrorCallback?: (reason: any) => void,
+    onTimeoutCallback?: () => void,
+    onAbortCallback?: () => void
+): RestRequest<Blob> {
+
+    return new RestRequest<Blob>(
+        `${baseUrl}/path4`,
+        "GET",
+        value => value,
+        "blob",
+        undefined,
+        timeout,
+        onLoadCallback,
+        onErrorCallback,
+        onTimeoutCallback,
+        onAbortCallback
+    )
+}
+
+export function sendOctetStream(
+    baseUrl: string,
+    body: Blob,
+    timeout?: number,
+    onLoadCallback?: (value: void) => void,
+    onErrorCallback?: (reason: any) => void,
+    onTimeoutCallback?: () => void,
+    onAbortCallback?: () => void
+): RestRequest<void> {
+
+    return new RestRequest<void>(
+        `${baseUrl}/path5`,
+        "POST",
+        value => undefined,
+        "text",
+        body,
+        timeout,
+        onLoadCallback,
+        onErrorCallback,
+        onTimeoutCallback,
+        onAbortCallback
+    )
+}
+
 /**
  *
  */

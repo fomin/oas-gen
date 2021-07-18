@@ -1,15 +1,23 @@
 package io.github.fomin.oasgen.java.reactor.netty
 
 import io.github.fomin.oasgen.*
+import io.github.fomin.oasgen.generator.BodyType
+import io.github.fomin.oasgen.generator.bodyType
+import io.github.fomin.oasgen.generator.response2xx
 import io.github.fomin.oasgen.java.*
 import io.github.fomin.oasgen.java.dto.jackson.wstatic.*
-import java.util.*
 
 class ReactorNettyClientWriter(
-        private val dtoPackage: String,
-        private val routePackage: String,
-        private val converterIds: List<String>
+    private val dtoPackage: String,
+    private val routePackage: String,
+    private val converterIds: List<String>
 ) : Writer<OpenApiSchema> {
+
+    data class OperationItem(
+        val methodDeclaration: String,
+        val dtoSchemas: List<JsonSchema>
+    )
+
     override fun write(items: Iterable<OpenApiSchema>): List<OutputFile> {
         val outputFiles = mutableListOf<OutputFile>()
 
@@ -21,130 +29,198 @@ class ReactorNettyClientWriter(
             val clientClassName = toJavaClassName(routePackage, openApiSchema, "Client")
             val filePath = getFilePath(clientClassName)
 
-            val importDeclarations = TreeSet<String>()
+            val operationMethods = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
+                pathItem.operations().map { operation ->
+                    val (responseCode, response) = response2xx(operation.responses())
+                    val requestBodyType = bodyType(operation.requestBody()?.content())
+                    val responseBodyType = bodyType(response.content())
 
-            importDeclarations.addAll(listOf(
-                    "import com.fasterxml.jackson.databind.ObjectMapper;",
-                    "import io.github.fomin.oasgen.ByteBufConverter;",
-                    "import io.github.fomin.oasgen.UrlEncoderUtils;",
-                    "import io.netty.buffer.ByteBuf;",
-                    "import javax.annotation.Nonnull;",
-                    "import javax.annotation.Nullable;",
-                    "import reactor.core.publisher.Mono;",
-                    "import reactor.netty.http.client.HttpClient;"
-            ))
-
-            val paths = openApiSchema.paths()
-            val javaOperations = toJavaOperations(converterRegistry, paths)
-
-            val operationMethods = javaOperations.map { javaOperation ->
-                val requestBodyArgDeclaration = javaOperation.requestVariable?.let { requestVariable ->
-                    "@Nonnull Mono<${requestVariable.type}> ${toVariableName(getSimpleName(requestVariable.type))}"
-                }
-                val requestBodyInternalArgDeclaration = javaOperation.requestVariable?.let { requestVariable ->
-                    "Mono<${requestVariable.type}> bodyArg"
-                }
-                val requestBodyArg = javaOperation.requestVariable?.let { requestVariable ->
-                    toVariableName(getSimpleName(requestVariable.type))
-                }
-                val parameterArgDeclarations = javaOperation.parameters.map { javaParameter ->
-                    val annotation = when (javaParameter.schemaParameter.required) {
-                        true -> "@Nonnull"
-                        false -> "@Nullable"
+                    val returnType = when (responseBodyType) {
+                        null -> "Mono<java.lang.Void>"
+                        is BodyType.Json -> {
+                            val valueType = converterRegistry[responseBodyType.jsonSchema].valueType()
+                            "Mono<$valueType>"
+                        }
+                        is BodyType.Binary -> "Flux<ByteBuf>"
                     }
-                    """$annotation ${javaParameter.javaVariable.type} ${javaParameter.javaVariable.name}"""
-                }
-                val parameterInternalArgDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
-                    """${javaParameter.javaVariable.type} param$index"""
-                }
-                val parameterArgs = javaOperation.parameters.map { javaParameter ->
-                    javaParameter.javaVariable.name
-                }
-                val methodArgDeclarations = (parameterArgDeclarations + requestBodyArgDeclaration)
-                        .filterNotNull().joinToString(",\n")
-                val methodInternalArgDeclarations = (parameterInternalArgDeclarations + requestBodyInternalArgDeclaration)
-                        .filterNotNull().joinToString(",\n")
-                val methodArgs = (parameterArgs + requestBodyArg)
-                        .filterNotNull().joinToString(",\n")
-                val responseType = javaOperation.responseVariable.type ?: "java.lang.Void"
 
-                val responseCall = when (val responseSchema = javaOperation.responseVariable.schema) {
-                    null -> ".response().then()"
-                    else ->
-                        """|.responseSingle((httpClientResponse, byteBufMono) ->
-                           |        byteBufConverter.parse(byteBufMono, jsonNode -> ${converterRegistry[responseSchema].parseExpression("jsonNode")})
-                           |)""".trimMargin()
-                }
+                    val methodName = toMethodName(operation.operationId)
 
-                val sendCall = when (val requestSchema = javaOperation.requestVariable?.schema) {
-                    null -> ""
-                    else -> """|.send((httpClientRequest, nettyOutbound) -> {
-                               |    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, (jsonGenerator, value) -> ${converterRegistry[requestSchema].writeExpression("jsonGenerator", "value")});
+                    data class MethodArg(
+                        val publicDeclaration: String,
+                        val privateDeclaration: String,
+                        val publicName: String,
+                    )
+
+                    val requestBodyArg = when (requestBodyType) {
+                        null -> null
+                        is BodyType.Json -> {
+                            val valueType = converterRegistry[requestBodyType.jsonSchema].valueType()
+                            val variableName = toVariableName(getSimpleName(valueType))
+                            MethodArg(
+                                "@Nonnull Mono<$valueType> $variableName",
+                                "Mono<${valueType}> bodyArg",
+                                variableName,
+                            )
+                        }
+                        is BodyType.Binary -> {
+                            MethodArg(
+                                "@Nonnull Flux<ByteBuf> requestBodyFlux",
+                                "@Nonnull Flux<ByteBuf> requestBodyFlux",
+                                "requestBodyFlux",
+                            )
+                        }
+                    }
+                    val parameterArgs = operation.parameters().mapIndexed { index, parameter ->
+                        val annotation = when (parameter.required) {
+                            true -> "@Nonnull"
+                            false -> "@Nullable"
+                        }
+                        val valueType = converterRegistry[parameter.schema()].valueType()
+                        MethodArg(
+                            """$annotation $valueType ${parameter.name}""",
+                            """$valueType param$index""",
+                            parameter.name
+                        )
+                    }
+                    val args = parameterArgs.plus(requestBodyArg).filterNotNull()
+                    val headerParameters = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        if (parameter.parameterIn == ParameterIn.HEADER)
+                            """|if (param${index}Str != null) {
+                               |    headers.set("${parameter.name}", param${index}Str);
+                               |}
+                            """.trimMargin()
+                        else {
+                            null
+                        }
+                    }
+                    val contentTypeHeader = when (requestBodyType) {
+                        null -> null
+                        else -> """headers.set("Content-Type", "${requestBodyType.contentType}");"""
+                    }
+                    val requestHeaders = headerParameters.plus(contentTypeHeader).filterNotNull()
+                    val headersCall = if (requestHeaders.isNotEmpty()) {
+                        """|.headers(headers -> {
+                           |    ${requestHeaders.indentWithMargin(1)}
+                           |})
+                        """.trimMargin()
+                    } else {
+                        ""
+                    }
+                    val queryParameterArgs = operation.parameters().mapIndexedNotNull { index, parameter ->
+                        if (parameter.parameterIn == ParameterIn.QUERY) {
+                            """, "${parameter.name}", param${index}Str"""
+                        } else {
+                            null
+                        }
+                    }.joinToString("")
+                    val parameterStrDeclarations = operation.parameters().mapIndexed { index, parameter ->
+                        val stringWriteExpression =
+                            converterRegistry[parameter.schema()].stringWriteExpression("param$index")
+                        "String param${index}Str = param$index != null ? $stringWriteExpression : null;"
+                    }
+                    val sendCall = when (requestBodyType) {
+                        null -> ""
+                        is BodyType.Json -> {
+                            val writeExpression = converterRegistry[requestBodyType.jsonSchema].writeExpression(
+                                "jsonGenerator",
+                                "value"
+                            )
+                            """|.send((httpClientRequest, nettyOutbound) -> {
+                               |    Mono<ByteBuf> byteBufMono = byteBufConverter.write(nettyOutbound, bodyArg, (jsonGenerator, value) -> $writeExpression);
                                |    return nettyOutbound.send(byteBufMono);
                                |})
-                               |""".trimMargin()
-                }
-
-                val queryParameterArgs = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
-                    if (javaParameter.schemaParameter.parameterIn == ParameterIn.QUERY) {
-                        """, "${javaParameter.name}", param${index}Str"""
-                    } else {
-                        null
+                            """.trimMargin()
+                        }
+                        is BodyType.Binary ->
+                            """|.send((httpClientRequest, nettyOutbound) -> {
+                               |    return nettyOutbound.send(requestBodyFlux);
+                               |})
+                            """.trimMargin()
                     }
-                }.joinToString("")
+                    val responseCall = when (responseBodyType) {
+                        null ->
+                            """|.response()
+                               |.handle((httpClientResponse, sink) -> {
+                               |    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                               |    if (httpResponseStatus.code() == $responseCode) {
+                               |        sink.complete();
+                               |    } else {
+                               |        sink.error(new RuntimeException(httpResponseStatus.toString()));
+                               |    }
+                               |})
+                            """.trimMargin()
+                        is BodyType.Json -> {
+                            val parseExpression = converterRegistry[responseBodyType.jsonSchema].parseExpression(
+                                "jsonNode"
+                            )
+                            """|.responseSingle((httpClientResponse, byteBufMono) -> {
+                               |    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                               |    if (httpResponseStatus.code() == $responseCode) {
+                               |        return byteBufConverter.parse(byteBufMono, jsonNode -> $parseExpression);
+                               |    } else {
+                               |        return Mono.error(new RuntimeException(httpResponseStatus.toString()));
+                               |    }
+                               |})
+                            """.trimMargin()
+                        }
+                        is BodyType.Binary ->
+                            """|.response((httpClientResponse, byteBufFlux) -> {
+                               |    HttpResponseStatus httpResponseStatus = httpClientResponse.status();
+                               |    if (httpResponseStatus.code() == $responseCode) {
+                               |        return byteBufFlux;
+                               |    } else {
+                               |        return Flux.error(new RuntimeException(httpResponseStatus.toString()));
+                               |    }
+                               |})
+                            """.trimMargin()
+                    }
 
-                val parameterStrDeclarations = javaOperation.parameters.mapIndexed { index, javaParameter ->
-                    val stringWriteExpression =
-                            converterRegistry[javaParameter.schemaParameter.schema()].stringWriteExpression("param$index")
-                    "String param${index}Str = param$index != null ? $stringWriteExpression : null;"
-                }
-
-                val headerCallList = javaOperation.parameters.mapIndexedNotNull { index, javaParameter ->
-                    if (javaParameter.schemaParameter.parameterIn == ParameterIn.HEADER)
-                        """|if (param${index}Str != null) {
-                           |    headers.set("${javaParameter.name}", param${index}Str);
+                    val url = pathTemplateToUrl(pathTemplate, operation.parameters())
+                    val content =
+                        """|@Nonnull
+                           |public $returnType $methodName(
+                           |        ${args.joinToString(",\n") { it.publicDeclaration }.indentWithMargin(2)}
+                           |) {
+                           |    return $methodName$0(
+                           |            ${args.joinToString(",\n") { it.publicName }.indentWithMargin(3)}
+                           |    );
                            |}
+                           |
+                           |private $returnType $methodName$0(
+                           |        ${args.joinToString(",\n") { it.privateDeclaration }.indentWithMargin(2)}
+                           |) {
+                           |    ${parameterStrDeclarations.indentWithMargin(1)}
+                           |    return httpClient
+                           |            ${headersCall.indentWithMargin(3)}
+                           |            .${operation.operationType.name.lowercase()}()
+                           |            .uri(UrlEncoderUtils.encodeUrl($url$queryParameterArgs))
+                           |            ${sendCall.indentWithMargin(3)}
+                           |            ${responseCall.indentWithMargin(3)};
+                           |}
+                           |
                         """.trimMargin()
-                    else {
-                        null
-                    }
+                    val dtoSchemas = operation.parameters().map { it.schema() }
+                        .plus(requestBodyType?.jsonSchema())
+                        .plus(responseBodyType?.jsonSchema())
+                        .filterNotNull()
+                    OperationItem(content, dtoSchemas)
                 }
-                val headersCall = if (headerCallList.isNotEmpty()) {
-                    """|.headers(headers -> {
-                       |    ${headerCallList.indentWithMargin(1)}
-                       |})
-                    """.trimMargin()
-                } else {
-                    ""
-                }
-
-                """|@Nonnull
-                   |public Mono<$responseType> ${javaOperation.methodName}(
-                   |        ${methodArgDeclarations.indentWithMargin(2)}
-                   |) {
-                   |    return ${javaOperation.methodName}$0(
-                   |            ${methodArgs.indentWithMargin(3)}
-                   |    );
-                   |}
-                   |
-                   |private Mono<$responseType> ${javaOperation.methodName}$0(
-                   |        ${methodInternalArgDeclarations.indentWithMargin(2)}
-                   |) {
-                   |    ${parameterStrDeclarations.indentWithMargin(1)}
-                   |    return httpClient
-                   |            ${headersCall.indentWithMargin(3)}
-                   |            .${javaOperation.operation.operationType.name.toLowerCase()}()
-                   |            .uri(UrlEncoderUtils.encodeUrl(${pathTemplateToUrl(javaOperation.pathTemplate, javaOperation.parameters)}$queryParameterArgs))
-                   |            ${sendCall.indentWithMargin(3)}
-                   |            ${responseCall.indentWithMargin(3)};
-                   |}
-                   |""".trimMargin()
             }
 
             val content = """
                |package ${getPackage(clientClassName)};
                |
-               |${importDeclarations.indentWithMargin(0)}
+               |import com.fasterxml.jackson.databind.ObjectMapper;
+               |import io.github.fomin.oasgen.ByteBufConverter;
+               |import io.github.fomin.oasgen.UrlEncoderUtils;
+               |import io.netty.buffer.ByteBuf;
+               |import javax.annotation.Nonnull;
+               |import javax.annotation.Nullable;
+               |import io.netty.handler.codec.http.HttpResponseStatus;
+               |import reactor.core.publisher.Flux;
+               |import reactor.core.publisher.Mono;
+               |import reactor.netty.http.client.HttpClient;
                |
                |public class ${getSimpleName(clientClassName)} {
                |    private final ByteBufConverter byteBufConverter;
@@ -155,18 +231,13 @@ class ReactorNettyClientWriter(
                |        this.httpClient = httpClient;
                |    }
                |
-               |    ${operationMethods.indentWithMargin(1)}
+               |    ${operationMethods.map { it.methodDeclaration }.indentWithMargin(1)}
                |
                |}
                |
             """.trimMargin()
 
-            val dtoSchemas = mutableListOf<JsonSchema>()
-            dtoSchemas.addAll(javaOperations.mapNotNull { it.responseVariable.schema })
-            dtoSchemas.addAll(javaOperations.mapNotNull { it.requestVariable?.schema })
-            dtoSchemas.addAll(javaOperations.flatMap { javaOperation ->
-                javaOperation.parameters.map { it.schemaParameter.schema() }
-            })
+            val dtoSchemas = operationMethods.flatMap { it.dtoSchemas }
             val dtoFiles = javaDtoWriter.write(dtoSchemas)
             outputFiles.addAll(dtoFiles)
             outputFiles.add(OutputFile(filePath, content, OutputFileType.ROUTE))
@@ -175,8 +246,8 @@ class ReactorNettyClientWriter(
         return outputFiles
     }
 
-    private fun pathTemplateToUrl(pathTemplate: String, parameters: List<JavaParameter>): String {
-        val parametersMap = parameters.map { it.name to it.index }.toMap()
+    private fun pathTemplateToUrl(pathTemplate: String, parameters: List<Parameter>): String {
+        val parametersMap = parameters.mapIndexed { index, parameter -> parameter.name to index }.toMap()
         val expressionParts = mutableListOf<String>()
         var openBraceIndex = -1
         var closeBraceIndex = -1

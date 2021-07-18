@@ -1,6 +1,9 @@
 package io.github.fomin.oasgen.java.spring.web
 
 import io.github.fomin.oasgen.*
+import io.github.fomin.oasgen.generator.BodyType
+import io.github.fomin.oasgen.generator.bodyType
+import io.github.fomin.oasgen.generator.response2xx
 import io.github.fomin.oasgen.java.*
 import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterMatcherProvider
 import io.github.fomin.oasgen.java.dto.jackson.wstatic.ConverterRegistry
@@ -62,58 +65,57 @@ class JavaSpringMvcServerWriter(
         val matchCases = pathEntries.mapIndexed { index, (_, pathItem) ->
             val operationCases = pathItem.operations().map { operation ->
                 val requestBody = operation.requestBody()
-                val extractBodyBlock = if (requestBody != null) {
-                    val mediaTypeObject = requestBody.content()["application/json"]
-                        ?: error("only application/json request body is supported")
-                    val requestBodySchema = mediaTypeObject.schema()
-                    val converterWriter = converterRegistry[requestBodySchema]
-                    """|${converterWriter.valueType()} requestBodyDto;
-                       |String contentType = request.getContentType();
+                val requestBodyType = bodyType(requestBody?.content())
+                val checkMediaTypeBlock = if (requestBodyType != null) {
+                    """|String contentType = request.getContentType();
                        |MediaType mediaType = MediaType.parseMediaType(contentType);
-                       |if (mediaType.equalsTypeAndSubtype(MediaType.APPLICATION_JSON)) {
-                       |    JsonNode jsonNode = objectMapper.readTree(request.getInputStream());
-                       |    requestBodyDto = ${converterWriter.parseExpression("jsonNode")};
-                       |} else {
+                       |if (!mediaType.equalsTypeAndSubtype(MediaType.parseMediaType("${requestBodyType.contentType}"))) {
                        |    throw new UnsupportedOperationException(contentType);
                        |}
                     """.trimMargin()
                 } else {
                     ""
                 }
-                val response = operation.responses().singleOrNull2xx()?.value
-                val responseSchema = response?.let { responseLocal ->
-                    val content = responseLocal.content()
-                    if (content.isEmpty()) {
-                        null
-                    } else {
-                        val mediaTypeObject = content["application/json"]
-                            ?: error("only application/json response body is supported" + responseLocal.fragment)
-                        mediaTypeObject.schema()
-                    }
-                }
-                val responseVariableDeclaration = if (responseSchema != null) {
-                    """${converterRegistry[responseSchema].valueType()} responseBody = """
-                } else {
-                    ""
-                }
-                val operationArgs = (operation.parameters().mapIndexed { index, _ -> "param$index" }
-                        + requestBody?.let { "requestBodyDto" }).filterNotNull().joinToString(",\n")
-                val writeResponseBodyBlock = if (responseSchema != null) {
-                    """|response.setContentType("application/json");
-                       |JsonGenerator jsonGenerator = objectMapper.createGenerator(response.getOutputStream());
-                       |List<? extends ValidationError> validationErrors = ${
-                        converterRegistry[responseSchema].writeExpression(
-                            "jsonGenerator",
-                            "responseBody"
-                        )
-                    };
-                       |jsonGenerator.close();
-                       |if (!validationErrors.isEmpty()) {
-                       |    throw new ValidationException(validationErrors);
-                       |}
+                val extractBodyBlock = if (requestBodyType is BodyType.Json) {
+                    val converterWriter = converterRegistry[requestBodyType.jsonSchema]
+                    """|JsonNode jsonNode = objectMapper.readTree(request.getInputStream());
+                       |${converterWriter.valueType()} requestBodyDto = ${converterWriter.parseExpression("jsonNode")};
                     """.trimMargin()
                 } else {
                     ""
+                }
+                val (responseCode, response) = response2xx(operation.responses())
+                val responseBodyType = bodyType(response.content())
+
+                val responseVariableDeclaration = if (responseBodyType is BodyType.Json) {
+                    """${converterRegistry[responseBodyType.jsonSchema].valueType()} responseBody = """
+                } else {
+                    ""
+                }
+                val requestBodyArg = when (requestBodyType) {
+                    null -> null
+                    is BodyType.Binary -> "request.getInputStream()"
+                    is BodyType.Json -> "requestBodyDto"
+                }
+                val operationArgs = (operation.parameters().mapIndexed { index, _ -> "param$index" }
+                        + requestBodyArg
+                        + if (responseBodyType is BodyType.Binary) "response.getOutputStream()" else null
+                        ).filterNotNull().joinToString(",\n")
+                val writeResponseBodyBlock = when (responseBodyType) {
+                    is BodyType.Json -> {
+                        val writeExpression = converterRegistry[responseBodyType.jsonSchema].writeExpression(
+                            "jsonGenerator",
+                            "responseBody"
+                        )
+                        """|JsonGenerator jsonGenerator = objectMapper.createGenerator(response.getOutputStream());
+                           |List<? extends ValidationError> validationErrors = $writeExpression;
+                           |jsonGenerator.close();
+                           |if (!validationErrors.isEmpty()) {
+                           |    throw new ValidationException(validationErrors);
+                           |}
+                        """.trimMargin()
+                    }
+                    else -> ""
                 }
                 val urlVariablesDefinition =
                     if (operation.parameters().any { parameter -> parameter.parameterIn == ParameterIn.PATH }) {
@@ -133,15 +135,23 @@ class JavaSpringMvcServerWriter(
                        |${converterWriter.valueType()} param$index = param${index}Str != null ? ${converterWriter.stringParseExpression("param${index}Str")} : null;
                     """.trimMargin()
                 }
+                val effectiveResponseCode = if (responseCode == "2xx") "200" else responseCode
+                val setContentType = when (responseBodyType) {
+                    null -> ""
+                    is BodyType.Json -> """response.setContentType("application/json");"""
+                    is BodyType.Binary -> """response.setContentType("${responseBodyType.contentType}");"""
+                }
                 """|if ("${operation.operationType.name}".equals(request.getMethod())) {
                    |    $urlVariablesDefinition
                    |    ${parameterDefinitions.indentWithMargin(1)}
+                   |    ${checkMediaTypeBlock.indentWithMargin(1)}
                    |    ${extractBodyBlock.indentWithMargin(1)}
+                   |    response.setStatus($effectiveResponseCode);
+                   |    $setContentType
                    |    ${responseVariableDeclaration}operations.${toMethodName(operation.operationId)}(
                    |            ${operationArgs.indentWithMargin(3)}
                    |    );
                    |    ${writeResponseBodyBlock.indentWithMargin(1)}
-                   |    response.setStatus(200);
                    |    return null;
                    |}
                 """.trimMargin()
@@ -233,19 +243,10 @@ class JavaSpringMvcServerWriter(
         val filePath = getFilePath(className)
         val methods = openApiSchema.paths().pathItems().entries.map { (_, pathItem) ->
             pathItem.operations().map { operation ->
-                val response = operation.responses().singleOrNull2xx()?.value
-                val responseSchema = response?.let { responseLocal ->
-                    val content = responseLocal.content()
-                    if (content.isEmpty()) {
-                        null
-                    } else {
-                        val mediaTypeObject = content["application/json"]
-                            ?: error("only application/json response body is supported" + responseLocal.fragment)
-                        mediaTypeObject.schema()
-                    }
-                }
-                val returnType = if (responseSchema != null) {
-                    converterRegistry[responseSchema].valueType()
+                val (_, response) = response2xx(operation.responses())
+                val responseBodyType = bodyType(response.content())
+                val returnType = if (responseBodyType is BodyType.Json) {
+                    converterRegistry[responseBodyType.jsonSchema].valueType()
                 } else {
                     "void"
                 }
@@ -257,18 +258,33 @@ class JavaSpringMvcServerWriter(
                     "$nullAnnotation ${converterRegistry[parameter.schema()].valueType()} ${toVariableName(parameter.name)}"
                 }
                 val requestBody = operation.requestBody()
-                val bodyArg = requestBody?.let { requestBodyLocal ->
-                    val mediaTypeObject = requestBodyLocal.content()["application/json"]
-                        ?: error("only application/json request body is supported")
-                    val schema = mediaTypeObject.schema()
-                    val valueType = converterRegistry[schema].valueType()
-                    """@Nonnull $valueType ${toVariableName(getSimpleName(valueType))}"""
+                val requestBodyType = bodyType(requestBody?.content())
+                val requestBodyArg = when (requestBodyType) {
+                    null -> null
+                    is BodyType.Json -> {
+                        val valueType = converterRegistry[requestBodyType.jsonSchema].valueType()
+                        """@Nonnull $valueType ${toVariableName(getSimpleName(valueType))}"""
+                    }
+                    is BodyType.Binary -> {
+                        """@Nonnull java.io.InputStream inputStream"""
+                    }
                 }
-                val args = (parameterArgs + bodyArg).filterNotNull().joinToString(",\n")
+                val responseBodyArg = if (responseBodyType is BodyType.Binary) {
+                    """@Nonnull java.io.OutputStream outputStream"""
+                } else {
+                    null
+                }
+                val exceptions = if (requestBodyType is BodyType.Binary || responseBodyType is BodyType.Binary) {
+                    " throws java.io.IOException"
+                } else {
+                    ""
+                }
+
+                val args = (parameterArgs + requestBodyArg + responseBodyArg).filterNotNull().joinToString(",\n")
 
                 """|${returnType} ${toMethodName(operation.operationId)}(
                    |        ${args.indentWithMargin(2)}
-                   |);
+                   |)$exceptions;
                    |
                 """.trimMargin()
             }

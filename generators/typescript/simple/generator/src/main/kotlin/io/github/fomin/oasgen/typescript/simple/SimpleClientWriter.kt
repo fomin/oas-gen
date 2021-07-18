@@ -1,6 +1,9 @@
 package io.github.fomin.oasgen.typescript.simple
 
 import io.github.fomin.oasgen.*
+import io.github.fomin.oasgen.generator.BodyType
+import io.github.fomin.oasgen.generator.bodyType
+import io.github.fomin.oasgen.generator.response2xx
 import io.github.fomin.oasgen.java.*
 import io.github.fomin.oasgen.typescript.dto.*
 
@@ -20,18 +23,15 @@ class SimpleClientWriter(
         return items.map { openApiSchema ->
             val clientFunctions = openApiSchema.paths().pathItems().flatMap { (pathTemplate, pathItem) ->
                 pathItem.operations().map { operation ->
-                    val response200 = operation.responses().singleOrNull2xx()?.value
-                    val responseEntry = response200?.let { response ->
-                        val entries = response.content().entries
-                        if (entries.isEmpty()) {
-                            null
-                        } else {
-                             entries.single()
-                        }
+                    val requestBodyType = bodyType(operation.requestBody()?.content())
+                    val (responseCode, response) = response2xx(operation.responses())
+                    val responseBodyType = bodyType(response.content())
+
+                    val returnType = when (responseBodyType) {
+                        null -> "void"
+                        is BodyType.Json -> typeConverterRegistry[responseBodyType.jsonSchema].type()
+                        is BodyType.Binary -> "Blob"
                     }
-                    val responseSchema = responseEntry?.value?.schema()
-                    val returnType = if (responseSchema == null) "void"
-                    else typeConverterRegistry[responseSchema].type()
 
                     val functionName = toLowerCamelCase(operation.operationId)
                     //TODO: Add processing of HEADER
@@ -41,10 +41,11 @@ class SimpleClientWriter(
                         val optionMark = if (parameter.required) "" else "?"
                         "${toLowerCamelCase(parameter.name)}$optionMark: ${typeConverterRegistry[parameter.schema()].type()}"
                     }
-                    val requestEntry = operation.requestBody()?.content()?.entries?.single()
-                    val bodySchema = requestEntry?.value?.schema()
-                    val bodyArguments = if (bodySchema == null) emptyList()
-                    else listOf("body: ${typeConverterRegistry[bodySchema].type()}")
+                    val bodyArgument = when (requestBodyType) {
+                        null -> null
+                        is BodyType.Json -> "body: ${typeConverterRegistry[requestBodyType.jsonSchema].type()}"
+                        is BodyType.Binary -> "body: Blob"
+                    }
                     val parameterStrDefinitions = operation.parameters().mapNotNull { parameter ->
                         if (parameter.parameterIn == ParameterIn.QUERY) {
                             val jsonConverter = typeConverterRegistry[parameter.schema()].jsonConverter
@@ -69,37 +70,43 @@ class SimpleClientWriter(
                         }
                     }.joinToString("&")
                     val url = "${pathTemplateToUrl(pathTemplate)}${if (queryString.isNotEmpty()) "?$queryString" else ""}"
-                    val responseTransformation = if (responseSchema != null) {
-                        val jsonConverter = typeConverterRegistry[responseSchema].jsonConverter
-                        "value => " + (jsonConverter?.fromJson("value") ?: "value")
-                    } else {
-                        "value => undefined"
-                    }
-
-                    val responseType = when {
-                        responseEntry != null -> when (responseEntry.key) {
-                            "application/json" -> """"json""""
-                            else -> """"text""""
+                    val responseTransformation = when (responseBodyType) {
+                        null -> "value => undefined"
+                        is BodyType.Json -> {
+                            val jsonConverter = typeConverterRegistry[responseBodyType.jsonSchema].jsonConverter
+                            "value => " + (jsonConverter?.fromJson("value") ?: "value")
                         }
-                        else -> """"text""""
+                        is BodyType.Binary -> "value => value"
                     }
 
-                    val requestTransformation = if (bodySchema != null) {
-                        val jsonConverter = typeConverterRegistry[bodySchema].jsonConverter
-                        "JSON.stringify(${jsonConverter?.toJson("body") ?: "body"})"
-                    } else {
-                        "undefined"
+                    val responseType = when (responseBodyType) {
+                        null -> """"text""""
+                        is BodyType.Json -> """"json""""
+                        is BodyType.Binary -> """"blob""""
                     }
 
-                    val methodArguments = listOf(
-                            "baseUrl: string"
-                    ) + bodyArguments + parameterArguments + listOf(
-                            "timeout?: number",
-                            "onLoadCallback?: (value: $returnType) => void",
-                            "onErrorCallback?: (reason: any) => void",
-                            "onTimeoutCallback?: () => void",
-                            "onAbortCallback?: () => void"
-                    )
+                    val requestTransformation = when (requestBodyType) {
+                        null -> "undefined"
+                        is BodyType.Json -> {
+                            val jsonConverter = typeConverterRegistry[requestBodyType.jsonSchema].jsonConverter
+                            "JSON.stringify(${jsonConverter?.toJson("body") ?: "body"})"
+                        }
+                        is BodyType.Binary -> "body"
+                    }
+
+                    val methodArguments = listOf("baseUrl: string")
+                        .plus(bodyArgument)
+                        .plus(parameterArguments)
+                        .plus(
+                            listOf(
+                                "timeout?: number",
+                                "onLoadCallback?: (value: $returnType) => void",
+                                "onErrorCallback?: (reason: any) => void",
+                                "onTimeoutCallback?: () => void",
+                                "onAbortCallback?: () => void"
+                            )
+                        )
+                        .filterNotNull()
                     ClientFunction(
                             """|export function $functionName(
                                |    ${methodArguments.joinToString(",\n").indentWithMargin(1)}
@@ -119,7 +126,15 @@ class SimpleClientWriter(
                                |    )
                                |}
                                |""".trimMargin(),
-                            listOfNotNull(bodySchema, responseSchema) + operation.parameters().filter { it.parameterIn != ParameterIn.HEADER }.map { it.schema() }
+                        listOfNotNull(
+                            requestBodyType?.jsonSchema(),
+                            responseBodyType?.jsonSchema(),
+                        ).plus(
+                            operation
+                                .parameters()
+                                .filter { it.parameterIn != ParameterIn.HEADER }
+                                .map { it.schema() }
+                        )
                     )
                 }
             }

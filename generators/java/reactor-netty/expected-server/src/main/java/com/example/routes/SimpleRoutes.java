@@ -7,7 +7,11 @@ import java.util.Map;
 import java.util.function.Consumer;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import io.netty.buffer.ByteBuf;
+import org.reactivestreams.Publisher;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.netty.ByteBufFlux;
 import reactor.netty.http.server.HttpServerRoutes;
 
 public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
@@ -28,18 +32,31 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     @Nonnull
     public abstract Mono<Void> testNullableParameter(@Nullable java.time.LocalDate param1);
 
+    @Nonnull
+    public abstract Flux<ByteBuf> returnOctetStream();
+
+    @Nonnull
+    public abstract Mono<Void> sendOctetStream(@Nonnull ByteBufFlux requestBodyFlux);
+
     @Override
     public final void accept(HttpServerRoutes httpServerRoutes) {
         httpServerRoutes
             .post(baseUrl + "/path1", (request, response) -> {
 
 
-                Mono<com.example.dto.Dto> requestMono = byteBufConverter.parse(request.receive().aggregate(), jsonNode -> com.example.routes.DtoConverter.parse(jsonNode));
-                Mono<java.lang.String> responseMono = simplePost(requestMono);
+                Mono<com.example.dto.Dto> requestPublisher = byteBufConverter.parse(
+                        request.receive().aggregate(),
+                        jsonNode -> com.example.routes.DtoConverter.parse(jsonNode)
+                );
+                Publisher<ByteBuf> responsePublisher = byteBufConverter.write(
+                        response,
+                        simplePost(requestPublisher),
+                        (jsonGenerator, value) -> io.github.fomin.oasgen.StringConverter.write(jsonGenerator, value)
+                );
                 return response
                         .status(200)
                         .header("Content-Type", "application/json")
-                        .send(byteBufConverter.write(response, responseMono, (jsonGenerator, value) -> io.github.fomin.oasgen.StringConverter.write(jsonGenerator, value)));
+                        .send(responsePublisher);
             })
             .get(baseUrl + "/path2/{id}", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
@@ -52,19 +69,46 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 String param3Str = request.requestHeaders().get("param3");
                 java.time.LocalDate param3 = param3Str != null ? java.time.LocalDate.parse(param3Str) : null;
 
-                Mono<com.example.dto.Dto> responseMono = simpleGet(param0, param1, param2, param3);
+                Publisher<ByteBuf> responsePublisher = byteBufConverter.write(
+                        response,
+                        simpleGet(param0, param1, param2, param3),
+                        (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value)
+                );
                 return response
                         .status(200)
                         .header("Content-Type", "application/json")
-                        .send(byteBufConverter.write(response, responseMono, (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value)));
+                        .send(responsePublisher);
             })
             .post(baseUrl + "/path3", (request, response) -> {
                 Map<String, String> queryParams = UrlEncoderUtils.parseQueryParams(request.uri());
                 String param0Str = queryParams.get("param1");
                 java.time.LocalDate param0 = param0Str != null ? java.time.LocalDate.parse(param0Str) : null;
 
-                Mono<Void> responseMono = testNullableParameter(param0);
-                return responseMono.thenEmpty(response.send());
+                Publisher<ByteBuf> responsePublisher = testNullableParameter(param0).cast(ByteBuf.class);
+                return response
+                        .status(200)
+
+                        .send(responsePublisher);
+            })
+            .get(baseUrl + "/path4", (request, response) -> {
+
+
+
+                Publisher<ByteBuf> responsePublisher = returnOctetStream();
+                return response
+                        .status(200)
+                        .header("Content-Type", "application/octet-stream")
+                        .send(responsePublisher);
+            })
+            .post(baseUrl + "/path5", (request, response) -> {
+
+
+                ByteBufFlux requestPublisher = request.receive();
+                Publisher<ByteBuf> responsePublisher = sendOctetStream(requestPublisher).cast(ByteBuf.class);
+                return response
+                        .status(200)
+
+                        .send(responsePublisher);
             })
         ;
     }

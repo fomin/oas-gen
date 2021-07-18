@@ -14,10 +14,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SimpleRoutesTest extends BaseServerTest {
 
@@ -58,6 +61,24 @@ class SimpleRoutesTest extends BaseServerTest {
                 @Override
                 public void testNullableParameter(@Nullable LocalDate param1) {
                     assertNull(param1);
+                }
+
+                @Override
+                public void returnOctetStream(@Nonnull OutputStream outputStream) throws java.io.IOException {
+                    outputStream.write(TEST_BYTES);
+                    outputStream.flush();
+                }
+
+                @Override
+                public void sendOctetStream(@Nonnull InputStream inputStream) throws IOException {
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1000];
+                    int read = inputStream.read(buffer);
+                    while (read > 0) {
+                        byteArrayOutputStream.write(buffer, 0, read);
+                        read = inputStream.read(buffer);
+                    }
+                    assertArrayEquals(TEST_BYTES, byteArrayOutputStream.toByteArray());
                 }
             };
         }

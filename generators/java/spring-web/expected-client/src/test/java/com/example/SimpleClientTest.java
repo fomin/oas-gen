@@ -19,8 +19,11 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.DefaultResponseErrorHandler;
 import reactor.netty.DisposableServer;
 
+import java.io.ByteArrayOutputStream;
 import java.time.LocalDate;
 
+import static io.github.fomin.oasgen.test.ReferenceServer.TEST_BYTES;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SimpleClientTest implements ClientTest {
@@ -84,5 +87,26 @@ class SimpleClientTest implements ClientTest {
     @Test
     public void testNullableParameter() {
         simpleClient.testNullableParameter(null);
+    }
+
+    @Override
+    @Test
+    public void testReturnOctetStream() {
+        simpleClient.returnOctetStream(inputStream -> {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1000];
+            int read = inputStream.read(buffer);
+            while (read > 0) {
+                byteArrayOutputStream.write(buffer, 0, read);
+                read = inputStream.read(buffer);
+            }
+            assertArrayEquals(TEST_BYTES, byteArrayOutputStream.toByteArray());
+        });
+    }
+
+    @Override
+    @Test
+    public void testSendOctetStream() {
+        simpleClient.sendOctetStream(outputStream -> outputStream.write(TEST_BYTES));
     }
 }
