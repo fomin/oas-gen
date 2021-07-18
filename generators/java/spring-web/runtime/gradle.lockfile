@@ -1,10 +1,10 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-com.fasterxml.jackson.core:jackson-annotations:2.12.3=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-com.fasterxml.jackson.core:jackson-core:2.12.3=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-com.fasterxml.jackson.core:jackson-databind:2.12.3=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-com.fasterxml.jackson:jackson-bom:2.12.3=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-annotations:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-core:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-databind:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson:jackson-bom:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.google.code.findbugs:jsr305:3.0.2=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.apache.tomcat.embed:tomcat-embed-core:9.0.44=compileClasspath,compileOnly,testCompileClasspath,testCompileOnly
 org.apache.tomcat:tomcat-annotations-api:9.0.44=compileClasspath,compileOnly,testCompileClasspath,testCompileOnly
@@ -15,12 +15,12 @@ org.junit.platform:junit-platform-commons:1.7.2=testCompileClasspath,testRuntime
 org.junit.platform:junit-platform-engine:1.7.2=testCompileClasspath,testRuntimeClasspath
 org.junit:junit-bom:5.7.2=testCompileClasspath,testRuntimeClasspath
 org.opentest4j:opentest4j:1.2.0=testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-aop:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-beans:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-context:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-core:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-expression:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-jcl:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-web:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-org.springframework:spring-webmvc:5.3.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-aop:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-beans:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-context:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-core:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-expression:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-jcl:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-web:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+org.springframework:spring-webmvc:5.3.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 empty=annotationProcessor,archives,compile,runtime,signatures,testAnnotationProcessor,testCompile,testRuntime
