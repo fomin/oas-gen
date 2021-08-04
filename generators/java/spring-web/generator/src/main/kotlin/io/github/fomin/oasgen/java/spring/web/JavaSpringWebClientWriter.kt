@@ -181,13 +181,16 @@ class JavaSpringWebClientWriter(
 
                     val requestConsumer = when (requestBodyType) {
                         null -> "null"
-                        is BodyType.Json ->
+                        is BodyType.Json -> {
+                            val writeExpression = converterRegistry[requestBodyType.jsonSchema]
+                                .writeExpression("jsonGenerator", "value")
                             """|RequestConsumer.json(
                                |        bodyArg,
-                               |        (jsonGenerator, value) -> com.example.routes.DtoConverter.write(jsonGenerator, value),
+                               |        (jsonGenerator, value) -> $writeExpression,
                                |        springMvcClient.objectMapper
                                |)
                             """.trimMargin()
+                        }
                         is BodyType.Binary ->
                             """new RequestConsumer("${requestBodyType.contentType}", outputStreamIoConsumer)"""
                     }
