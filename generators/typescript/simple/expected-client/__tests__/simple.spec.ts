@@ -34,7 +34,7 @@ let server = http.createServer((req, res) => {
                 expect(content).toEqual(dtoJson)
                 res.end('"postResponseValue"')
             })
-        } else if (req.url == "/path3?param1=" && req.method == 'POST') {
+        } else if (req.url == "/path3" && req.method == 'POST') {
             onContent(req, content => {
                 expect(content).toEqual("")
                 res.end()

@@ -46,30 +46,22 @@ class SimpleClientWriter(
                         is BodyType.Json -> "body: ${typeConverterRegistry[requestBodyType.jsonSchema].type()}"
                         is BodyType.Binary -> "body: Blob"
                     }
-                    val parameterStrDefinitions = operation.parameters().mapNotNull { parameter ->
-                        if (parameter.parameterIn == ParameterIn.QUERY) {
+                    val queryParameters = operation.parameters().filter { it.parameterIn == ParameterIn.QUERY }
+                    val queryParameterDefinition = if (queryParameters.isNotEmpty()) {
+                        val queryParameterItems = queryParameters.joinToString(",\n") { parameter ->
                             val jsonConverter = typeConverterRegistry[parameter.schema()].jsonConverter
                             val toStrExpression = jsonConverter?.toJson(parameter.name) ?: parameter.name
-                            """|let ${parameter.name}Str
-                               |if (${parameter.name}) {
-                               |    ${parameter.name}Str = encodeURIComponent($toStrExpression)
-                               |} else {
-                               |    ${parameter.name}Str = ""
-                               |}
-                            """.trimMargin()
-                        } else {
-                            null
+                            """(${parameter.name}) ? "${parameter.name}=" + encodeURIComponent($toStrExpression) : null"""
                         }
+                        """|let queryParameters = [
+                           |    ${queryParameterItems.indentWithMargin(1)}
+                           |].filter(value => value != null).join("&")
+                        """.trimMargin()
+                    } else {
+                        ""
                     }
-                    val queryString = operation.parameters()
-                            .filter { parameter -> parameter.parameterIn != ParameterIn.HEADER }
-                            .mapNotNull { parameter ->
-                        when (parameter.parameterIn) {
-                            ParameterIn.QUERY -> "${parameter.name}=${'$'}{${parameter.name}Str}"
-                            else -> null
-                        }
-                    }.joinToString("&")
-                    val url = "${pathTemplateToUrl(pathTemplate)}${if (queryString.isNotEmpty()) "?$queryString" else ""}"
+
+                    val url = "${pathTemplateToUrl(pathTemplate)}${if (queryParameters.isNotEmpty()) "?${'$'}{queryParameters}" else ""}"
                     val responseTransformation = when (responseBodyType) {
                         null -> "value => undefined"
                         is BodyType.Json -> {
@@ -111,7 +103,7 @@ class SimpleClientWriter(
                             """|export function $functionName(
                                |    ${methodArguments.joinToString(",\n").indentWithMargin(1)}
                                |): RestRequest<$returnType> {
-                               |    ${parameterStrDefinitions.indentWithMargin(1)}
+                               |    ${queryParameterDefinition.indentWithMargin(1)}
                                |    return new RestRequest<$returnType>(
                                |        `${'$'}{baseUrl}$url`,
                                |        "${operation.operationType.name}",
