@@ -36,20 +36,12 @@ export function simpleGet(
     onTimeoutCallback?: () => void,
     onAbortCallback?: () => void
 ): RestRequest<Dto> {
-    let param1Str
-    if (param1) {
-        param1Str = encodeURIComponent(param1)
-    } else {
-        param1Str = ""
-    }
-    let param2Str
-    if (param2) {
-        param2Str = encodeURIComponent(param2)
-    } else {
-        param2Str = ""
-    }
+    let queryParameters = [
+        (param1) ? "param1=" + encodeURIComponent(param1) : null,
+        (param2) ? "param2=" + encodeURIComponent(param2) : null
+    ].filter(value => value != null).join("&")
     return new RestRequest<Dto>(
-        `${baseUrl}/path2/${id}?param1=${param1Str}&param2=${param2Str}`,
+        `${baseUrl}/path2/${id}?${queryParameters}`,
         "GET",
         value => value,
         "json",
@@ -71,14 +63,11 @@ export function testNullableParameter(
     onTimeoutCallback?: () => void,
     onAbortCallback?: () => void
 ): RestRequest<void> {
-    let param1Str
-    if (param1) {
-        param1Str = encodeURIComponent((param1 as LocalDate).format(DateTimeFormatter.ISO_LOCAL_DATE))
-    } else {
-        param1Str = ""
-    }
+    let queryParameters = [
+        (param1) ? "param1=" + encodeURIComponent((param1 as LocalDate).format(DateTimeFormatter.ISO_LOCAL_DATE)) : null
+    ].filter(value => value != null).join("&")
     return new RestRequest<void>(
-        `${baseUrl}/path3?param1=${param1Str}`,
+        `${baseUrl}/path3?${queryParameters}`,
         "POST",
         value => undefined,
         "text",
