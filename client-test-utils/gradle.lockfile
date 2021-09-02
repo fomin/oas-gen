@@ -1,26 +1,26 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-io.netty:netty-buffer:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec-dns:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec-http2:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec-http:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec-socks:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-codec:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-common:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-handler-proxy:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-handler:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-resolver-dns-native-macos:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-resolver-dns:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-resolver:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-transport-native-epoll:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-transport-native-unix-common:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.netty:netty-transport:4.1.65.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.projectreactor.netty:reactor-netty-core:1.0.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.projectreactor.netty:reactor-netty-http-brave:1.0.9=default,runtimeClasspath,testRuntimeClasspath
-io.projectreactor.netty:reactor-netty-http:1.0.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.projectreactor.netty:reactor-netty:1.0.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-io.projectreactor:reactor-core:3.4.8=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-buffer:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec-dns:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec-http2:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec-http:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec-socks:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-codec:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-common:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-handler-proxy:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-handler:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-resolver-dns-native-macos:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-resolver-dns:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-resolver:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-transport-native-epoll:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-transport-native-unix-common:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.netty:netty-transport:4.1.66.Final=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.projectreactor.netty:reactor-netty-core:1.0.10=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.projectreactor.netty:reactor-netty-http-brave:1.0.10=default,runtimeClasspath,testRuntimeClasspath
+io.projectreactor.netty:reactor-netty-http:1.0.10=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.projectreactor.netty:reactor-netty:1.0.10=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+io.projectreactor:reactor-core:3.4.9=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 io.zipkin.brave:brave-instrumentation-http:5.13.3=default,runtimeClasspath,testRuntimeClasspath
 io.zipkin.brave:brave:5.13.3=default,runtimeClasspath,testRuntimeClasspath
 io.zipkin.reporter2:zipkin-reporter-brave:2.16.3=default,runtimeClasspath,testRuntimeClasspath

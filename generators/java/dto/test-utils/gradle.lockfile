@@ -2,13 +2,13 @@
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
 com.fasterxml.jackson.core:jackson-annotations:2.12.3=implementationDependenciesMetadata,testImplementationDependenciesMetadata
-com.fasterxml.jackson.core:jackson-annotations:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-annotations:2.12.5=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.fasterxml.jackson.core:jackson-core:2.12.3=implementationDependenciesMetadata,testImplementationDependenciesMetadata
-com.fasterxml.jackson.core:jackson-core:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-core:2.12.5=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.fasterxml.jackson.core:jackson-databind:2.12.3=implementationDependenciesMetadata,testImplementationDependenciesMetadata
-com.fasterxml.jackson.core:jackson-databind:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson.core:jackson-databind:2.12.5=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.fasterxml.jackson:jackson-bom:2.12.3=implementationDependenciesMetadata,testImplementationDependenciesMetadata
-com.fasterxml.jackson:jackson-bom:2.12.4=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
+com.fasterxml.jackson:jackson-bom:2.12.5=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 com.google.code.findbugs:jsr305:3.0.2=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
 org.apiguardian:apiguardian-api:1.1.0=compileClasspath,default,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
 org.jetbrains.intellij.deps:trove4j:1.0.20181211=kotlinCompilerClasspath,kotlinKlibCommonizerClasspath
