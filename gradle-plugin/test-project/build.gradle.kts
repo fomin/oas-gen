@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.fomin.oas-gen") version "0.1.7-SNAPSHOT"
+    id("io.github.fomin.oas-gen") version "0.1.13-SNAPSHOT"
     java
 }
 
@@ -8,7 +8,12 @@ repositories {
     mavenCentral()
 }
 
-val oasGenVersion = "0.1.7-SNAPSHOT"
+dependencyLocking {
+    lockAllConfigurations()
+    lockMode.set(LockMode.STRICT)
+}
+
+val oasGenVersion = "0.1.13-SNAPSHOT"
 dependencies {
     oasGen("io.github.fomin.oas-gen", "oas-gen-java-reactor-netty-generator", oasGenVersion)
     implementation("io.github.fomin.oas-gen", "oas-gen-java-reactor-netty-runtime", oasGenVersion)
@@ -25,7 +30,7 @@ oasGen {
     generateFromDependency(
             generatorId = "java-reactor-netty-client",
             dependency = "io.github.fomin.oas-gen:oas-gen-test-schemas:$oasGenVersion",
-            basePath = "simple-schema",
+            basePath = "openapi",
             schemaPath = "simple.yaml",
             namespace = "com.example2",
             javaSources = true

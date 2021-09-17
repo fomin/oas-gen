@@ -167,15 +167,8 @@ open class OasGenTask @Inject constructor(
                         generationSource.baseDir
                     }
                     is DependencyGenerationSource -> {
-                        val configuration = project.configurations.register("oasGen$index") { configuration ->
-                            configuration.isCanBeResolved = true
-                            configuration.isCanBeConsumed = false
-                            configuration.defaultDependencies { dependencySet ->
-                                val dependency = project.dependencies.create(generationSource.dependency)
-                                dependencySet.add(dependency)
-                            }
-                        }
-                        val zipFile = configuration.get().files.single()
+                        val configuration = project.configurations.getByName("oasGen$index")
+                        val zipFile = configuration.files.single()
                         val unzipDir = "${project.buildDir}/oas-gen/unzipped$index"
                         project.copy {
                             it.from(project.zipTree(zipFile))
@@ -255,6 +248,22 @@ class OasGenPlugin : Plugin<Project> {
             if (oasGenExtension.generationSpecs.any { it.javaSources }) {
                 project.tasks.getAt("compileJava").dependsOn(oasGenTask)
             }
+
+            oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
+                when (val generationSource = generationSpec.generationSource) {
+                    is DependencyGenerationSource -> {
+                        project.configurations.register("oasGen$index") { configuration ->
+                            configuration.isCanBeResolved = true
+                            configuration.isCanBeConsumed = false
+                            configuration.defaultDependencies { dependencySet ->
+                                val dependency = project.dependencies.create(generationSource.dependency)
+                                dependencySet.add(dependency)
+                            }
+                        }
+                    }
+                }
+            }
+
         }
     }
 }
