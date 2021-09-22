@@ -22,6 +22,8 @@ fun Iterable<String>.indentWithMargin(indentLevel: Int): String {
     return this.indentWithMargin(indent)
 }
 
+fun String.removeBlankLines(): String = this.lines().filter { it.isNotBlank() }.joinToString("\n")
+
 fun String.trimEndings(): String = this.lines().map { it.trimEnd() }.joinToString("\n")
 
 fun escapeReservedWordsAndChars(replacementChars: List<Pair<String, String>>, reservedWords: Set<String>, vararg parts: String): List<String> {

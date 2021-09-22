@@ -32,8 +32,12 @@ class GenerationSpec(
     val dtoNamespace: String,
     val routeNamespace: String,
     val converterIds: Array<out String>,
-    val javaSources: Boolean
+    val sourceType: SourceType
 )
+
+enum class SourceType {
+    NONE, JAVA, JAVA_TEST, JAVA_TEST_FIXTURE
+}
 
 sealed class GenerationSource
 
@@ -57,9 +61,20 @@ open class OasGenExtension {
             schemaPath: String,
             namespace: String,
             vararg converterIds: String = emptyArray(),
-            javaSources: Boolean = false
+            /**
+             * @java.lang.Deprecated Use sourceType instead
+             */
+            @Suppress("DEPRECATED_JAVA_ANNOTATION")
+            @java.lang.Deprecated
+            javaSources: Boolean = false,
+            sourceType: SourceType = SourceType.NONE
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources))
+        val resultSourceType = if (sourceType == SourceType.NONE && javaSources) {
+            SourceType.JAVA
+        } else {
+            sourceType
+        }
+        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, resultSourceType))
     }
 
     @Suppress("Unused")
@@ -72,9 +87,20 @@ open class OasGenExtension {
         dtoNamespace: String,
         routeNamespace: String,
         vararg converterIds: String = emptyArray(),
-        javaSources: Boolean = false
+        /**
+         * @java.lang.Deprecated Use sourceType instead
+         */
+        @Suppress("DEPRECATED_JAVA_ANNOTATION")
+        @java.lang.Deprecated
+        javaSources: Boolean = false,
+        sourceType: SourceType = SourceType.NONE
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources))
+        val resultSourceType = if (sourceType == SourceType.NONE && javaSources) {
+            SourceType.JAVA
+        } else {
+            sourceType
+        }
+        generationSpecs.add(GenerationSpec(generatorId, DirectoryGenerationSource(baseDir), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, resultSourceType))
     }
 
     @Suppress("Unused")
@@ -86,9 +112,20 @@ open class OasGenExtension {
             schemaPath: String,
             namespace: String,
             vararg converterIds: String = emptyArray(),
-            javaSources: Boolean = false
+            /**
+             * @java.lang.Deprecated Use sourceType instead
+             */
+            @Suppress("DEPRECATED_JAVA_ANNOTATION")
+            @java.lang.Deprecated
+            javaSources: Boolean = false,
+            sourceType: SourceType = SourceType.NONE
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, javaSources))
+        val resultSourceType = if (sourceType == SourceType.NONE && javaSources) {
+            SourceType.JAVA
+        } else {
+            sourceType
+        }
+        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), outputDir, outputDir, schemaPath, namespace, namespace, converterIds, resultSourceType))
     }
 
     @Suppress("Unused")
@@ -102,9 +139,15 @@ open class OasGenExtension {
         dtoNamespace: String,
         routeNamespace: String,
         vararg converterIds: String = emptyArray(),
-        javaSources: Boolean = false
+        javaSources: Boolean = false,
+        sourceType: SourceType = SourceType.NONE
     ) {
-        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, javaSources))
+        val resultSourceType = if (sourceType == SourceType.NONE && javaSources) {
+            SourceType.JAVA
+        } else {
+            sourceType
+        }
+        generationSpecs.add(GenerationSpec(generatorId, DependencyGenerationSource(dependency, basePath), dtoOutputDir, routeOutputDir, schemaPath, dtoNamespace, routeNamespace, converterIds, resultSourceType))
     }
 }
 
@@ -232,21 +275,59 @@ class OasGenPlugin : Plugin<Project> {
 
         project.afterEvaluate {
             oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
-                if (generationSpec.javaSources) {
-                    val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
-                    javaConvention.sourceSets.getAt(SourceSet.MAIN_SOURCE_SET_NAME).java {
-                        if (generationSpec.routeOutputDir != null && generationSpec.dtoOutputDir != generationSpec.routeOutputDir) {
-                            it.srcDirs(effectiveDtoOutputDir(project.buildDir, index, generationSpec),
-                                effectiveRouteOutputDir(project.buildDir, index, generationSpec))
-                        } else {
-                            it.srcDir(effectiveDtoOutputDir(project.buildDir, index, generationSpec))
+                when(generationSpec.sourceType) {
+                    SourceType.JAVA -> {
+                        val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
+                        javaConvention.sourceSets.getAt(SourceSet.MAIN_SOURCE_SET_NAME).java {
+                            if (generationSpec.routeOutputDir != null && generationSpec.dtoOutputDir != generationSpec.routeOutputDir) {
+                                it.srcDirs(
+                                    effectiveDtoOutputDir(project.buildDir, index, generationSpec),
+                                    effectiveRouteOutputDir(project.buildDir, index, generationSpec)
+                                )
+                            } else {
+                                it.srcDir(effectiveDtoOutputDir(project.buildDir, index, generationSpec))
+                            }
+                        }
+                    }
+                    SourceType.JAVA_TEST -> {
+                        val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
+                        javaConvention.sourceSets.getAt(SourceSet.TEST_SOURCE_SET_NAME).java {
+                            if (generationSpec.routeOutputDir != null && generationSpec.dtoOutputDir != generationSpec.routeOutputDir) {
+                                it.srcDirs(
+                                    effectiveDtoOutputDir(project.buildDir, index, generationSpec),
+                                    effectiveRouteOutputDir(project.buildDir, index, generationSpec)
+                                )
+                            } else {
+                                it.srcDir(effectiveDtoOutputDir(project.buildDir, index, generationSpec))
+                            }
+                        }
+                    }
+                    SourceType.JAVA_TEST_FIXTURE -> {
+                        val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
+                        javaConvention.sourceSets.getAt("testFixtures").java {
+                            if (generationSpec.routeOutputDir != null && generationSpec.dtoOutputDir != generationSpec.routeOutputDir) {
+                                it.srcDirs(
+                                    effectiveDtoOutputDir(project.buildDir, index, generationSpec),
+                                    effectiveRouteOutputDir(project.buildDir, index, generationSpec)
+                                )
+                            } else {
+                                it.srcDir(effectiveDtoOutputDir(project.buildDir, index, generationSpec))
+                            }
                         }
                     }
                 }
             }
 
-            if (oasGenExtension.generationSpecs.any { it.javaSources }) {
+            if (oasGenExtension.generationSpecs.any { it.sourceType == SourceType.JAVA }) {
                 project.tasks.getAt("compileJava").dependsOn(oasGenTask)
+            }
+
+            if (oasGenExtension.generationSpecs.any { it.sourceType == SourceType.JAVA_TEST }) {
+                project.tasks.getAt("compileTestJava").dependsOn(oasGenTask)
+            }
+
+            if (oasGenExtension.generationSpecs.any { it.sourceType == SourceType.JAVA_TEST_FIXTURE }) {
+                project.tasks.getAt("compileTestFixturesJava").dependsOn(oasGenTask)
             }
 
             oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
