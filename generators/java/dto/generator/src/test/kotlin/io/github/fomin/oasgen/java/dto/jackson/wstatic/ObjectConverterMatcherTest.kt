@@ -80,4 +80,25 @@ internal class ObjectConverterMatcherTest {
             File("../expected-dto/src/javadoc/java")
         )
     }
+
+    @Test
+    fun recursive() {
+        val objectConverterMatcher = ObjectConverterMatcher(
+            "com.example.recursive.dto",
+            "com.example.recursive.routes"
+        )
+        val converterRegistry = ConverterRegistry(
+            CompositeConverterMatcher(
+                listOf(
+                    objectConverterMatcher
+                )
+            )
+        )
+        jsonSchemaTestCase(
+            JavaDtoWriter(converterRegistry),
+            File("build/test-schemas/dto/recursive"),
+            "dto.yaml",
+            File("../expected-dto/src/recursive/java")
+        )
+    }
 }

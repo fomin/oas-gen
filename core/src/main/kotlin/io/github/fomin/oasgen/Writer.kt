@@ -21,15 +21,12 @@ abstract class TypedFragment {
         other as TypedFragment
 
         if (fragment != other.fragment) return false
-        if (parent != other.parent) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = fragment.hashCode()
-        result = 31 * result + (parent?.hashCode() ?: 0)
-        return result
+        return fragment.hashCode()
     }
 
 }
