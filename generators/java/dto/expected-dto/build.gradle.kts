@@ -16,6 +16,7 @@ sourceSets {
             srcDir("src/enum/java")
             srcDir("src/map/java")
             srcDir("src/builtin/java")
+            srcDir("src/recursive/java")
         }
     }
 }
