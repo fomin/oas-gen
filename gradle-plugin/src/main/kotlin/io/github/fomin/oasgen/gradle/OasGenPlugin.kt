@@ -8,7 +8,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.plugins.BasePlugin
-import org.gradle.api.plugins.JavaPluginConvention
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -233,8 +233,8 @@ class OasGenPlugin : Plugin<Project> {
         project.afterEvaluate {
             oasGenExtension.generationSpecs.forEachIndexed { index, generationSpec ->
                 if (generationSpec.javaSources) {
-                    val javaConvention = project.convention.getPlugin(JavaPluginConvention::class.java)
-                    javaConvention.sourceSets.getAt(SourceSet.MAIN_SOURCE_SET_NAME).java {
+                    val javaPluginExtension = project.extensions.getByType(JavaPluginExtension::class.java)
+                    javaPluginExtension.sourceSets.getAt(SourceSet.MAIN_SOURCE_SET_NAME).java {
                         if (generationSpec.routeOutputDir != null && generationSpec.dtoOutputDir != generationSpec.routeOutputDir) {
                             it.srcDirs(effectiveDtoOutputDir(project.buildDir, index, generationSpec),
                                 effectiveRouteOutputDir(project.buildDir, index, generationSpec))
