@@ -1,5 +1,5 @@
 plugins {
-    id("io.github.fomin.oas-gen") version "0.1.13-SNAPSHOT"
+    id("io.github.fomin.oas-gen") version "0.1.14-SNAPSHOT"
     java
 }
 
@@ -13,7 +13,7 @@ dependencyLocking {
     lockMode.set(LockMode.STRICT)
 }
 
-val oasGenVersion = "0.1.13-SNAPSHOT"
+val oasGenVersion = "0.1.14-SNAPSHOT"
 dependencies {
     oasGen("io.github.fomin.oas-gen", "oas-gen-java-reactor-netty-generator", oasGenVersion)
     implementation("io.github.fomin.oas-gen", "oas-gen-java-reactor-netty-runtime", oasGenVersion)
