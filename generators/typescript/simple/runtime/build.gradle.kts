@@ -1,4 +1,4 @@
-import com.moowork.gradle.node.npm.NpmTask
+import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
     id("com.github.node-gradle.node")
@@ -7,7 +7,7 @@ plugins {
 tasks {
     val build by registering(NpmTask::class) {
         dependsOn(npmInstall)
-        setArgs(listOf("run-script", "build"))
+        args.set(listOf("run-script", "build"))
     }
 
     val clean by registering(Delete::class) {

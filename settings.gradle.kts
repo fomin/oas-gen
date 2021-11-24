@@ -1,12 +1,5 @@
 rootProject.name = "oas-gen"
 
-pluginManagement {
-    plugins {
-        id("com.github.node-gradle.node") version "2.2.4"
-        id("com.gradle.plugin-publish") version "0.12.0"
-    }
-}
-
 enableFeaturePreview("ONE_LOCKFILE_PER_PROJECT")
 
 include(":cli")
