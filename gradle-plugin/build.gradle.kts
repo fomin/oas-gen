@@ -30,3 +30,32 @@ gradlePlugin {
         }
     }
 }
+
+val versionDir = file("${project.buildDir}/generated/sources/version")
+
+val generateVersionFile by tasks.registering {
+    doLast {
+        versionDir.mkdirs()
+        File(versionDir, "Version.kt").writeText(
+            """|package io.github.fomin.oasgen.gradle
+               |
+               |const val oasGenVersion = "$version"
+               |
+            """.trimMargin()
+        )
+    }
+}
+
+kotlin {
+    sourceSets {
+        main {
+            kotlin.srcDir(versionDir)
+        }
+    }
+}
+
+tasks {
+    compileKotlin {
+        dependsOn(generateVersionFile)
+    }
+}

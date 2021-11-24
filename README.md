@@ -17,28 +17,31 @@ java -cp <classpath> io.github.fomin.oasgen.java.MainKt \
 
 ## How to use with gradle
 
+### Configuration example
+
 ```kotlin
+import io.github.fomin.oasgen.gradle.*
+import io.github.fomin.oasgen.gradle.java.*
+
 plugins {
     id("io.github.fomin.oas-gen") version "<PLUGIN_VERSION>"
 }
 
-dependencies {
-    // add generators to configuration "oas-gen"
-    // there is example for reactor-netty generator
-    oasGen("io.github.fomin.oas-gen", "oas-gen-reactor-netty-generator", "0.0.18")
-}
-
 oasGen {
-    generate(
-            generatorId = "java-reactor-netty-client",
-            baseDir = file("../../simple-schema"),
-            schemaPath = "simple.yaml",
-            namespace = "com.example",
-            // create java source-set with generated files
-            javaSources = true
-    )
+    generate("id") {
+        source = DirectorySource(file("src/main/openapi"))
+        schemaPath = "petstore.yaml"
+        generator = javaReactorNettyClient(
+            namespaceConfiguration = SingleNamespace("com.example"),
+            outputConfiguration = SingleOutput(java.sourceSets.main),
+        )
+    }
 }
 ```
+### Predefined generators
+
+- [java](gradle-plugin/src/main/kotlin/io/github/fomin/oasgen/gradle/java/BuiltinJavaGenerators.kt)
+- [typescript](gradle-plugin/src/main/kotlin/io/github/fomin/oasgen/gradle/typescript/BuiltinTypeScriptGenerators.kt)
 
 ## Links and Trademarks
 
