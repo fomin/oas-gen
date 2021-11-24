@@ -45,6 +45,15 @@ data class TypeName(
                         nameParts.add("$")
                     }
                     break
+                } else if (fragmentReference.fragmentPath.size == 2
+                    && fragmentReference.fragmentPath[0] == "definitions") {
+
+                    val componentName = fragmentReference.fragmentPath[1]
+                    nameParts.add(componentName)
+                    if (!componentName[0].isLetter()) {
+                        nameParts.add("$")
+                    }
+                    break
                 }
 
                 val parent = currentFragment.parent ?: break
