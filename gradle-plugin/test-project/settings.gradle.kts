@@ -17,3 +17,6 @@ gradleEnterprise {
         termsOfServiceAgree = "yes"
     }
 }
+
+include("groovy-project")
+include("kotlin-project")
