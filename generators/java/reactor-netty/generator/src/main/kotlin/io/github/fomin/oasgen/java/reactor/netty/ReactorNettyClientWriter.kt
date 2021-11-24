@@ -78,9 +78,9 @@ class ReactorNettyClientWriter(
                         }
                         val valueType = converterRegistry[parameter.schema()].valueType()
                         MethodArg(
-                            """$annotation $valueType ${parameter.name}""",
+                            """$annotation $valueType ${toVariableName(parameter.name)}""",
                             """$valueType param$index""",
-                            parameter.name
+                            toVariableName(parameter.name)
                         )
                     }
                     val args = parameterArgs.plus(requestBodyArg).filterNotNull()
@@ -109,7 +109,7 @@ class ReactorNettyClientWriter(
                     }
                     val queryParameterArgs = operation.parameters().mapIndexedNotNull { index, parameter ->
                         if (parameter.parameterIn == ParameterIn.QUERY) {
-                            """, "${parameter.name}", param${index}Str"""
+                            """, "${toVariableName(parameter.name)}", param${index}Str"""
                         } else {
                             null
                         }

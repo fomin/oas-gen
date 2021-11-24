@@ -46,7 +46,7 @@ paths:
               - value1
               - value2
         - in: header
-          name: param3
+          name: param3-header
           schema:
             type: string
             format: date

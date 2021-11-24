@@ -27,7 +27,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
     public abstract Mono<java.lang.String> simplePost(@Nonnull Mono<com.example.dto.Dto> requestBodyMono);
 
     @Nonnull
-    public abstract Mono<com.example.dto.Dto> simpleGet(@Nonnull java.lang.String id, @Nonnull java.lang.String param1, @Nullable com.example.dto.Param2OfSimpleGet param2, @Nullable java.time.LocalDate param3);
+    public abstract Mono<com.example.dto.Dto> simpleGet(@Nonnull java.lang.String id, @Nonnull java.lang.String param1, @Nullable com.example.dto.Param2OfSimpleGet param2, @Nullable java.time.LocalDate param3Header);
 
     @Nonnull
     public abstract Mono<Void> testNullableParameter(@Nullable java.time.LocalDate param1);
@@ -66,7 +66,7 @@ public abstract class SimpleRoutes implements Consumer<HttpServerRoutes> {
                 java.lang.String param1 = param1Str != null ? param1Str : null;
                 String param2Str = queryParams.get("param2");
                 com.example.dto.Param2OfSimpleGet param2 = param2Str != null ? com.example.routes.Param2OfSimpleGetConverter.parseString(param2Str) : null;
-                String param3Str = request.requestHeaders().get("param3");
+                String param3Str = request.requestHeaders().get("param3-header");
                 java.time.LocalDate param3 = param3Str != null ? java.time.LocalDate.parse(param3Str) : null;
 
                 Publisher<ByteBuf> responsePublisher = byteBufConverter.write(

@@ -45,7 +45,7 @@ public abstract class BaseServerTest {
     @Test
     public void testGet() {
         String body = httpClient
-                .headers(headers -> headers.add("param3", LocalDate.parse("2021-06-01")))
+                .headers(headers -> headers.add("param3-header", LocalDate.parse("2021-06-01")))
                 .get()
                 .uri("/path2/idValue?param1=param1Value&param2=value1")
                 .responseSingle((httpClientResponse, byteBufMono) -> {

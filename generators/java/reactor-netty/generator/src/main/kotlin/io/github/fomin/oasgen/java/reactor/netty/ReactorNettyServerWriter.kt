@@ -50,7 +50,7 @@ class ReactorNettyServerWriter(
                             false -> "@Nullable"
                         }
                         val parameterType = converterRegistry[parameter.schema()].valueType()
-                        "$nullAnnotation $parameterType ${parameter.name}"
+                        "$nullAnnotation $parameterType ${toVariableName(parameter.name)}"
                     }
                     val requestBodyArgDeclaration = when (requestBodyType) {
                         null -> null

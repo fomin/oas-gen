@@ -49,12 +49,12 @@ class SimpleRoutesTest extends BaseServerTest {
                         @Nonnull String id,
                         @Nonnull String param1,
                         @Nullable Param2OfSimpleGet param2,
-                        @Nullable java.time.LocalDate param3
+                        @Nullable java.time.LocalDate param3Header
                 ) {
                     assertEquals("idValue", id);
                     assertEquals("param1Value", param1);
                     assertEquals(Param2OfSimpleGet.VALUE1, param2);
-                    assertEquals(LocalDate.parse("2021-06-01"), param3);
+                    assertEquals(LocalDate.parse("2021-06-01"), param3Header);
                     return REFERENCE_DTO;
                 }
 

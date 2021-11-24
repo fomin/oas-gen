@@ -12,7 +12,7 @@ public interface SimpleOperations {
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
             @Nullable com.example.dto.Param2OfSimpleGet param2,
-            @Nullable java.time.LocalDate param3
+            @Nullable java.time.LocalDate param3Header
     );
 
     void testNullableParameter(
