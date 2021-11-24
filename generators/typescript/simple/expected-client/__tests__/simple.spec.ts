@@ -53,7 +53,7 @@ let server = http.createServer((req, res) => {
             res.statusCode = 404
         }
     }
-).listen(9080, "127.0.0.1");
+).listen(9080, "localhost");
 
 server.timeout = 100;
 
