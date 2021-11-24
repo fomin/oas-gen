@@ -41,7 +41,7 @@ public class SimpleRoutesTest extends BaseServerTest {
 
             @Nonnull
             @Override
-            public Mono<Dto> simpleGet(@Nonnull String id, @Nonnull String param1, @Nullable Param2OfSimpleGet param2, @Nullable java.time.LocalDate param3) {
+            public Mono<Dto> simpleGet(@Nonnull String id, @Nonnull String param1, @Nullable Param2OfSimpleGet param2, @Nullable java.time.LocalDate param3Header) {
                 return Mono.just(new Dto("value1"));
             }
 

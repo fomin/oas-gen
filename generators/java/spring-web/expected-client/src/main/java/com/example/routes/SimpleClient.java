@@ -62,13 +62,13 @@ public class SimpleClient {
             @Nonnull java.lang.String id,
             @Nonnull java.lang.String param1,
             @Nullable com.example.dto.Param2OfSimpleGet param2,
-            @Nullable java.time.LocalDate param3
+            @Nullable java.time.LocalDate param3Header
     ) {
         return simpleGet$0(
                 id,
                 param1,
                 param2,
-                param3
+                param3Header
         );
     }
 
@@ -90,7 +90,7 @@ public class SimpleClient {
                 HttpMethod.GET,
                 headers -> {
                     if (param3 != null) {
-                        headers.set("param3", param3.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE));
+                        headers.set("param3-header", param3.format(java.time.format.DateTimeFormatter.ISO_LOCAL_DATE));
                     }
                 },
                 null,

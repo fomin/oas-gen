@@ -87,7 +87,7 @@ public class SimpleHandlerAdapter implements MatchingHandlerAdapter {
                 java.lang.String param1 = param1Str != null ? param1Str : null;
                 String param2Str = request.getParameter("param2");
                 com.example.dto.Param2OfSimpleGet param2 = param2Str != null ? com.example.routes.Param2OfSimpleGetConverter.parseString(param2Str) : null;
-                String param3Str = request.getHeader("param3");
+                String param3Str = request.getHeader("param3-header");
                 java.time.LocalDate param3 = param3Str != null ? java.time.LocalDate.parse(param3Str) : null;
 
 
