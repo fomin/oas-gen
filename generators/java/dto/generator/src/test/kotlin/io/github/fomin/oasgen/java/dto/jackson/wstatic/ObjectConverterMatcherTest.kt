@@ -101,4 +101,29 @@ internal class ObjectConverterMatcherTest {
             File("../expected-dto/src/recursive/java")
         )
     }
+
+    @Test
+    fun `obfuscated`() {
+        val stringConverterMatcher = StringConverterMatcher()
+        val int32ConverterMatcher = Int32ConverterMatcher()
+        val objectConverterMatcher = ObjectConverterMatcher(
+            "com.example.obfuscated.dto",
+            "com.example.obfuscated.routes"
+        )
+        val converterRegistry = ConverterRegistry(
+            CompositeConverterMatcher(
+                listOf(
+                    stringConverterMatcher,
+                    int32ConverterMatcher,
+                    objectConverterMatcher
+                )
+            )
+        )
+        jsonSchemaTestCase(
+            JavaDtoWriter(converterRegistry),
+            File("build/test-schemas/dto/obfuscated"),
+            "dto.yaml",
+            File("../expected-dto/src/obfuscated/java")
+        )
+    }
 }
