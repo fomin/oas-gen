@@ -1,0 +1,12 @@
+type: object
+properties:
+  property1:
+    type: string
+    x-obfuscated: true
+  property2:
+    type: string
+    x-obfuscated: false
+  property3:
+    type: integer
+    format: int32
+    x-obfuscated: true

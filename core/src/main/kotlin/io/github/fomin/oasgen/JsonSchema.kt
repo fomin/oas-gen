@@ -86,3 +86,15 @@ fun JsonSchema.jointProperties(): Map<String, JsonSchema> = jointPropertiesList(
             }
             acc
         }
+
+fun JsonSchema.obfuscatedProperties(): List<String> {
+    val properties: Map<String, JsonSchema> = properties()
+    var obfuscatedProperties = mutableListOf<String>()
+    for (p in properties.keys) {
+        val props = properties?.get(p)?.fragment?.value as LinkedHashMap<String, *>
+        if (props?.get("x-obfuscated") != null && props?.get("x-obfuscated") as Boolean) {
+            obfuscatedProperties.add(p)
+        }
+    }
+    return obfuscatedProperties
+}

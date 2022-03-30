@@ -95,7 +95,11 @@ class MutableObjectConverterMatcher(val dtoBasePackage: String, val routesBasePa
 
                     val toStringParts = jointProperties.entries.mapIndexed { index, (propertyName, _) ->
                         val variableName = toVariableName(propertyName)
-                        """"${if (index == 0) "" else ", "}$variableName='" + $variableName + '\'' +"""
+                        var variableValue = toVariableName(propertyName)
+                        if (jsonSchema.obfuscatedProperties().contains(propertyName)) {
+                            variableValue = "\"***\""
+                        }
+                        """"${if (index == 0) "" else ", "}$variableName='" + $variableValue + '\'' +"""
                     }
 
 
