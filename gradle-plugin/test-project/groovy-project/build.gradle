@@ -3,7 +3,7 @@ import io.github.fomin.oasgen.gradle.java.*
 import io.github.fomin.oasgen.gradle.typescript.*
 
 plugins {
-    id "io.github.fomin.oas-gen" version "0.1.14-SNAPSHOT"
+    id "io.github.fomin.oas-gen" version "0.2.2-SNAPSHOT"
     id "java"
 }
 

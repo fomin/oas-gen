@@ -40,4 +40,4 @@ org.junit.platform:junit-platform-engine:1.8.2=compileClasspath,default,runtimeC
 org.junit:junit-bom:5.8.2=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.opentest4j:opentest4j:1.2.0=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
 org.reactivestreams:reactive-streams:1.0.3=compileClasspath,default,runtimeClasspath,testCompileClasspath,testRuntimeClasspath
-empty=annotationProcessor,archives,compile,compileOnly,runtime,signatures,testAnnotationProcessor,testCompile,testCompileOnly,testRuntime
+empty=annotationProcessor,archives,signatures,testAnnotationProcessor

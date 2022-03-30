@@ -8,4 +8,4 @@ org.junit.platform:junit-platform-commons:1.8.2=testCompileClasspath,testRuntime
 org.junit.platform:junit-platform-engine:1.8.2=testCompileClasspath,testRuntimeClasspath
 org.junit:junit-bom:5.8.2=testCompileClasspath,testRuntimeClasspath
 org.opentest4j:opentest4j:1.2.0=testCompileClasspath,testRuntimeClasspath
-empty=annotationProcessor,archives,compile,compileClasspath,compileOnly,default,runtime,runtimeClasspath,signatures,testAnnotationProcessor,testCompile,testCompileOnly,testRuntime
+empty=annotationProcessor,archives,compileClasspath,default,runtimeClasspath,signatures,testAnnotationProcessor

@@ -3,9 +3,9 @@ import io.github.fomin.oasgen.gradle.java.*
 import io.github.fomin.oasgen.gradle.typescript.*
 
 plugins {
-    id("io.github.fomin.oas-gen") version "0.1.14-SNAPSHOT"
+    id("io.github.fomin.oas-gen") version "0.2.2-SNAPSHOT"
     java
-    kotlin("jvm") version "1.5.31"
+    kotlin("jvm") version "1.6.10"
 }
 
 repositories {
